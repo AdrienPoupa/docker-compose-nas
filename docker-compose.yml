@@ -1,0 +1,99 @@
+version: "3.9"
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - PGID=${GROUP_ID}
+    volumes:
+      - ./sonarr:/config
+      - /mnt/data:/data
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - PGID=${GROUP_ID}
+    volumes:
+      - ./radarr:/config
+      - /mnt/data:/data
+    ports:
+      - "7878:7878"
+    restart: unless-stopped
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:develop
+    container_name: prowlarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - PGID=${GROUP_ID}
+    volumes:
+      - ./prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:14.3.9
+    container_name: qbittorrent
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - WEBUI_PORT=8080
+    volumes:
+      - ./qbittorrent:/config
+      - /mnt/data/torrents:/data/torrents
+    restart: unless-stopped
+    network_mode: "service:vpn"
+    depends_on:
+      - vpn
+  vpn:
+    image: thrnz/docker-wireguard-pia
+    container_name: vpn
+    volumes:
+      - ./pia:/pia
+      - ./pia-shared:/pia-shared
+    ports:
+      - "6881:6881"
+      - "6881:6881/udp"
+      - "8080:8080"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - LOC=${PIA_LOCATION}
+      - USER=${PIA_USER}
+      - PASS=${PIA_PASS}
+      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
+      - PORT_FORWARDING=1
+      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+  heimdall:
+    image: lscr.io/linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - PGID=${GROUP_ID}
+    volumes:
+      - ./heimdall:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped

@@ -1,0 +1,16 @@
+.env
+.idea
+/heimdall
+!/heimdall/.gitkeep
+/sonarr
+!/sonarr/.gitkeep
+/radarr
+!/radarr/.gitkeep
+/prowlarr
+!/prowlarr/.gitkeep
+/qbittorrent
+!/qbittorrent/.gitkeep
+/pia
+!/pia/.gitkeep
+/pia-shared
+!/pia-shared/.gitkeep
