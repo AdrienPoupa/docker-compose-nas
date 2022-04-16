@@ -6,7 +6,6 @@ services:
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
-      - PGID=${GROUP_ID}
     volumes:
       - ./sonarr:/config
       - /mnt/data:/data
@@ -19,7 +18,6 @@ services:
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
-      - PGID=${GROUP_ID}
     volumes:
       - ./radarr:/config
       - /mnt/data:/data
@@ -31,7 +29,6 @@ services:
     container_name: prowlarr
     environment:
       - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
       - PGID=${GROUP_ID}
     volumes:
       - ./prowlarr:/config
@@ -89,7 +86,6 @@ services:
     container_name: heimdall
     environment:
       - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
       - PGID=${GROUP_ID}
     volumes:
       - ./heimdall:/config
