@@ -8,7 +8,7 @@ services:
       - PGID=${GROUP_ID}
     volumes:
       - ./sonarr:/config
-      - /mnt/data:/data
+      - ${DATA_ROOT}:/data
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
       - PGID=${GROUP_ID}
     volumes:
       - ./radarr:/config
-      - /mnt/data:/data
+      - ${DATA_ROOT}:/data
     ports:
       - "7878:7878"
     restart: unless-stopped
@@ -45,7 +45,7 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - ./qbittorrent:/config
-      - /mnt/data/torrents:/data/torrents
+      - ${DOWNLOAD_ROOT}:/data/torrents
     restart: unless-stopped
     network_mode: "service:vpn"
     depends_on:
