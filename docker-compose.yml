@@ -1,5 +1,21 @@
 version: "3.9"
 services:
+  traefik:
+    image: traefik:v2.6
+    container_name: traefik
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web-secure.address=:443
+      - --entrypoints.web.http.redirections.entryPoint.to=web-secure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
@@ -9,9 +25,12 @@ services:
     volumes:
       - ./sonarr:/config
       - ${DATA_ROOT}:/data
-    ports:
-      - "8989:8989"
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.rule=PathPrefix(`/sonarr`)
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      - traefik.http.routers.sonarr.tls=true
   radarr:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
@@ -21,9 +40,12 @@ services:
     volumes:
       - ./radarr:/config
       - ${DATA_ROOT}:/data
-    ports:
-      - "7878:7878"
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.radarr.rule=PathPrefix(`/radarr`)
+      - traefik.http.routers.radarr.tls=true
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:develop
     container_name: prowlarr
@@ -32,9 +54,12 @@ services:
       - PGID=${GROUP_ID}
     volumes:
       - ./prowlarr:/config
-    ports:
-      - "9696:9696"
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.rule=PathPrefix(`/prowlarr`)
+      - traefik.http.routers.prowlarr.tls=true
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:14.3.9
     container_name: qbittorrent
@@ -50,16 +75,24 @@ services:
     network_mode: "service:vpn"
     depends_on:
       - vpn
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.qbittorrent.rule=PathPrefix(`/qbittorrent`)
+      - traefik.http.routers.qbittorrent.tls=true
+      - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
+      - traefik.http.routers.qbittorrent.middlewares=qbittorrent-strip-slash,qbittorrent-stripprefix
+      # https://github.com/qbittorrent/qBittorrent/issues/5693#issuecomment-552146296
+      - traefik.http.middlewares.qbittorrent-stripprefix.stripPrefix.prefixes=/qbittorrent
+      # https://community.traefik.io/t/middleware-to-add-the-if-needed/1895/19
+      - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.regex=(^.*\/qbittorrent$$)
+      - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.replacement=$$1/
+      - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.permanent=false
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: vpn
     volumes:
       - ./pia:/pia
       - ./pia-shared:/pia-shared
-    ports:
-      - "6881:6881"
-      - "6881:6881/udp"
-      - "8080:8080"
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -89,7 +122,9 @@ services:
       - PGID=${GROUP_ID}
     volumes:
       - ./heimdall:/config
-    ports:
-      - "80:80"
-      - "443:443"
     restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.heimdall.rule=PathPrefix(`/`)
+      - traefik.http.services.heimdall.loadbalancer.server.port=80
+      - traefik.http.routers.heimdall.tls=true

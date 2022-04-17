@@ -23,9 +23,7 @@ but you could use other providers:
 - NordVPN + OpenVPN: [bubuntux/nordvpn](https://hub.docker.com/r/bubuntux/nordvpn/dockerfile)
 - NordVPN + Wireguard (NordLynx): [bubuntux/nordlynx](https://hub.docker.com/r/bubuntux/nordlynx)
 
-For PIA + Wireguard, copy the example `.env` and fill it with your PIA credentials:
-
-`cp .env.example .env`
+For PIA + Wireguard, fill `.env` and fill it with your PIA credentials.
 
 The location of the server it will connect to is set by `LOC=ca`, defaulting to Montreal - Canada.
 
@@ -68,8 +66,8 @@ place in the VPN container, the hostname for qBittorrent is the hostname of the 
 
 The indexers are configured through Prowlarr. They synchronize automatically to Radarr and Sonarr.
 
-Radarr and Sonarr may then be added via Settongs > Apps. The Prowlarr server is `http://prowlarr:9696`, the Radarr server
-is `http://radarr:7878` and Sonarr `http://sonarr:8989`:
+Radarr and Sonarr may then be added via Settongs > Apps. The Prowlarr server is `http://prowlarr:9696/prowlarr`, the Radarr server
+is `http://radarr:7878/radarr` and Sonarr `http://sonarr:8989/sonarr`:
 
 ![](https://cdn.poupa.net/uploads/2022/03/sonarr.png)
 
@@ -95,7 +93,7 @@ The web UI login page can be disabled on for the local network in Settings > Web
 
 ## Heimdall
 
-Applications can be added in Items > Add. The URLs should be the static IP, ie: `http://192.168.0.10:8989/` for Sonarr
+Applications can be added in Items > Add. The URLs should be the static IP, ie: `http://192.168.0.10/` for Sonarr
 for example.
 
 ![](https://cdn.poupa.net/uploads/2022/03/homepage.png)

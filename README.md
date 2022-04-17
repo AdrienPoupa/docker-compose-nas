@@ -15,12 +15,13 @@ The following applications are available:
 - [PIA Wireguard VPN](https://github.com/thrnz/docker-wireguard-pia): Encapsulate qBittorrent traffic in 
 [PIA](https://www.privateinternetaccess.com/) with [Wireguard](https://www.wireguard.com/) with port forwarding.
 - [Heimdall](https://heimdall.site/): Application dashboard
+- [Traefik](https://traefik.io/): Reverse proxy
 
 ## Installation
 
 See [installation instructions](./INSTALL.md).
 
-TLDR: `cp .env.example .env`, edit to your needs then `sudo docker compose up -d`
+TLDR: `cp .env.example .env`, edit to your needs then `sudo docker compose up -d`, then for the first time `./update-config.sh`.
 
 ## Configuration
 
@@ -28,19 +29,20 @@ See [configuration](./CONFIGURATION.md).
 
 ## Containers
 
-| **Application**   | **Image**                                                                          | **Port** | **Notes**                                                         |
-|-------------------|------------------------------------------------------------------------------------|----------|-------------------------------------------------------------------|
-| Sonarr            | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                  | 8989     |                                                                   |
-| Radarr            | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                  | 7878     |                                                                   |
-| Prowlarr          | [linuxserver/prowlarr:develop](https://hub.docker.com/r/linuxserver/prowlarr)      | 9696     | `develop` tag as it is not stable yet                             |
-| PIA Wireguard VPN | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)  |          |                                                                   |
-| qBittorrent       | [linuxserver/qbittorrent:14.3.9](https://hub.docker.com/r/linuxserver/qbittorrent) | 8080     | Uses VPN network<br>Frozen to v4.3.9 due to Libtorrent 2.x issues |
-| Heimdall          | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)              | 80, 443  |                                                                   |
+| **Application**   | **Image**                                                                          | **URL**      | **Notes**                                                         |
+|-------------------|------------------------------------------------------------------------------------|--------------|-------------------------------------------------------------------|
+| Sonarr            | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                  | /sonarr      |                                                                   |
+| Radarr            | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                  | /radarr      |                                                                   |
+| Prowlarr          | [linuxserver/prowlarr:develop](https://hub.docker.com/r/linuxserver/prowlarr)      | /prowlarr    | `develop` tag as it is not stable yet                             |
+| PIA Wireguard VPN | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)  |              |                                                                   |
+| qBittorrent       | [linuxserver/qbittorrent:14.3.9](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent | Uses VPN network<br>Frozen to v4.3.9 due to Libtorrent 2.x issues |
+| Heimdall          | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)              | /            |                                                                   |
+| Traefik           | [traefik](https://hub.docker.com/_/traefik)                                        |              |                                                                   |
 
 
 ## Improvement
 
-There is always room for improvement. I did not need those containers so I did not include them, but maybe you could
+There is always room for improvement. I did not need those containers, so I did not include them, but maybe you could
 benefit from:
 
 - [Bazarr](https://www.bazarr.media/): companion application to Sonarr and Radarr that manages and downloads subtitles
@@ -49,4 +51,7 @@ benefit from:
 for some indexers in Prowlarr
 - [Jackett](https://github.com/Jackett/Jackett): API Support for your favorite torrent trackers, as a Prowlarr replacement
 - [Plex](https://www.plex.tv/): Plex Media Server
+- [Pi-hole](https://pi-hole.net/): DNS that blocks ads
+- Use a domain name and Let's Encrypt certificate to get SSL
+- Expose services with CloudFlare Tunnel
 - you tell me!
