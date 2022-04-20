@@ -9,9 +9,12 @@ then fill the `.env` file with your variables:
 - `USER_ID`: ID of the user to use in Docker containers, defaults to `1000`
 - `GROUP_ID`: ID of the user group to use in Docker containers, defaults to `1000`
 - `TIMEZONE`: for the containers, defaults to `America/New_York`
+- `DATA_ROOT`: host location of the data files, defaults to `/mnt/data`
+- `DOWNLOAD_ROOT`: host download location for qBittorrent, should be a subfolder of `DATA_ROOT`, defaults to `/mnt/data/torrents`
 - `PIA_LOCATION`: servers to use for PIA, defaults to `ca`, ie Montreal, Canada with port forwarding support
 - `PIA_USER`: PIA username
 - `PIA_PASS`: PIA password
+- `PIA_LOCAL_NETWORK`: PIA local network
 
 ## PIA Wireguard VPN
 
