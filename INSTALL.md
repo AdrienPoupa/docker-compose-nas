@@ -61,6 +61,9 @@ copy `/usr/libexec/docker/cli-plugins` rather than `$HOME/.docker/cli-plugins/do
 
 You may then run the applications with `sudo docker compose up -d`
 
+Then, to update the Sonarr/Radarr/Prowlarr base path, please run `./update-config.sh`. 
+This is only needed for the first time, and will update their `config.xml` file to set the correct path.
+
 ## NFS Share
 
 It is now time to share the folders to other local devices using NFS, as it is easy to set up and fast. 
