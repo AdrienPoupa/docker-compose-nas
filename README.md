@@ -16,6 +16,7 @@ The following applications are available:
 [PIA](https://www.privateinternetaccess.com/) with [Wireguard](https://www.wireguard.com/) with port forwarding.
 - [Heimdall](https://heimdall.site/): Application dashboard
 - [Traefik](https://traefik.io/): Reverse proxy
+- [Watchtower](https://containrrr.dev/watchtower/): Automated Docker images update
 
 ## Installation
 
@@ -38,6 +39,7 @@ See [configuration](./CONFIGURATION.md).
 | qBittorrent       | [linuxserver/qbittorrent:14.3.9](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent | Uses VPN network<br>Frozen to v4.3.9 due to Libtorrent 2.x issues |
 | Heimdall          | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)              | /            |                                                                   |
 | Traefik           | [traefik](https://hub.docker.com/_/traefik)                                        |              |                                                                   |
+| Watchtower        | [watchtower](https://hub.docker.com/r/containrrr/watchtower)                       |              |                                                                   |
 
 
 ## Improvement

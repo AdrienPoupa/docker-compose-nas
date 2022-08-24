@@ -128,7 +128,12 @@ services:
       - traefik.http.routers.heimdall.rule=PathPrefix(`/`)
       - traefik.http.services.heimdall.loadbalancer.server.port=80
       - traefik.http.routers.heimdall.tls=true
-      
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 networks:
   default:
     name: docker-compose-nas
