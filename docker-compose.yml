@@ -87,7 +87,7 @@ services:
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.regex=(^.*\/qbittorrent$$)
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.replacement=$$1/
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.permanent=false
-      - com.centurylinklabs.watchtower.depends-on="/vpn"
+      #- com.centurylinklabs.watchtower.depends-on="/vpn"
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: vpn
@@ -115,6 +115,9 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    labels:
+      # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
+      - com.centurylinklabs.watchtower.enable=false
   heimdall:
     image: lscr.io/linuxserver/heimdall
     container_name: heimdall
