@@ -3,6 +3,7 @@ services:
   traefik:
     image: traefik:v2.6
     container_name: traefik
+    restart: always
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -25,7 +26,7 @@ services:
     volumes:
       - ./sonarr:/config
       - ${DATA_ROOT}:/data
-    restart: unless-stopped
+    restart: always
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=PathPrefix(`/sonarr`)
@@ -40,7 +41,7 @@ services:
     volumes:
       - ./radarr:/config
       - ${DATA_ROOT}:/data
-    restart: unless-stopped
+    restart: always
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=PathPrefix(`/radarr`)
@@ -54,7 +55,7 @@ services:
       - PGID=${GROUP_ID}
     volumes:
       - ./prowlarr:/config
-    restart: unless-stopped
+    restart: always
     labels:
       - traefik.enable=true
       - traefik.http.routers.prowlarr.rule=PathPrefix(`/prowlarr`)
@@ -71,7 +72,7 @@ services:
     volumes:
       - ./qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
-    restart: unless-stopped
+    restart: always
     network_mode: "service:vpn"
     depends_on:
       - vpn
@@ -87,7 +88,7 @@ services:
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.regex=(^.*\/qbittorrent$$)
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.replacement=$$1/
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.permanent=false
-      #- com.centurylinklabs.watchtower.depends-on="/vpn"
+      #- com.centurylinklabs.watchtower.depends-on=/vpn
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: vpn
@@ -114,7 +115,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: unless-stopped
+    restart: always
     labels:
       # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
       - com.centurylinklabs.watchtower.enable=false
@@ -126,7 +127,7 @@ services:
       - PGID=${GROUP_ID}
     volumes:
       - ./heimdall:/config
-    restart: unless-stopped
+    restart: always
     labels:
       - traefik.enable=true
       - traefik.http.routers.heimdall.rule=PathPrefix(`/`)
@@ -135,6 +136,7 @@ services:
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
+    restart: always
     environment:
       - WATCHTOWER_CLEANUP=true
     volumes:
