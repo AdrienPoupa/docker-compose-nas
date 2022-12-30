@@ -13,7 +13,7 @@ The following applications are available:
 - [Prowlarr](https://github.com/Prowlarr/Prowlarr): Indexer aggregator for Sonarr and Radarr
 - [qBittorrent](https://www.qbittorrent.org/): Bittorrent client with a complete web UI
 - [PIA Wireguard VPN](https://github.com/thrnz/docker-wireguard-pia): Encapsulate qBittorrent traffic in 
-[PIA](https://www.privateinternetaccess.com/) with [Wireguard](https://www.wireguard.com/) with port forwarding.
+[PIA](https://www.privateinternetaccess.com/) using [Wireguard](https://www.wireguard.com/) with port forwarding.
 - [Heimdall](https://heimdall.site/): Application dashboard
 - [Traefik](https://traefik.io/): Reverse proxy
 - [Watchtower](https://containrrr.dev/watchtower/): Automated Docker images update
