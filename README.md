@@ -30,16 +30,16 @@ See [configuration](./CONFIGURATION.md).
 
 ## Containers
 
-| **Application**   | **Image**                                                                          | **URL**      | **Notes**                                                         |
-|-------------------|------------------------------------------------------------------------------------|--------------|-------------------------------------------------------------------|
-| Sonarr            | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                  | /sonarr      |                                                                   |
-| Radarr            | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                  | /radarr      |                                                                   |
-| Prowlarr          | [linuxserver/prowlarr:develop](https://hub.docker.com/r/linuxserver/prowlarr)      | /prowlarr    | `develop` tag as it is not stable yet                             |
-| PIA Wireguard VPN | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)  |              |                                                                   |
-| qBittorrent       | [linuxserver/qbittorrent:14.3.9](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent | Uses VPN network<br>Frozen to v4.3.9 due to Libtorrent 2.x issues |
-| Heimdall          | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)              | /            |                                                                   |
-| Traefik           | [traefik](https://hub.docker.com/_/traefik)                                        |              |                                                                   |
-| Watchtower        | [watchtower](https://hub.docker.com/r/containrrr/watchtower)                       |              |                                                                   |
+| **Application**   | **Image**                                                                                      | **URL**      | **Notes**                                 |
+|-------------------|------------------------------------------------------------------------------------------------|--------------|-------------------------------------------|
+| Sonarr            | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                              | /sonarr      |                                           |
+| Radarr            | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                              | /radarr      |                                           |
+| Prowlarr          | [linuxserver/prowlarr:develop](https://hub.docker.com/r/linuxserver/prowlarr)                  | /prowlarr    | `develop` tag as it is not stable yet     |
+| PIA Wireguard VPN | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)              |              |                                           |
+| qBittorrent       | [linuxserver/qbittorrent:4.5.0-libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent | Uses VPN network<br>Using Libtorrent 1.x  |
+| Heimdall          | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)                          | /            |                                           |
+| Traefik           | [traefik](https://hub.docker.com/_/traefik)                                                    |              |                                           |
+| Watchtower        | [watchtower](https://hub.docker.com/r/containrrr/watchtower)                                   |              |                                           |
 
 
 ## Improvement
