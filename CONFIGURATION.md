@@ -69,7 +69,7 @@ place in the VPN container, the hostname for qBittorrent is the hostname of the 
 
 The indexers are configured through Prowlarr. They synchronize automatically to Radarr and Sonarr.
 
-Radarr and Sonarr may then be added via Settongs > Apps. The Prowlarr server is `http://prowlarr:9696/prowlarr`, the Radarr server
+Radarr and Sonarr may then be added via Settings > Apps. The Prowlarr server is `http://prowlarr:9696/prowlarr`, the Radarr server
 is `http://radarr:7878/radarr` and Sonarr `http://sonarr:8989/sonarr`:
 
 ![](https://cdn.poupa.net/uploads/2022/03/sonarr.png)
@@ -100,3 +100,60 @@ Applications can be added in Items > Add. The URLs should be the static IP, ie: 
 for example.
 
 ![](https://cdn.poupa.net/uploads/2022/03/homepage.png)
+
+## Traefik and SSL Certificates
+
+While you can use the private IP to access your NAS, how cool would it be for it to be accessible through a subdomain
+with a valid SSL certificate?
+
+Traefik makes this trivial by using Let's Encrypt and one of its 
+[supported ACME challenge providers](https://doc.traefik.io/traefik/https/acme/).
+
+Let's assume we are using `nas.domain.com` as custom subdomain.
+
+The idea is to create an A record pointing to the private IP of the NAS, `192.168.0.10` for example:
+```
+nas.domain.com.	1	IN	A	192.168.0.10
+```
+
+The record will be publicly exposed but not resolve given this is a private IP.
+
+Given the NAS is not accessible from the internet, we need to do a dnsChallenge. 
+Here we will be using CloudFlare, but the mechanism will be the same for all DNS providers 
+baring environment variable changes, see the Traefik documentation above and [Lego's documentation](https://go-acme.github.io/lego/dns/).
+
+Then, we need to fill the `.env` entries:
+
+- `HOSTNAME`: the subdomain used, `nas.domain.com` for example
+- `LETS_ENCRYPT_EMAIL`: e-mail address used to send expiration notifications
+- `CLOUDFLARE_EMAIL`: Account email
+- `CLOUDFLARE_DNS_API_TOKEN`: API token with DNS:Edit permission
+- `CLOUDFLARE_ZONE_API_TOKEN`: API token with Zone:Read permission
+
+If you want to test your configuration first, use the Let's Encrypt staging server by uncommenting this:
+```
+#- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+```
+
+If it worked, you will see the staging certificate at https://nas.domain.com. 
+You may remove the `./letsencrypt/acme.json` file and restart the services to issue the real certificate.
+
+### Accessing from the outside
+
+If we want to make it reachable from outside the network without opening ports or exposing it to the internet, I found
+[Tailscale](https://tailscale.com/) to be a great solution: create a network, run the client on both the NAS and the device
+you are connecting from, and they will see each other. 
+
+In this case, the A record should point to the IP Tailscale assigned to the NAS, eg `100.xxx.xxx.xxx`:
+```
+nas.domain.com.	1	IN	A	100.xxx.xxx.xxx
+```
+
+See [here](https://tailscale.com/kb/installation/) for installation instructions.
+
+However, this means you will always need to be connected to Tailscale to access your NAS, even locally. 
+This can be remedied by overriding the DNS entry for the NAS domain like `192.168.0.10 nas.domain.com` 
+in your local DNS resolver such as Pi-Hole.
+
+This way, when connected to the local network, the NAS is accessible directly from the private IP, 
+and from the outside you need to connect to Tailscale first, then the NAS domain will be accessible.

@@ -3,6 +3,7 @@
 After searching for the perfect NAS solution, I realized what I wanted could be achieved 
 with some Docker containers on a vanilla Linux box. The result is an opinionated Docker Compose configuration capable of 
 browsing indexers to retrieve media resources and downloading them through a Wireguard VPN with port forwarding.
+SSL certificates and remote access through Tailscale are supported.
 
 ## Applications
 
@@ -54,6 +55,5 @@ for some indexers in Prowlarr
 - [Jackett](https://github.com/Jackett/Jackett): API Support for your favorite torrent trackers, as a Prowlarr replacement
 - [Plex](https://www.plex.tv/): Plex Media Server
 - [Pi-hole](https://pi-hole.net/): DNS that blocks ads
-- Use a domain name and Let's Encrypt certificate to get SSL
-- Expose services with CloudFlare Tunnel
+- Expose services with CloudFlare Tunnel if Tailscale is not enough
 - you tell me!

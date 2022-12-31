@@ -4,6 +4,11 @@ services:
     image: traefik:v2.9
     container_name: traefik
     restart: always
+    environment:
+      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+      - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
+      - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -12,10 +17,17 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.to=web-secure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --certificatesresolvers.myresolver.acme.dnschallenge=true
+      - --certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare
+      # Uncomment to test your configuration by using Let's Encrypt staging certificates
+     #- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      - ./letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
   sonarr:
     image: lscr.io/linuxserver/sonarr
@@ -29,9 +41,10 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.sonarr.rule=PathPrefix(`/sonarr`)
-      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      - traefik.http.routers.sonarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sonarr`) || PathPrefix(`/sonarr`))
       - traefik.http.routers.sonarr.tls=true
+      - traefik.http.routers.sonarr.tls.certresolver=myresolver
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
   radarr:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
@@ -44,8 +57,9 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.radarr.rule=PathPrefix(`/radarr`)
+      - traefik.http.routers.radarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/radarr`) || PathPrefix(`/radarr`))
       - traefik.http.routers.radarr.tls=true
+      - traefik.http.routers.radarr.tls.certresolver=myresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:develop
@@ -58,8 +72,9 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prowlarr.rule=PathPrefix(`/prowlarr`)
+      - traefik.http.routers.prowlarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/prowlarr`) || PathPrefix(`/prowlarr`))
       - traefik.http.routers.prowlarr.tls=true
+      - traefik.http.routers.prowlarr.tls.certresolver=myresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:4.5.0-libtorrentv1
@@ -78,8 +93,9 @@ services:
       - vpn
     labels:
       - traefik.enable=true
-      - traefik.http.routers.qbittorrent.rule=PathPrefix(`/qbittorrent`)
+      - traefik.http.routers.qbittorrent.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/qbittorrent`) || PathPrefix(`/qbittorrent`))
       - traefik.http.routers.qbittorrent.tls=true
+      - traefik.http.routers.qbittorrent.tls.certresolver=myresolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
       - traefik.http.routers.qbittorrent.middlewares=qbittorrent-strip-slash,qbittorrent-stripprefix
       # https://github.com/qbittorrent/qBittorrent/issues/5693#issuecomment-552146296
@@ -130,9 +146,10 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.heimdall.rule=PathPrefix(`/`)
-      - traefik.http.services.heimdall.loadbalancer.server.port=80
+      - traefik.http.routers.heimdall.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`) || PathPrefix(`/`))
       - traefik.http.routers.heimdall.tls=true
+      - traefik.http.routers.heimdall.tls.certresolver=myresolver
+      - traefik.http.services.heimdall.loadbalancer.server.port=80
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
