@@ -15,6 +15,7 @@ The following applications are available:
 - [qBittorrent](https://www.qbittorrent.org/): Bittorrent client with a complete web UI
 - [PIA Wireguard VPN](https://github.com/thrnz/docker-wireguard-pia): Encapsulate qBittorrent traffic in 
 [PIA](https://www.privateinternetaccess.com/) using [Wireguard](https://www.wireguard.com/) with port forwarding.
+- [Jellyfin](https://jellyfin.org/): Media server designed to organize, manage, and share digital media files to networked devices
 - [Heimdall](https://heimdall.site/): Application dashboard
 - [Traefik](https://traefik.io/): Reverse proxy
 - [Watchtower](https://containrrr.dev/watchtower/): Automated Docker images update
@@ -38,6 +39,7 @@ See [configuration](./CONFIGURATION.md).
 | Prowlarr          | [linuxserver/prowlarr:develop](https://hub.docker.com/r/linuxserver/prowlarr)                  | /prowlarr    | `develop` tag as it is not stable yet     |
 | PIA Wireguard VPN | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)              |              |                                           |
 | qBittorrent       | [linuxserver/qbittorrent:4.5.0-libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent | Uses VPN network<br>Using Libtorrent 1.x  |
+| Jellyfin          | [linuxserver/jellyfin](https://hub.docker.com/r/linuxserver/jellyfin)                          | /jellyfin    |                                           |
 | Heimdall          | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)                          | /            |                                           |
 | Traefik           | [traefik](https://hub.docker.com/_/traefik)                                                    |              |                                           |
 | Watchtower        | [watchtower](https://hub.docker.com/r/containrrr/watchtower)                                   |              |                                           |
@@ -53,7 +55,6 @@ benefit from:
 - [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr): Proxy server to bypass Cloudflare protection, useful
 for some indexers in Prowlarr
 - [Jackett](https://github.com/Jackett/Jackett): API Support for your favorite torrent trackers, as a Prowlarr replacement
-- [Plex](https://www.plex.tv/): Plex Media Server
 - [Pi-hole](https://pi-hole.net/): DNS that blocks ads
 - Expose services with CloudFlare Tunnel if Tailscale is not enough
 - you tell me!

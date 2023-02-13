@@ -16,3 +16,5 @@
 !/pia-shared/.gitkeep
 /letsencrypt
 !/letsencrypt/.gitkeep
+/jellyfin
+!/jellyfin/.gitkeep
