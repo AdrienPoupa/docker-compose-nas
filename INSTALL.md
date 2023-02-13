@@ -3,8 +3,9 @@
 ## Requirements
 
 Any Docker-capable recent Linux box. 
-I am using a fresh Ubuntu Server 20.04 on a repurposed laptop so this guide reflects it, 
-but it would  probably work with other distributions and different versions with a few tweaks.
+I am using a fresh Ubuntu Server 22.04 on a repurposed laptop so this guide reflects it, 
+but it would probably work with other distributions and different versions with a few tweaks.
+I also tested this setup on a Synology DS220+ with DSM 7.0.
 
 ## Pre-Docker Steps
 
@@ -14,7 +15,7 @@ If not done during installation, install OpenSSH server for remote connection: `
 
 ### Static IP
 
-Set a static IP:
+Set a static IP, assuming `192.168.0.10` and using Google DNS servers:
 
 `sudo nano /etc//netplan/00-installer-config.yaml`
 
@@ -32,7 +33,7 @@ network:
   version: 2
 ```
 
-Here, `192.168.0.10` is going to be the static IP, and we will use Google's DNS servers. Apply the plan:
+Apply the plan:
 
 `sudo netplan apply`
 
@@ -61,12 +62,16 @@ copy `/usr/libexec/docker/cli-plugins` rather than `$HOME/.docker/cli-plugins/do
 
 You may then run the applications with `sudo docker compose up -d`
 
-Then, to update the Sonarr/Radarr/Prowlarr base path, please run `./update-config.sh`. 
-This is only needed for the first time, and will update their `config.xml` file to set the correct path.
+Then, to update the Sonarr/Radarr/Prowlarr/Jellyfin base paths, please run `./update-config.sh`. 
+This is only needed for the first time as it will update the application's configuration files to use the proper URL.
 
-## NFS Share
+## NFS Share (Optional)
 
-It is now time to share the folders to other local devices using NFS, as it is easy to set up and fast. 
+It is now time to share the folders to other local devices using NFS, as it is easy to set up and fast.
+
+This can be useful to share the media folder to a local player like Kodi or computers in the local network,
+but may not be necessary if Jellyfin is going to be used to access the media.
+
 Install the NFS kernel server:
 
 `sudo apt-get install nfs-kernel-server`

@@ -23,5 +23,12 @@ do
 done
 sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/prowlarr<\/UrlBase>/" ./prowlarr/config.xml && rm ./prowlarr/config.xml.bak
 
+echo "Updating Jellyfin configuration..."
+until [ -f ./jellyfin/network.xml ]
+do
+  sleep 5
+done
+sed -i.bak "s/<BaseUrl \/>/<BaseUrl>\/jellyfin<\/BaseUrl>/" ./jellyfin/network.xml && rm ./jellyfin/network.xml.bak
+
 echo "Restarting containers..."
-docker compose restart radarr sonarr prowlarr
+docker compose restart radarr sonarr prowlarr jellyfin

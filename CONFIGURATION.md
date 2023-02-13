@@ -94,6 +94,20 @@ The web UI login page can be disabled on for the local network in Settings > Web
 172.17.0.0/16
 ```
 
+## Jellyfin
+
+To enable [hardware transcoding](https://jellyfin.org/docs/general/administration/hardware-acceleration/), 
+depending on your system, you may need to update the following block:
+
+```    
+devices:
+  - /dev/dri/renderD128:/dev/dri/renderD128
+  - /dev/dri/card0:/dev/dri/card0
+```
+
+Generally, running Docker on Linux you will want to use VA-API, but the exact mount paths may differ depending on your
+hardware.
+
 ## Heimdall
 
 Applications can be added in Items > Add. The URLs should be the static IP, ie: `http://192.168.0.10/` for Sonarr

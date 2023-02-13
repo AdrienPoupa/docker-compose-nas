@@ -135,6 +135,31 @@ services:
     labels:
       # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
       - com.centurylinklabs.watchtower.enable=false
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin
+    container_name: jellyfin
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - JELLYFIN_PublishedServerUrl=${HOSTNAME}/jellyfin
+    volumes:
+      - ./jellyfin:/config
+      - ${DATA_ROOT}:/data
+    ports:
+      - "7359:7359/udp"
+      - "1900:1900/udp"
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`) || PathPrefix(`/jellyfin`))
+      - traefik.http.routers.jellyfin.tls=true
+      - traefik.http.routers.jellyfin.tls.certresolver=myresolver
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+      - traefik.http.services.jellyfin.loadbalancer.passhostheader=true
   heimdall:
     image: lscr.io/linuxserver/heimdall
     container_name: heimdall
