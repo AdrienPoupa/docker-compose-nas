@@ -18,3 +18,9 @@
 !/letsencrypt/.gitkeep
 /jellyfin
 !/jellyfin/.gitkeep
+/adguardhome/certs
+!/adguardhome/certs/.gitkeep
+/adguardhome/conf
+!/adguardhome/conf/.gitkeep
+/adguardhome/work
+!/adguardhome/work/.gitkeep
