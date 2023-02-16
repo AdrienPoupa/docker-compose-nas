@@ -77,7 +77,7 @@ services:
       - traefik.http.routers.prowlarr.tls.certresolver=myresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:4.5.0-libtorrentv1
+    image: lscr.io/linuxserver/qbittorrent:libtorrentv1
     container_name: qbittorrent
     environment:
       - PUID=${USER_ID}
