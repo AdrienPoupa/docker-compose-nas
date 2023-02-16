@@ -1,5 +1,6 @@
 .env
 .idea
+docker-compose.override.yml
 /heimdall
 !/heimdall/.gitkeep
 /sonarr
