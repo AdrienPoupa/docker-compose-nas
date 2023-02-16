@@ -40,8 +40,6 @@ services:
   traefik-certs-dumper:
     image: ldez/traefik-certs-dumper
     container_name: traefik-certs-dumper
-    networks:
-      docker-compose-nas:
     restart: always
     entrypoint: sh -c '
       apk add jq
@@ -56,7 +54,6 @@ services:
       - ./adguardhome/certs:/certs
 
 networks:
-  docker-compose-nas:
   adguardhome:
     driver: bridge
     driver_opts:
