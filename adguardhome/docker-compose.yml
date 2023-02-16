@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  dhcp-relay:
+    image: modem7/dhcprelay:latest
+    container_name: dhcp-relay
+    restart: always
+    command: ["-id", "enp2s0", "-iu", "br_adguard", "10.0.0.10"]
+    cap_add:
+      - NET_ADMIN
+    network_mode: host
+    mem_reservation: 6m
+
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    restart: always
+    networks:
+      adguardhome:
+        ipv4_address: 10.0.0.10
+      docker-compose-nas:
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "68:68/tcp"
+      - "68:68/udp"
+      - "853:853/tcp"
+    volumes:
+      - ./adguardhome/work:/opt/adguardhome/work
+      - ./adguardhome/conf:/opt/adguardhome/conf
+      - ./adguardhome/certs:/opt/adguardhome/certs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=docker-compose-nas"
+      - "traefik.http.services.adguardhome.loadbalancer.server.port=3000"
+      - "traefik.http.routers.adguardhome.rule=(Host(`${ADGUARD_HOSTNAME}`))"
+      - "traefik.http.routers.adguardhome.tls=true"
+      - "traefik.http.routers.adguardhome.tls.certresolver=myresolver"
+
+  traefik-certs-dumper:
+    image: ldez/traefik-certs-dumper
+    container_name: traefik-certs-dumper
+    networks:
+      docker-compose-nas:
+    restart: always
+    entrypoint: sh -c '
+      apk add jq
+      ; while ! [ -e /data/acme.json ]
+      || ! [ `jq ".[] | .Certificates | length" /data/acme.json` != 0 ]; do
+      sleep 1
+      ; done
+      && traefik-certs-dumper file --version v2 --watch
+      --source /data/acme.json --dest /certs'
+    volumes:
+      - ./letsencrypt:/data
+      - ./adguardhome/certs:/certs
+
+networks:
+  docker-compose-nas:
+    external: true
+  adguardhome:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: br_adguard
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
