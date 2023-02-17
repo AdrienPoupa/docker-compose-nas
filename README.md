@@ -243,7 +243,7 @@ from the ACME certificates Traefik generates in JSON.
 #### DHCP
 
 If you want to use the AdGuard Home DHCP server, for example because your router does not allow changing its DNS server,
-you will need to select the `eth0` DHCP interface (or at least NOT the one that is `10.0.0.10`), then specify the 
+you will need to select the `eth0` DHCP interface matching `10.0.0.10`, then specify the 
 Gateway IP to match your router address (`192.168.0.1` for example) and set a range of IP addresses assigned to local
 devices.
 
