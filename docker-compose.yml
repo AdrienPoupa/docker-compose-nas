@@ -62,7 +62,7 @@ services:
       - traefik.http.routers.radarr.tls.certresolver=myresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:develop
+    image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     environment:
       - PUID=${USER_ID}
