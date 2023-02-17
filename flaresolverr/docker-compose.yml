@@ -5,8 +5,6 @@ services:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: always
-    networks:
-      docker-compose-nas:
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
@@ -17,7 +15,3 @@ services:
       - traefik.http.routers.flaresolverr.rule=PathPrefix(`/flaresolverr`)
       - traefik.http.routers.flaresolverr.tls=true
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
-
-networks:
-  docker-compose-nas:
-    external: true

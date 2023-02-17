@@ -5,6 +5,8 @@ services:
     image: modem7/dhcprelay:latest
     container_name: dhcp-relay
     restart: always
+    depends_on:
+      - adguardhome
     command: ["-id", "enp2s0", "-iu", "br_adguard", "10.0.0.10"]
     cap_add:
       - NET_ADMIN
@@ -18,10 +20,11 @@ services:
     networks:
       adguardhome:
         ipv4_address: 10.0.0.10
-      docker-compose-nas:
+      default:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
+      - "67:67/tcp"
       - "68:68/tcp"
       - "68:68/udp"
       - "853:853/tcp"
