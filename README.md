@@ -247,6 +247,9 @@ you will need to select the `eth0` DHCP interface matching `10.0.0.10`, then spe
 Gateway IP to match your router address (`192.168.0.1` for example) and set a range of IP addresses assigned to local
 devices.
 
+In `adguardhome/docker-compose.yml`, set the network interface `dhcp-relay` should listen to. By default, it is set to
+`enp2s0`, but you may need to change it to your host's network interface, verify it with `ip a`.
+
 In the configuration (`adguardhome/conf/AdGuardHome.yaml`), set the DHCP options 6th key to your NAS internal IP address:
 ```yml
 dhcp:
