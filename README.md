@@ -331,6 +331,7 @@ If you are using the Synology DHCP Server package, it will use port 53 even if i
 it uses Dnsmasq to handle DHCP requests, but does not serve DNS queries. The port can be released by editing (as root) 
 `/usr/local/lib/systemd/system/pkg-dhcpserver.service` and [adding -p 0](https://www.reddit.com/r/synology/comments/njwdao/comment/j2d23qr/?utm_source=reddit&utm_medium=web2x&context=3):
 `ExecStart=/var/packages/DhcpServer/target/dnsmasq-2.x/usr/bin/dnsmasq --user=DhcpServer --group=DhcpServer --cache-size=200 --conf-file=/etc/dhcpd/dhcpd.conf --dhcp-lease-max=2147483648 -p 0`
+Reboot the NAS and the port 53 will be free for Adguard.
 
 ## NFS Share
 
