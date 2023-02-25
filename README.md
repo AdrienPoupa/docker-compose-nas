@@ -6,7 +6,7 @@ browsing indexers to retrieve media resources and downloading them through a Wir
 SSL certificates and remote access through Tailscale are supported.
 
 Requirements: Any Docker-capable recent Linux box with Docker Engine and Docker Compose V2.
-I am running it in Ubuntu Server 22.04; I also tested this setup on a Synology DS220+ with DSM 7.0.
+I am running it in Ubuntu Server 22.04; I also tested this setup on a Synology DS220+ with DSM 7.1.
 
 ## Table of Content
 
@@ -32,6 +32,11 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a Synology D
       * [DHCP](#dhcp)
       * [Expose DNS Server with Tailscale](#expose-dns-server-with-tailscale)
   * [Customization](#customization)
+  * [Synology Quirks](#synology-quirks)
+    * [Free Ports 80 and 443](#free-ports-80-and-443)
+    * [Install Synology Wireguard](#install-synology-wireguard)
+    * [Free Port 1900](#free-port-1900)
+    * [Synology DHCP Server and Adguard Home Port Conflict](#synology-dhcp-server-and-adguard-home-port-conflict)
   * [NFS Share](#nfs-share)
   * [Static IP](#static-ip)
   * [Laptop Specific Configuration](#laptop-specific-configuration)
@@ -288,6 +293,44 @@ services:
       - TECHNOLOGY=NordLynx
       - NETWORK=192.168.1.0/24  # So it can be accessed within the local network
 ```
+
+## Synology Quirks
+
+Docker compose NAS can run on DSM 7.1, with a few extra steps.
+
+### Free Ports 80 and 443
+
+By default, ports 80 and 443 are used by Nginx but not actually used for anything useful. Free them by creating a new task
+in the Task Scheduler > Create > Triggered Task > User-defined script. Leave the Event as `Boot-up` and the `root` user,
+go to Task Settings and paste the following in User-defined script:
+```
+sed -i -e 's/80/81/' -e 's/443/444/' /usr/syno/share/nginx/server.mustache /usr/syno/share/nginx/DSM.mustache /usr/syno/share/nginx/WWWService.mustache
+
+synosystemctl restart nginx
+```
+
+### Install Synology Wireguard
+
+Since Wireguard is not part of DSM's kernel, an external package must be installed for the `vpn` container to run.
+
+For DSM 7.1, download and install the package corresponding to your NAS CPU architecture 
+[from here](https://github.com/vegardit/synology-wireguard/releases).
+
+As specified in the [project's README](https://github.com/vegardit/synology-wireguard#installation), 
+the package must be run as `root` from the command line: `sudo /var/packages/WireGuard/scripts/start`
+
+### Free Port 1900
+
+Jellyfin will fail to run by default since the port 1900 
+[is not free](https://lookanotherblog.com/resolve-port-1900-conflict-between-plex-and-synology/). 
+You may free it by going to  Control Panel > File Services > Advanced > SSTP > Untick `Enable Windows network discovery`.
+
+### Synology DHCP Server and Adguard Home Port Conflict
+
+If you are using the Synology DHCP Server package, it will use port 53 even if it does not need it. This is because
+it uses Dnsmasq to handle DHCP requests, but does not serve DNS queries. The port can be released by editing (as root) 
+`/usr/local/lib/systemd/system/pkg-dhcpserver.service` and [adding -p 0](https://www.reddit.com/r/synology/comments/njwdao/comment/j2d23qr/?utm_source=reddit&utm_medium=web2x&context=3):
+`ExecStart=/var/packages/DhcpServer/target/dnsmasq-2.x/usr/bin/dnsmasq --user=DhcpServer --group=DhcpServer --cache-size=200 --conf-file=/etc/dhcpd/dhcpd.conf --dhcp-lease-max=2147483648 -p 0`
 
 ## NFS Share
 
