@@ -42,7 +42,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.sonarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sonarr`) || PathPrefix(`/sonarr`))
+      - traefik.http.routers.sonarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sonarr`))
       - traefik.http.routers.sonarr.tls=true
       - traefik.http.routers.sonarr.tls.certresolver=myresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
@@ -59,7 +59,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.radarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/radarr`) || PathPrefix(`/radarr`))
+      - traefik.http.routers.radarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/radarr`))
       - traefik.http.routers.radarr.tls=true
       - traefik.http.routers.radarr.tls.certresolver=myresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
@@ -75,7 +75,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prowlarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/prowlarr`) || PathPrefix(`/prowlarr`))
+      - traefik.http.routers.prowlarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/prowlarr`))
       - traefik.http.routers.prowlarr.tls=true
       - traefik.http.routers.prowlarr.tls.certresolver=myresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
@@ -96,7 +96,7 @@ services:
       - vpn
     labels:
       - traefik.enable=true
-      - traefik.http.routers.qbittorrent.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/qbittorrent`) || PathPrefix(`/qbittorrent`))
+      - traefik.http.routers.qbittorrent.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/qbittorrent`))
       - traefik.http.routers.qbittorrent.tls=true
       - traefik.http.routers.qbittorrent.tls.certresolver=myresolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
@@ -160,7 +160,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`) || PathPrefix(`/jellyfin`))
+      - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`))
       - traefik.http.routers.jellyfin.tls=true
       - traefik.http.routers.jellyfin.tls.certresolver=myresolver
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096

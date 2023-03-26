@@ -81,9 +81,9 @@ For the first time, run `./update-config.sh` to update the applications base URL
 | `PIA_USER`                  | PIA username                                                                                         |                         |
 | `PIA_PASS`                  | PIA password                                                                                         |                         |
 | `PIA_LOCAL_NETWORK`         | PIA local network                                                                                    | `192.168.0.0/16`        |
-| `HOSTNAME`                  | Hostname of the NAS, could be a local IP or a domain name                                            |                         |
+| `HOSTNAME`                  | Hostname of the NAS, could be a local IP or a domain name                                            | `localhost`             |
 | `ADGUARD_HOSTNAME`          | AdGuard Home hostname used, if enabled                                                               |                         |
-| `DNS_CHALLENGE_PROVIDER`    | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers). | `cloudflare`             |
+| `DNS_CHALLENGE_PROVIDER`    | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers). | `cloudflare`            |
 | `LETS_ENCRYPT_EMAIL`        | E-mail address used to send expiration notifications                                                 |                         |
 | `CLOUDFLARE_EMAIL`          | CloudFlare Account email                                                                             |                         |
 | `CLOUDFLARE_DNS_API_TOKEN`  | API token with `DNS:Edit` permission                                                                 |                         |
