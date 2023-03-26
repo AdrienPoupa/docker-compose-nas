@@ -35,6 +35,7 @@ services:
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
     volumes:
       - ./sonarr:/config
       - ${DATA_ROOT}:/data
@@ -51,6 +52,7 @@ services:
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
     volumes:
       - ./radarr:/config
       - ${DATA_ROOT}:/data
@@ -67,6 +69,7 @@ services:
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
     volumes:
       - ./prowlarr:/config
     restart: always
