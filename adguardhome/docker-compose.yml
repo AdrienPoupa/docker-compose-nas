@@ -50,6 +50,7 @@ services:
       sleep 1
       ; done
       && traefik-certs-dumper file --version v2 --watch
+      --clean false
       --source /data/acme.json --dest /certs'
     volumes:
       - ./letsencrypt:/data
