@@ -120,7 +120,9 @@ services:
       - PASS=${PIA_PASS}
       - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
       - PORT_FORWARDING=1
+      - PORT_PERSIST=1
       - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+      - EXIT_ON_FATAL=1
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.default.disable_ipv6=1
