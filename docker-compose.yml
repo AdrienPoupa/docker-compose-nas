@@ -164,7 +164,6 @@ services:
       - traefik.http.routers.jellyfin.tls=true
       - traefik.http.routers.jellyfin.tls.certresolver=myresolver
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
-      - traefik.http.services.jellyfin.loadbalancer.passhostheader=true
   heimdall:
     image: lscr.io/linuxserver/heimdall
     container_name: heimdall
