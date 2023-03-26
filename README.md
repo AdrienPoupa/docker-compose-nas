@@ -6,7 +6,7 @@ browsing indexers to retrieve media resources and downloading them through a Wir
 SSL certificates and remote access through Tailscale are supported.
 
 Requirements: Any Docker-capable recent Linux box with Docker Engine and Docker Compose V2.
-I am running it in Ubuntu Server 22.04; I also tested this setup on a Synology DS220+ with DSM 7.1.
+I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology DS220+ with DSM 7.1](#synology-quirks).
 
 ## Table of Content
 
