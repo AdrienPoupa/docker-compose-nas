@@ -2,7 +2,7 @@
 
 After searching for the perfect NAS solution, I realized what I wanted could be achieved 
 with some Docker containers on a vanilla Linux box. The result is an opinionated Docker Compose configuration capable of 
-browsing indexers to retrieve media resources and downloading them through a Wireguard VPN with port forwarding.
+browsing indexers to retrieve media resources and downloading them through a WireGuard VPN with port forwarding.
 SSL certificates and remote access through Tailscale are supported.
 
 Requirements: Any Docker-capable recent Linux box with Docker Engine and Docker Compose V2.
@@ -16,7 +16,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
   * [Applications](#applications)
   * [Quick Start](#quick-start)
   * [Environment Variables](#environment-variables)
-  * [PIA Wireguard VPN](#pia-wireguard-vpn)
+  * [PIA WireGuard VPN](#pia-wireguard-vpn)
   * [Sonarr & Radarr](#sonarr--radarr)
     * [File Structure](#file-structure)
     * [Download Client](#download-client)
@@ -27,6 +27,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     * [Accessing from the outside with Tailscale](#accessing-from-the-outside-with-tailscale)
   * [Optional Services](#optional-services)
     * [FlareSolverr](#flaresolverr)
+    * [SABnzbd](#sabnzbd)
     * [AdGuard Home](#adguard-home)
       * [Encryption](#encryption)
       * [DHCP](#dhcp)
@@ -34,7 +35,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
   * [Customization](#customization)
   * [Synology Quirks](#synology-quirks)
     * [Free Ports 80 and 443](#free-ports-80-and-443)
-    * [Install Synology Wireguard](#install-synology-wireguard)
+    * [Install Synology WireGuard](#install-synology-wireguard)
     * [Free Port 1900](#free-port-1900)
     * [Synology DHCP Server and Adguard Home Port Conflict](#synology-dhcp-server-and-adguard-home-port-conflict)
   * [NFS Share](#nfs-share)
@@ -44,21 +45,25 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 
 ## Applications
 
-| **Application**                                                      | **Description**                                                                                                                                      | **Image**                                                                                                        | **URL**        |
-|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|----------------|
-| [Sonarr](https://sonarr.tv)                                          | PVR for newsgroup and bittorrent users                                                                                                               | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                                                | /sonarr        |
-| [Radarr](https://radarr.video)                                       | Movie collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                                                | /radarr        |
-| [Prowlarr](https://github.com/Prowlarr/Prowlarr)                     | Indexer aggregator for Sonarr and Radarr                                                                                                             | [linuxserver/prowlarr:latest](https://hub.docker.com/r/linuxserver/prowlarr)                                     | /prowlarr      |
-| [PIA Wireguard VPN](https://github.com/thrnz/docker-wireguard-pia)   | Encapsulate qBittorrent traffic in [PIA](https://www.privateinternetaccess.com/) using [Wireguard](https://www.wireguard.com/) with port forwarding. | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)                                |                |
-| [qBittorrent](https://www.qbittorrent.org)                           | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent)                         | /qbittorrent   |
-| [Jellyfin](https://jellyfin.org)                                     | Media server designed to organize, manage, and share digital media files to networked devices                                                        | [linuxserver/jellyfin](https://hub.docker.com/r/linuxserver/jellyfin)                                            | /jellyfin      |
-| [Heimdall](https://heimdall.site)                                    | Application dashboard                                                                                                                                | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)                                            | /              |
-| [Traefik](https://traefik.io)                                        | Reverse proxy                                                                                                                                        | [traefik](https://hub.docker.com/_/traefik)                                                                      |                |
-| [Watchtower](https://containrrr.dev/watchtower/)                     | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                                          |                |
-| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)         | Optional - Proxy server to bypass Cloudflare protection in Prowlarr                                                                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)                                  |                |
-| [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)    | Optional - Network-wide software for blocking ads & tracking                                                                                         | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                                              |                |
-| [DHCP Relay](https://github.com/modem7/DHCP-Relay)                   | Optional - Docker DHCP Relay                                                                                                                         | [modem7/dhcprelay](https://hub.docker.com/r/modem7/dhcprelay)                                                    |                |
-| [Traefik Certs Dumper](https://github.com/ldez/traefik-certs-dumper) | Optional - Dump ACME data from Traefik to certificates                                                                                               | [ldez/traefik-certs-dumper](https://hub.docker.com/r/ldez/traefik-certs-dumper)                                  |                |
+| **Application**                                                      | **Description**                                                                                                                                      | **Image**                                                                                | **URL**      |
+|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
+| [Sonarr](https://sonarr.tv)                                          | PVR for newsgroup and bittorrent users                                                                                                               | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                        | /sonarr      |
+| [Radarr](https://radarr.video)                                       | Movie collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                        | /radarr      |
+| [Prowlarr](https://github.com/Prowlarr/Prowlarr)                     | Indexer aggregator for Sonarr and Radarr                                                                                                             | [linuxserver/prowlarr:latest](https://hub.docker.com/r/linuxserver/prowlarr)             | /prowlarr    |
+| [PIA WireGuard VPN](https://github.com/thrnz/docker-wireguard-pia)   | Encapsulate qBittorrent traffic in [PIA](https://www.privateinternetaccess.com/) using [WireGuard](https://www.wireguard.com/) with port forwarding. | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)        |              |
+| [qBittorrent](https://www.qbittorrent.org)                           | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent |
+| [Jellyfin](https://jellyfin.org)                                     | Media server designed to organize, manage, and share digital media files to networked devices                                                        | [linuxserver/jellyfin](https://hub.docker.com/r/linuxserver/jellyfin)                    | /jellyfin    |
+| [Heimdall](https://heimdall.site)                                    | Application dashboard                                                                                                                                | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)                    | /            |
+| [Traefik](https://traefik.io)                                        | Reverse proxy                                                                                                                                        | [traefik](https://hub.docker.com/_/traefik)                                              |              |
+| [Watchtower](https://containrrr.dev/watchtower/)                     | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                  |              |
+| [SABnzbd](https://sabnzbd.org/)                                      | Optional - Free and easy binary newsreader                                                                                                           | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
+| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)         | Optional - Proxy server to bypass Cloudflare protection in Prowlarr                                                                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
+| [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)    | Optional - Network-wide software for blocking ads & tracking                                                                                         | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
+| [DHCP Relay](https://github.com/modem7/DHCP-Relay)                   | Optional - Docker DHCP Relay                                                                                                                         | [modem7/dhcprelay](https://hub.docker.com/r/modem7/dhcprelay)                            |              |
+| [Traefik Certs Dumper](https://github.com/ldez/traefik-certs-dumper) | Optional - Dump ACME data from Traefik to certificates                                                                                               | [ldez/traefik-certs-dumper](https://hub.docker.com/r/ldez/traefik-certs-dumper)          |              |
+
+Optional containers are not run by default, they need to be enabled, 
+see [Optional Services](#optional-services) for more information.
 
 ## Quick Start
 
@@ -89,17 +94,17 @@ For the first time, run `./update-config.sh` to update the applications base URL
 | `CLOUDFLARE_DNS_API_TOKEN`  | API token with `DNS:Edit` permission                                                                 |                         |
 | `CLOUDFLARE_ZONE_API_TOKEN` | API token with `Zone:Read` permission                                                                |                         |
 
-## PIA Wireguard VPN
+## PIA WireGuard VPN
 
-I chose PIA since it supports Wireguard and [port forwarding](https://github.com/thrnz/docker-wireguard-pia/issues/26#issuecomment-868165281),
+I chose PIA since it supports WireGuard and [port forwarding](https://github.com/thrnz/docker-wireguard-pia/issues/26#issuecomment-868165281),
 but you could use other providers:
 
 - OpenVPN: [linuxserver/openvpn-as](https://hub.docker.com/r/linuxserver/openvpn-as)
-- Wireguard: [linuxserver/wireguard](https://hub.docker.com/r/linuxserver/wireguard)
+- WireGuard: [linuxserver/wireguard](https://hub.docker.com/r/linuxserver/wireguard)
 - NordVPN + OpenVPN: [bubuntux/nordvpn](https://hub.docker.com/r/bubuntux/nordvpn/dockerfile)
-- NordVPN + Wireguard (NordLynx): [bubuntux/nordlynx](https://hub.docker.com/r/bubuntux/nordlynx)
+- NordVPN + WireGuard (NordLynx): [bubuntux/nordlynx](https://hub.docker.com/r/bubuntux/nordlynx)
 
-For PIA + Wireguard, fill `.env` and fill it with your PIA credentials.
+For PIA + WireGuard, fill `.env` and fill it with your PIA credentials.
 
 The location of the server it will connect to is set by `LOC=ca`, defaulting to Montreal - Canada.
 
@@ -145,7 +150,7 @@ Their API keys can be found in Settings > Security > API Key.
 
 ## qBittorrent
 
-Set the default save path to `/data/torrents` in Settings, and restrict the network interface to Wireguard (`wg0`).
+Set the default save path to `/data/torrents` in Settings, and restrict the network interface to WireGuard (`wg0`).
 
 The web UI login page can be disabled on for the local network in Settings > Web UI > Bypass authentication for clients
 
@@ -235,6 +240,12 @@ Say you want to enable FlareSolverr, you should have `COMPOSE_FILE=docker-compos
 
 In Prowlarr, add the FlareSolverr indexer with the URL http://flaresolverr:8191/
 
+### SABnzbd
+
+Enable SABnzbd by setting `COMPOSE_FILE=docker-compose.yml:sabnzbd/docker-compose.yml`. It will be accessible at `/sabnzbd`.
+
+If that is not the case, the `url_base` parameter in `sabnzbd.ini` should be set to `/sabnzbd`.
+
 ### AdGuard Home
 
 Set the `ADGUARD_HOSTNAME`, I chose a different subdomain to use secure DNS without the folder.
@@ -314,9 +325,9 @@ sed -i -e 's/80/81/' -e 's/443/444/' /usr/syno/share/nginx/server.mustache /usr/
 synosystemctl restart nginx
 ```
 
-### Install Synology Wireguard
+### Install Synology WireGuard
 
-Since Wireguard is not part of DSM's kernel, an external package must be installed for the `vpn` container to run.
+Since WireGuard is not part of DSM's kernel, an external package must be installed for the `vpn` container to run.
 
 For DSM 7.1, download and install the package corresponding to your NAS CPU architecture 
 [from here](https://github.com/vegardit/synology-wireguard/releases).
