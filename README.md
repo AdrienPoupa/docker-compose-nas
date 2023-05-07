@@ -37,6 +37,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     * [Free Ports 80 and 443](#free-ports-80-and-443)
     * [Install Synology WireGuard](#install-synology-wireguard)
     * [Free Port 1900](#free-port-1900)
+    * [User Permissions](#user-permissions)
     * [Synology DHCP Server and Adguard Home Port Conflict](#synology-dhcp-server-and-adguard-home-port-conflict)
   * [NFS Share](#nfs-share)
   * [Static IP](#static-ip)
@@ -340,6 +341,19 @@ the package must be run as `root` from the command line: `sudo /var/packages/Wir
 Jellyfin will fail to run by default since the port 1900 
 [is not free](https://lookanotherblog.com/resolve-port-1900-conflict-between-plex-and-synology/). 
 You may free it by going to  Control Panel > File Services > Advanced > SSTP > Untick `Enable Windows network discovery`.
+
+### User Permissions
+
+By default, the user and groups are set to `1000` as it is the default on Ubuntu and many other Linux distributions.
+However, that is not the case in Synology; the first user should have an ID of `1026` and a group of `100`. 
+You may check yours with `id`. 
+Update the `USER_ID` and `GROUP_ID` in `.env` with your IDs.
+Not updating them may result in [permission issues](https://github.com/AdrienPoupa/docker-compose-nas/issues/10).
+
+```
+USER_ID=1026
+GROUP_ID=100
+```
 
 ### Synology DHCP Server and Adguard Home Port Conflict
 
