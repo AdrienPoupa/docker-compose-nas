@@ -39,6 +39,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     * [Free Port 1900](#free-port-1900)
     * [User Permissions](#user-permissions)
     * [Synology DHCP Server and Adguard Home Port Conflict](#synology-dhcp-server-and-adguard-home-port-conflict)
+  * [Use Separate Paths for Torrents and Storage](#use-separate-paths-for-torrents-and-storage)
   * [NFS Share](#nfs-share)
   * [Static IP](#static-ip)
   * [Laptop Specific Configuration](#laptop-specific-configuration)
@@ -363,12 +364,36 @@ it uses Dnsmasq to handle DHCP requests, but does not serve DNS queries. The por
 `ExecStart=/var/packages/DhcpServer/target/dnsmasq-2.x/usr/bin/dnsmasq --user=DhcpServer --group=DhcpServer --cache-size=200 --conf-file=/etc/dhcpd/dhcpd.conf --dhcp-lease-max=2147483648 -p 0`
 Reboot the NAS and the port 53 will be free for Adguard.
 
+## Use Separate Paths for Torrents and Storage
+
+If you want to use separate paths for torrents download and long term storage, to use different disks for example,
+set your `docker-compose.override.yml` to:
+
+```yml
+version: "3.9"
+services:
+  sonarr:
+    volumes:
+      - ./sonarr:/config
+      - ${DATA_ROOT}/media/tv:/data/media/tv
+      - ${DOWNLOAD_ROOT}/tv:/data/torrents/tv
+  radarr:
+    volumes:
+      - ./radarr:/config
+      - ${DATA_ROOT}/media/movies:/data/media/movies
+      - ${DOWNLOAD_ROOT}/movies:/data/torrents/movies
+```
+
+Note you will lose the hard link ability, ie your files will be duplicated.
+
+In Sonarr and Radarr, go to `Settings` > `Importing` > Untick `Use Hardlinks instead of Copy`
+
 ## NFS Share
 
 This can be useful to share the media folder to a local player like Kodi or computers in the local network,
 but may not be necessary if Jellyfin is going to be used to access the media.
 
-Install the NFS kernel server: `sudo apt-get install nfs-kernel-server`
+Install the NFS kernel server: `sudo apt install nfs-kernel-server`
 
 Then edit `/etc/exports` to configure your shares:
 
