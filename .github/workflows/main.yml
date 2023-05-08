@@ -1,0 +1,7 @@
+on: push
+jobs:
+  validate-docker-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ndeloof/install-compose-action@v0.0.1
+      - run: docker-compose config
