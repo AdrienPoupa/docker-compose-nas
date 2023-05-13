@@ -75,26 +75,28 @@ For the first time, run `./update-config.sh` to update the applications base URL
 
 ## Environment Variables
 
-| Variable                    | Description                                                                                          | Default                 |
-|-----------------------------|------------------------------------------------------------------------------------------------------|-------------------------|
-| `COMPOSE_FILE`              | Docker compose files to load                                                                         | `docker-compose.yml`    |
-| `COMPOSE_PATH_SEPARATOR`    | Path separator between compose files to load                                                         | `:`                     |
-| `USER_ID`                   | ID of the user to use in Docker containers                                                           | `1000`                  |
-| `GROUP_ID`                  | ID of the user group to use in Docker containers                                                     | `1000`                  |
-| `TIMEZONE`                  | TimeZone used by the container.                                                                      | `America/New_York`      |
-| `DATA_ROOT`                 | Host location of the data files                                                                      | `/mnt/data`             |
-| `DOWNLOAD_ROOT`             | Host download location for qBittorrent, should be a subfolder of `DATA_ROOT`                         | `/mnt/data/torrents`    |
-| `PIA_LOCATION`              | Servers to use for PIA                                                                               | `ca` (Montreal, Canada) |
-| `PIA_USER`                  | PIA username                                                                                         |                         |
-| `PIA_PASS`                  | PIA password                                                                                         |                         |
-| `PIA_LOCAL_NETWORK`         | PIA local network                                                                                    | `192.168.0.0/16`        |
-| `HOSTNAME`                  | Hostname of the NAS, could be a local IP or a domain name                                            | `localhost`             |
-| `ADGUARD_HOSTNAME`          | AdGuard Home hostname used, if enabled                                                               |                         |
-| `DNS_CHALLENGE_PROVIDER`    | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers). | `cloudflare`            |
-| `LETS_ENCRYPT_EMAIL`        | E-mail address used to send expiration notifications                                                 |                         |
-| `CLOUDFLARE_EMAIL`          | CloudFlare Account email                                                                             |                         |
-| `CLOUDFLARE_DNS_API_TOKEN`  | API token with `DNS:Edit` permission                                                                 |                         |
-| `CLOUDFLARE_ZONE_API_TOKEN` | API token with `Zone:Read` permission                                                                |                         |
+| Variable                    | Description                                                                                                                                                                                            | Default                                          |
+|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
+| `COMPOSE_FILE`              | Docker compose files to load                                                                                                                                                                           | `docker-compose.yml`                             |
+| `COMPOSE_PATH_SEPARATOR`    | Path separator between compose files to load                                                                                                                                                           | `:`                                              |
+| `USER_ID`                   | ID of the user to use in Docker containers                                                                                                                                                             | `1000`                                           |
+| `GROUP_ID`                  | ID of the user group to use in Docker containers                                                                                                                                                       | `1000`                                           |
+| `TIMEZONE`                  | TimeZone used by the container.                                                                                                                                                                        | `America/New_York`                               |
+| `DATA_ROOT`                 | Host location of the data files                                                                                                                                                                        | `/mnt/data`                                      |
+| `DOWNLOAD_ROOT`             | Host download location for qBittorrent, should be a subfolder of `DATA_ROOT`                                                                                                                           | `/mnt/data/torrents`                             |
+| `PIA_LOCATION`              | Servers to use for PIA                                                                                                                                                                                 | `ca` (Montreal, Canada)                          |
+| `PIA_USER`                  | PIA username                                                                                                                                                                                           |                                                  |
+| `PIA_PASS`                  | PIA password                                                                                                                                                                                           |                                                  |
+| `PIA_LOCAL_NETWORK`         | PIA local network                                                                                                                                                                                      | `192.168.0.0/16`                                 |
+| `HOSTNAME`                  | Hostname of the NAS, could be a local IP or a domain name                                                                                                                                              | `localhost`                                      |
+| `ADGUARD_HOSTNAME`          | AdGuard Home hostname used, if enabled                                                                                                                                                                 |                                                  |
+| `DNS_CHALLENGE`             | Enable/Disable DNS01 challenge, set to `false` to disable.                                                                                                                                             | `true`                                           |
+| `DNS_CHALLENGE_PROVIDER`    | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers).                                                                                                   | `cloudflare`                                     |
+| `LETS_ENCRYPT_CA_SERVER`    | Let's Encrypt CA Server used to generate certificates, set to production by default.<br/>Set to `https://acme-staging-v02.api.letsencrypt.org/directory` to test your changes with the staging server. | `https://acme-v02.api.letsencrypt.org/directory` |
+| `LETS_ENCRYPT_EMAIL`        | E-mail address used to send expiration notifications                                                                                                                                                   |                                                  |
+| `CLOUDFLARE_EMAIL`          | CloudFlare Account email                                                                                                                                                                               |                                                  |
+| `CLOUDFLARE_DNS_API_TOKEN`  | API token with `DNS:Edit` permission                                                                                                                                                                   |                                                  |
+| `CLOUDFLARE_ZONE_API_TOKEN` | API token with `Zone:Read` permission                                                                                                                                                                  |                                                  |
 
 ## PIA WireGuard VPN
 
@@ -199,9 +201,10 @@ baring environment variable changes, see the Traefik documentation above and [Le
 
 Then, fill the CloudFlare `.env` entries.
 
-If you want to test your configuration first, use the Let's Encrypt staging server by uncommenting this:
+If you want to test your configuration first, use the Let's Encrypt staging server by updating `LETS_ENCRYPT_CA_SERVER`'s
+value in `.env`:
 ```
-#- --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+LETS_ENCRYPT_CA_SERVER=https://acme-v02.api.letsencrypt.org/directory
 ```
 
 If it worked, you will see the staging certificate at https://nas.domain.com.
@@ -210,6 +213,8 @@ You may remove the `./letsencrypt/acme.json` file and restart the services to is
 You are free to use any DNS01 provider. Simply replace `DNS_CHALLENGE_PROVIDER` with your own provider, 
 [see complete list here](https://doc.traefik.io/traefik/https/acme/#providers). 
 You will also need to inject the environments variables specific to your provider.
+
+Certificate generation can be disabled by setting `DNS_CHALLENGE` to `false`.
 
 ### Accessing from the outside with Tailscale
 
