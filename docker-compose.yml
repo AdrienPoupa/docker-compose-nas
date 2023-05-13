@@ -93,7 +93,8 @@ services:
     restart: always
     network_mode: "service:vpn"
     depends_on:
-      - vpn
+      vpn:
+        condition: service_healthy
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/qbittorrent`))
