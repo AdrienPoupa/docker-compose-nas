@@ -323,7 +323,7 @@ Just make sure that AdGuard Home listens to all interfaces.
 
 ## Customization
 
-You can override the configuration of a services or add new services by creating a new `docker-compose.override.yml` file,
+You can override the configuration of a service or add new services by creating a new `docker-compose.override.yml` file,
 then appending it to the `COMPOSE_FILE` environment variable: `COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml`
 
 [See official documentation](https://docs.docker.com/compose/extends).
