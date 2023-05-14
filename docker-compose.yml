@@ -45,6 +45,15 @@ services:
       - traefik.http.routers.sonarr.tls=true
       - traefik.http.routers.sonarr.tls.certresolver=myresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      - homepage.group=Media
+      - homepage.name=Sonarr
+      - homepage.icon=sonarr.png
+      - homepage.href=/sonarr
+      - homepage.description=Series management
+      - homepage.weight=0
+      - homepage.widget.type=sonarr
+      - homepage.widget.url=http://sonarr:8989/sonarr
+      - homepage.widget.key=${SONARR_API_KEY}
   radarr:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
@@ -62,6 +71,15 @@ services:
       - traefik.http.routers.radarr.tls=true
       - traefik.http.routers.radarr.tls.certresolver=myresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
+      - homepage.group=Media
+      - homepage.name=Radarr
+      - homepage.icon=radarr.png
+      - homepage.href=/radarr
+      - homepage.description=Movies management
+      - homepage.weight=1
+      - homepage.widget.type=radarr
+      - homepage.widget.url=http://radarr:7878/radarr
+      - homepage.widget.key=${RADARR_API_KEY}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -78,6 +96,15 @@ services:
       - traefik.http.routers.prowlarr.tls=true
       - traefik.http.routers.prowlarr.tls.certresolver=myresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+      - homepage.group=Download
+      - homepage.name=Prowlarr
+      - homepage.icon=prowlarr.png
+      - homepage.href=/prowlarr
+      - homepage.description=Indexers management
+      - homepage.weight=4
+      - homepage.widget.type=prowlarr
+      - homepage.widget.url=http://prowlarr:9696/prowlarr
+      - homepage.widget.key=${PROWLARR_API_KEY}
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:libtorrentv1
     container_name: qbittorrent
@@ -108,6 +135,16 @@ services:
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.replacement=$$1/
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.permanent=false
       #- com.centurylinklabs.watchtower.depends-on=/vpn
+      - homepage.group=Download
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href=/qbittorrent
+      - homepage.description=Bittorrent client
+      - homepage.weight=5
+      - homepage.widget.type=qbittorrent
+      - homepage.widget.url=http://vpn:8080
+      - homepage.widget.username=admin
+      - homepage.widget.password=adminadmin
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: vpn
@@ -164,21 +201,39 @@ services:
       - traefik.http.routers.jellyfin.tls=true
       - traefik.http.routers.jellyfin.tls.certresolver=myresolver
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
-  heimdall:
-    image: lscr.io/linuxserver/heimdall
-    container_name: heimdall
+      - homepage.group=Media
+      - homepage.name=Jellyfin
+      - homepage.icon=jellyfin.png
+      - homepage.href=/jellyfin
+      - homepage.description=Media server
+      - homepage.weight=3
+      - homepage.widget.type=jellyfin
+      - homepage.widget.url=http://jellyfin:8096/jellyfin
+      - homepage.widget.key=${JELLYFIN_API_KEY}
+  homepage:
+    image: ghcr.io/benphelps/homepage:latest
+    container_name: homepage
     environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
+      - HOMEPAGE_VAR_TITLE=${HOMEPAGE_VAR_TITLE}
+      - HOMEPAGE_VAR_SEARCH_PROVIDER=${HOMEPAGE_VAR_SEARCH_PROVIDER}
+      - HOMEPAGE_VAR_HEADER_STYLE=${HOMEPAGE_VAR_HEADER_STYLE}
+      - HOMEPAGE_VAR_WEATHER_CITY=${HOMEPAGE_VAR_WEATHER_CITY}
+      - HOMEPAGE_VAR_WEATHER_LAT=${HOMEPAGE_VAR_WEATHER_LAT}
+      - HOMEPAGE_VAR_WEATHER_LONG=${HOMEPAGE_VAR_WEATHER_LONG}
+      - HOMEPAGE_VAR_WEATHER_TIME=${TIMEZONE}
+      - HOMEPAGE_VAR_WEATHER_UNIT=${HOMEPAGE_VAR_WEATHER_UNIT}
     volumes:
-      - ./heimdall:/config
+      - ./homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DATA_ROOT}:/data
     restart: always
+    command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.heimdall.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
-      - traefik.http.routers.heimdall.tls=true
-      - traefik.http.routers.heimdall.tls.certresolver=myresolver
-      - traefik.http.services.heimdall.loadbalancer.server.port=80
+      - traefik.http.routers.homepage.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
+      - traefik.http.routers.homepage.tls=true
+      - traefik.http.routers.homepage.tls.certresolver=myresolver
+      - traefik.http.services.homepage.loadbalancer.server.port=3000
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower

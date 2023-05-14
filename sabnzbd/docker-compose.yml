@@ -18,3 +18,9 @@ services:
       - traefik.http.routers.sabnzbd.tls=true
       - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
       - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
+      - homepage.group=Media
+      - homepage.name=Sabnzbd
+      - homepage.icon=sabnzbd.png
+      - homepage.href=/sabnzbd
+      - homepage.description=Usenet
+      - homepage.weight=6

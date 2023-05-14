@@ -1,0 +1,20 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/en/configs/settings
+
+title: {{HOMEPAGE_VAR_TITLE}}
+
+headerStyle: {{HOMEPAGE_VAR_HEADER_STYLE}}
+
+layout:
+  Media:
+    style: row
+    columns: 3
+  Download:
+    style: row
+    columns: 2
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+  hideVisitURL: true

@@ -1,8 +1,8 @@
 .env
 .idea
 docker-compose.override.yml
-/heimdall
-!/heimdall/.gitkeep
+/homepage/logs
+/homepage/*.yaml
 /sonarr
 !/sonarr/.gitkeep
 /radarr

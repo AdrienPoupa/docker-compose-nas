@@ -1,0 +1,8 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/en/configs/bookmarks
+
+- Credits:
+    - Docker-Compose-NAS:
+        - abbr: NAS
+          href: https://github.com/AdrienPoupa/docker-compose-nas
