@@ -8,6 +8,8 @@ SSL certificates and remote access through Tailscale are supported.
 Requirements: Any Docker-capable recent Linux box with Docker Engine and Docker Compose V2.
 I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology DS220+ with DSM 7.1](#synology-quirks).
 
+![Docker-Compose NAS Homepage](https://github.com/AdrienPoupa/docker-compose-nas/assets/15086425/3492a9f6-3779-49a5-b052-4193844f16f0)
+
 ## Table of Content
 
 <!-- TOC -->
@@ -23,6 +25,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
   * [Prowlarr](#prowlarr)
   * [qBittorrent](#qbittorrent)
   * [Jellyfin](#jellyfin)
+  * [Homepage](#homepage)
   * [Traefik and SSL Certificates](#traefik-and-ssl-certificates)
     * [Accessing from the outside with Tailscale](#accessing-from-the-outside-with-tailscale)
   * [Optional Services](#optional-services)
@@ -55,7 +58,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [PIA WireGuard VPN](https://github.com/thrnz/docker-wireguard-pia)   | Encapsulate qBittorrent traffic in [PIA](https://www.privateinternetaccess.com/) using [WireGuard](https://www.wireguard.com/) with port forwarding. | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)        |              |
 | [qBittorrent](https://www.qbittorrent.org)                           | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent |
 | [Jellyfin](https://jellyfin.org)                                     | Media server designed to organize, manage, and share digital media files to networked devices                                                        | [linuxserver/jellyfin](https://hub.docker.com/r/linuxserver/jellyfin)                    | /jellyfin    |
-| [Heimdall](https://heimdall.site)                                    | Application dashboard                                                                                                                                | [linuxserver/heimdall](https://hub.docker.com/r/linuxserver/heimdall)                    | /            |
+| [Homepage](https://gethomepage.dev)                                  | Application dashboard                                                                                                                                | [benphelps/homepage](https://github.com/benphelps/homepage/pkgs/container/homepage)      | /            |
 | [Traefik](https://traefik.io)                                        | Reverse proxy                                                                                                                                        | [traefik](https://hub.docker.com/_/traefik)                                              |              |
 | [Watchtower](https://containrrr.dev/watchtower/)                     | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                  |              |
 | [SABnzbd](https://sabnzbd.org/)                                      | Optional - Free and easy binary newsreader                                                                                                           | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
@@ -71,32 +74,47 @@ see [Optional Services](#optional-services) for more information.
 
 `cp .env.example .env`, edit to your needs then `sudo docker compose up -d`.
 
-For the first time, run `./update-config.sh` to update the applications base URLs.
+For the first time, run `./update-config.sh` to update the applications base URLs and set the API keys in `.env`.
+
+If you want to show Jellyfin information in the homepage, create it in Jellyfin settings and fill `JELLYFIN_API_KEY`.
 
 ## Environment Variables
 
-| Variable                    | Description                                                                                                                                                                                            | Default                                          |
-|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
-| `COMPOSE_FILE`              | Docker compose files to load                                                                                                                                                                           | `docker-compose.yml`                             |
-| `COMPOSE_PATH_SEPARATOR`    | Path separator between compose files to load                                                                                                                                                           | `:`                                              |
-| `USER_ID`                   | ID of the user to use in Docker containers                                                                                                                                                             | `1000`                                           |
-| `GROUP_ID`                  | ID of the user group to use in Docker containers                                                                                                                                                       | `1000`                                           |
-| `TIMEZONE`                  | TimeZone used by the container.                                                                                                                                                                        | `America/New_York`                               |
-| `DATA_ROOT`                 | Host location of the data files                                                                                                                                                                        | `/mnt/data`                                      |
-| `DOWNLOAD_ROOT`             | Host download location for qBittorrent, should be a subfolder of `DATA_ROOT`                                                                                                                           | `/mnt/data/torrents`                             |
-| `PIA_LOCATION`              | Servers to use for PIA                                                                                                                                                                                 | `ca` (Montreal, Canada)                          |
-| `PIA_USER`                  | PIA username                                                                                                                                                                                           |                                                  |
-| `PIA_PASS`                  | PIA password                                                                                                                                                                                           |                                                  |
-| `PIA_LOCAL_NETWORK`         | PIA local network                                                                                                                                                                                      | `192.168.0.0/16`                                 |
-| `HOSTNAME`                  | Hostname of the NAS, could be a local IP or a domain name                                                                                                                                              | `localhost`                                      |
-| `ADGUARD_HOSTNAME`          | AdGuard Home hostname used, if enabled                                                                                                                                                                 |                                                  |
-| `DNS_CHALLENGE`             | Enable/Disable DNS01 challenge, set to `false` to disable.                                                                                                                                             | `true`                                           |
-| `DNS_CHALLENGE_PROVIDER`    | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers).                                                                                                   | `cloudflare`                                     |
-| `LETS_ENCRYPT_CA_SERVER`    | Let's Encrypt CA Server used to generate certificates, set to production by default.<br/>Set to `https://acme-staging-v02.api.letsencrypt.org/directory` to test your changes with the staging server. | `https://acme-v02.api.letsencrypt.org/directory` |
-| `LETS_ENCRYPT_EMAIL`        | E-mail address used to send expiration notifications                                                                                                                                                   |                                                  |
-| `CLOUDFLARE_EMAIL`          | CloudFlare Account email                                                                                                                                                                               |                                                  |
-| `CLOUDFLARE_DNS_API_TOKEN`  | API token with `DNS:Edit` permission                                                                                                                                                                   |                                                  |
-| `CLOUDFLARE_ZONE_API_TOKEN` | API token with `Zone:Read` permission                                                                                                                                                                  |                                                  |
+| Variable                       | Description                                                                                                                                                                                            | Default                                          |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
+| `COMPOSE_FILE`                 | Docker compose files to load                                                                                                                                                                           | `docker-compose.yml`                             |
+| `COMPOSE_PATH_SEPARATOR`       | Path separator between compose files to load                                                                                                                                                           | `:`                                              |
+| `USER_ID`                      | ID of the user to use in Docker containers                                                                                                                                                             | `1000`                                           |
+| `GROUP_ID`                     | ID of the user group to use in Docker containers                                                                                                                                                       | `1000`                                           |
+| `TIMEZONE`                     | TimeZone used by the container.                                                                                                                                                                        | `America/New_York`                               |
+| `DATA_ROOT`                    | Host location of the data files                                                                                                                                                                        | `/mnt/data`                                      |
+| `DOWNLOAD_ROOT`                | Host download location for qBittorrent, should be a subfolder of `DATA_ROOT`                                                                                                                           | `/mnt/data/torrents`                             |
+| `PIA_LOCATION`                 | Servers to use for PIA                                                                                                                                                                                 | `ca` (Montreal, Canada)                          |
+| `PIA_USER`                     | PIA username                                                                                                                                                                                           |                                                  |
+| `PIA_PASS`                     | PIA password                                                                                                                                                                                           |                                                  |
+| `PIA_LOCAL_NETWORK`            | PIA local network                                                                                                                                                                                      | `192.168.0.0/16`                                 |
+| `HOSTNAME`                     | Hostname of the NAS, could be a local IP or a domain name                                                                                                                                              | `localhost`                                      |
+| `ADGUARD_HOSTNAME`             | Optional - AdGuard Home hostname used, if enabled                                                                                                                                                      |                                                  |
+| `ADGUARD_USERNAME`             | Optional - AdGuard Home username to show details in the homepage, if enabled                                                                                                                           |                                                  |
+| `ADGUARD_PASSWORD`             | Optional - AdGuard Home password to show details in the homepage, if enabled                                                                                                                           |                                                  |
+| `DNS_CHALLENGE`                | Enable/Disable DNS01 challenge, set to `false` to disable.                                                                                                                                             | `true`                                           |
+| `DNS_CHALLENGE_PROVIDER`       | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers).                                                                                                   | `cloudflare`                                     |
+| `LETS_ENCRYPT_CA_SERVER`       | Let's Encrypt CA Server used to generate certificates, set to production by default.<br/>Set to `https://acme-staging-v02.api.letsencrypt.org/directory` to test your changes with the staging server. | `https://acme-v02.api.letsencrypt.org/directory` |
+| `LETS_ENCRYPT_EMAIL`           | E-mail address used to send expiration notifications                                                                                                                                                   |                                                  |
+| `CLOUDFLARE_EMAIL`             | CloudFlare Account email                                                                                                                                                                               |                                                  |
+| `CLOUDFLARE_DNS_API_TOKEN`     | API token with `DNS:Edit` permission                                                                                                                                                                   |                                                  |
+| `CLOUDFLARE_ZONE_API_TOKEN`    | API token with `Zone:Read` permission                                                                                                                                                                  |                                                  |
+| `SONARR_API_KEY`               | Sonarr API key to show information in the homepage                                                                                                                                                     |                                                  |
+| `RADARR_API_KEY`               | Radarr API key to show information in the homepage                                                                                                                                                     |                                                  |
+| `PROWLARR_API_KEY`             | Prowlarr API key to show information in the homepage                                                                                                                                                   |                                                  |
+| `JELLYFIN_API_KEY`             | Jellyfin API key to show information in the homepage                                                                                                                                                   |                                                  |
+| `HOMEPAGE_VAR_TITLE`           | Title of the homepage                                                                                                                                                                                  | `Docker-Compose NAS`                             |
+| `HOMEPAGE_VAR_SEARCH_PROVIDER` | Homepage search provider, [see list here](https://gethomepage.dev/en/widgets/search/)                                                                                                                  | `google`                                         |
+| `HOMEPAGE_VAR_HEADER_STYLE`    | Homepage header style, [see list here](https://gethomepage.dev/en/configs/settings/#header-style)                                                                                                      | `boxed`                                          |
+| `HOMEPAGE_VAR_WEATHER_CITY`    | Homepage weather city name                                                                                                                                                                             |                                                  |
+| `HOMEPAGE_VAR_WEATHER_LAT`     | Homepage weather city latitude                                                                                                                                                                         |                                                  |
+| `HOMEPAGE_VAR_WEATHER_LONG`    | Homepage weather city longitude                                                                                                                                                                        |                                                  |
+| `HOMEPAGE_VAR_WEATHER_UNIT`    | Homepage weather unit, either `metric` or `imperial`                                                                                                                                                   | `metric`                                         |
 
 ## PIA WireGuard VPN
 
@@ -111,6 +129,9 @@ but you could use other providers:
 For PIA + WireGuard, fill `.env` and fill it with your PIA credentials.
 
 The location of the server it will connect to is set by `LOC=ca`, defaulting to Montreal - Canada.
+
+You need to fill the credentials in the `PIA_*` environment variable, 
+otherwise the VPN container will exit and qBittorrent will not start.
 
 ## Sonarr & Radarr
 
@@ -177,6 +198,15 @@ devices:
 
 Generally, running Docker on Linux you will want to use VA-API, but the exact mount paths may differ depending on your
 hardware.
+
+## Homepage
+
+The homepage comes with sensible defaults; some settings can ben controlled via environment variables in `.env`.
+
+If you to customize further, you can modify the files in `/homepage/*.yaml` according to the [documentation](https://gethomepage.dev). 
+Due to how the Docker socket is configured for the Docker integration, files must be edited as root.
+
+The files in `/homepage/tpl/*.yaml` only serve as a base to set up the homepage configuration on first run.
 
 ## Traefik and SSL Certificates
 
