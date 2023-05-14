@@ -204,7 +204,7 @@ Then, fill the CloudFlare `.env` entries.
 If you want to test your configuration first, use the Let's Encrypt staging server by updating `LETS_ENCRYPT_CA_SERVER`'s
 value in `.env`:
 ```
-LETS_ENCRYPT_CA_SERVER=https://acme-v02.api.letsencrypt.org/directory
+LETS_ENCRYPT_CA_SERVER=https://acme-staging-v02.api.letsencrypt.org/directory
 ```
 
 If it worked, you will see the staging certificate at https://nas.domain.com.
