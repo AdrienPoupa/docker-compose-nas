@@ -80,6 +80,35 @@ services:
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878/radarr
       - homepage.widget.key=${RADARR_API_KEY}
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=${TIMEZONE}
+    ports:
+      - 5055:5055
+    volumes:
+      - ./jellyseerr:/app/config
+    restart: always
+    labels:
+      - traefik.enable=true
+      ## HTTP Routers
+      - traefik.http.routers.jellyseerr-rtr.rule=Host(`jellyseerr.${HOSTNAME}`)
+      - traefik.http.routers.jellyseerr-rtr.tls=true
+      ## HTTP Services
+      - traefik.http.routers.jellyseerr-rtr.service=jellyseerr-svc
+      - traefik.http.routers.jellyseerr.tls.certresolver=myresolver
+      - traefik.http.services.jellyseerr-svc.loadbalancer.server.port=5055
+      - homepage.group=Media
+      - homepage.name=JellySeerr
+      - homepage.icon=jellyseerr.png
+      - homepage.href=jellyseerr.${HOSTNAME}
+      - homepage.description=Content Reccomendations and Request Management
+      - homepage.weight=2
+      - homepage.widget.type=jellyseerr
+      - homepage.widget.url=http://jellyseerr:5055
+      - homepage.widget.key=${JELLYSEERR_API_KEY}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
