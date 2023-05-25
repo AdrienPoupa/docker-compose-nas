@@ -10,7 +10,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 
 ![Docker-Compose NAS Homepage](https://github.com/AdrienPoupa/docker-compose-nas/assets/15086425/3492a9f6-3779-49a5-b052-4193844f16f0)
 
-## Table of Content
+## Table of Contents
 
 <!-- TOC -->
 * [Docker Compose NAS](#docker-compose-nas)
@@ -26,6 +26,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
   * [qBittorrent](#qbittorrent)
   * [Jellyfin](#jellyfin)
   * [Homepage](#homepage)
+  * [Jellyseerr](#jellyseerr)
   * [Traefik and SSL Certificates](#traefik-and-ssl-certificates)
     * [Accessing from the outside with Tailscale](#accessing-from-the-outside-with-tailscale)
   * [Optional Services](#optional-services)
@@ -89,7 +90,7 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `TIMEZONE`                     | TimeZone used by the container.                                                                                                                                                                        | `America/New_York`                               |
 | `DATA_ROOT`                    | Host location of the data files                                                                                                                                                                        | `/mnt/data`                                      |
 | `DOWNLOAD_ROOT`                | Host download location for qBittorrent, should be a subfolder of `DATA_ROOT`                                                                                                                           | `/mnt/data/torrents`                             |
-| `PIA_LOCATION`                 | Servers to use for PIA                                                                                                                                                                                 | `ca` (Montreal, Canada)                          |
+| `PIA_LOCATION`                 | Servers to use for PIA. [see list here](https://serverlist.piaservers.net/vpninfo/servers/v6)                                                                                                              | `ca` (Montreal, Canada)                      |
 | `PIA_USER`                     | PIA username                                                                                                                                                                                           |                                                  |
 | `PIA_PASS`                     | PIA password                                                                                                                                                                                           |                                                  |
 | `PIA_LOCAL_NETWORK`            | PIA local network                                                                                                                                                                                      | `192.168.0.0/16`                                 |
@@ -207,6 +208,10 @@ If you to customize further, you can modify the files in `/homepage/*.yaml` acco
 Due to how the Docker socket is configured for the Docker integration, files must be edited as root.
 
 The files in `/homepage/tpl/*.yaml` only serve as a base to set up the homepage configuration on first run.
+
+## Jellyseerr
+
+Jellyseer gives you content reccomendations, allows others to make requests to you, and allows logging in with jellyfin credentials.
 
 ## Traefik and SSL Certificates
 
