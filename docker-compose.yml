@@ -167,8 +167,8 @@ services:
       - homepage.weight=5
       - homepage.widget.type=qbittorrent
       - homepage.widget.url=http://vpn:8080
-      - homepage.widget.username=admin
-      - homepage.widget.password=adminadmin
+      - homepage.widget.username=${QBITTORRENT_USERNAME}
+      - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
     image: thrnz/docker-wireguard-pia
     container_name: vpn
