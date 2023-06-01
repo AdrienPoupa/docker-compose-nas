@@ -215,7 +215,18 @@ The files in `/homepage/tpl/*.yaml` only serve as a base to set up the homepage 
 
 ## Jellyseerr
 
-Jellyseer gives you content reccomendations, allows others to make requests to you, and allows logging in with jellyfin credentials.
+Jellyseer gives you content recommendations, allows others to make requests to you, and allows logging in with Jellyfin credentials.
+
+To setup, go to https://hostname/jellyseerr/setup, and set the URLs as follows:
+- Jellyfin: http://jellyfin:8096/jellyfin
+- Radarr:
+  - Hostname: radarr
+  - Port: 7878
+  - URL Base: /radarr
+- Sonarr
+  - Hostname: sonarr
+  - Port: 8989
+  - URL Base: /sonarr
 
 ## Traefik and SSL Certificates
 
