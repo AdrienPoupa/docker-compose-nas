@@ -10,6 +10,7 @@ services:
       - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
       - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
+      - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
@@ -33,6 +34,10 @@ services:
     volumes:
       - ./letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    healthcheck:
+      test: [ "CMD", "traefik", "healthcheck", "--ping" ]
+      interval: 5s
+      retries: 10
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
@@ -44,6 +49,10 @@ services:
       - ./sonarr:/config
       - ${DATA_ROOT}:/data
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
+      interval: 5s
+      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sonarr`))
@@ -70,6 +79,10 @@ services:
       - ./radarr:/config
       - ${DATA_ROOT}:/data
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
+      interval: 5s
+      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/radarr`))
@@ -96,6 +109,10 @@ services:
       - ./lidarr:/config
       - ${DATA_ROOT}:/data
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
+      interval: 5s
+      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.lidarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/lidarr`))
@@ -120,6 +137,10 @@ services:
     volumes:
       - ./jellyseerr:/app/config
     restart: always
+    healthcheck:
+      test: ["CMD", "wget", "http://127.0.0.1:5055/api/v1/status", "-qO", "/dev/null"]
+      interval: 5s
+      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyseerr`))
@@ -186,6 +207,10 @@ services:
     volumes:
       - ./prowlarr:/config
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
+      interval: 5s
+      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.prowlarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/prowlarr`))
@@ -213,6 +238,10 @@ services:
       - ./qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8080/api/v2/app/version" ]
+      interval: 5s
+      retries: 10
     network_mode: "service:vpn"
     depends_on:
       vpn:
@@ -291,6 +320,10 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128
       - /dev/dri/card0:/dev/dri/card0
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health" ]
+      interval: 5s
+      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`))
