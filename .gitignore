@@ -9,6 +9,8 @@ docker-compose.override.yml
 !/radarr/.gitkeep
 /prowlarr
 !/prowlarr/.gitkeep
+/lidarr
+!/lidarr/.gitkeep
 /qbittorrent
 !/qbittorrent/.gitkeep
 /pia
