@@ -55,6 +55,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 |----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
 | [Sonarr](https://sonarr.tv)                                          | PVR for newsgroup and bittorrent users                                                                                                               | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                        | /sonarr      |
 | [Radarr](https://radarr.video)                                       | Movie collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                        | /radarr      |
+| [Lidarr](https://lidarr.audio)                                       | Music collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/lidarr](https://hub.docker.com/r/linuxserver/lidarr)                        | /lidarr      |
 | [Prowlarr](https://github.com/Prowlarr/Prowlarr)                     | Indexer aggregator for Sonarr and Radarr                                                                                                             | [linuxserver/prowlarr:latest](https://hub.docker.com/r/linuxserver/prowlarr)             | /prowlarr    |
 | [PIA WireGuard VPN](https://github.com/thrnz/docker-wireguard-pia)   | Encapsulate qBittorrent traffic in [PIA](https://www.privateinternetaccess.com/) using [WireGuard](https://www.wireguard.com/) with port forwarding. | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)        |              |
 | [qBittorrent](https://www.qbittorrent.org)                           | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent |
@@ -110,6 +111,7 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `CLOUDFLARE_ZONE_API_TOKEN`    | API token with `Zone:Read` permission                                                                                                                                                                  |                                                  |
 | `SONARR_API_KEY`               | Sonarr API key to show information in the homepage                                                                                                                                                     |                                                  |
 | `RADARR_API_KEY`               | Radarr API key to show information in the homepage                                                                                                                                                     |                                                  |
+| `LIDARR_API_KEY`               | Lidarr API key to show information in the homepage                                                                                                                                                     |                                                  |
 | `PROWLARR_API_KEY`             | Prowlarr API key to show information in the homepage                                                                                                                                                   |                                                  |
 | `JELLYFIN_API_KEY`             | Jellyfin API key to show information in the homepage                                                                                                                                                   |                                                  |
 | `JELLYSEERR_API_KEY`           | Jellyseer API key to show information in the homepage                                                                                                                                                  |                                                  |
@@ -138,11 +140,11 @@ The location of the server it will connect to is set by `LOC=ca`, defaulting to 
 You need to fill the credentials in the `PIA_*` environment variable, 
 otherwise the VPN container will exit and qBittorrent will not start.
 
-## Sonarr & Radarr
+## Sonarr, Radarr & Lidarr
 
 ### File Structure
 
-Sonarr and Radarr must be configured to support hardlinks, to allow instant moves and prevent using twice the storage
+Sonarr, Radarr, and Lidarr must be configured to support hardlinks, to allow instant moves and prevent using twice the storage
 (Bittorrent downloads and final file). The trick is to use a single volume shared by the Bittorrent client and the *arrs.
 Subfolders are used to separate the TV shows from the movies.
 
@@ -158,11 +160,13 @@ data
 └── media = shared folder for Sonarr and Radarr files
    ├── movies = Radarr
    └── tv = Sonarr
+   └── music = Lidarr
 ```
 
 Go to Settings > Management.
 In Sonarr, set the Root folder to `/data/media/tv`.
-In Radar, set the Root folder to `/data/media/movies`.
+In Radarr, set the Root folder to `/data/media/movies`.
+In Lidarr, set the Root folder to `/data/media/music`.
 
 ### Download Client
 
@@ -174,7 +178,7 @@ place in the VPN container, the hostname for qBittorrent is the hostname of the 
 The indexers are configured through Prowlarr. They synchronize automatically to Radarr and Sonarr.
 
 Radarr and Sonarr may then be added via Settings > Apps. The Prowlarr server is `http://prowlarr:9696/prowlarr`, the Radarr server
-is `http://radarr:7878/radarr` and Sonarr `http://sonarr:8989/sonarr`:
+is `http://radarr:7878/radarr` Sonarr `http://sonarr:8989/sonarr`, and Lidarr `http://lidarr:8686/lidarr`:
 
 Their API keys can be found in Settings > Security > API Key.
 

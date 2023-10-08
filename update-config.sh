@@ -18,6 +18,14 @@ done
 sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/sonarr<\/UrlBase>/" ./sonarr/config.xml && rm ./sonarr/config.xml.bak
 sed -i.bak 's/^SONARR_API_KEY=.*/SONARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./sonarr/config.xml)"'/' .env && rm .env.bak
 
+echo "Updating Lidarr configuration..."
+until [ -f ./lidarr/config.xml ]
+do
+  sleep 5
+done
+sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/lidarr<\/UrlBase>/" ./lidarr/config.xml && rm ./lidarr/config.xml.bak
+sed -i.bak 's/^LIDARR_API_KEY=.*/LIDARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./lidarr/config.xml)"'/' .env && rm .env.bak
+
 echo "Updating Prowlarr configuration..."
 until [ -f ./prowlarr/config.xml ]
 do

@@ -85,6 +85,32 @@ services:
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878/radarr
       - homepage.widget.key=${RADARR_API_KEY}
+  lidarr:
+    image: lscr.io/linuxserver/lidarr
+    container_name: lidarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./lidarr:/config
+      - ${DATA_ROOT}:/data
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.lidarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/lidarr`))
+      - traefik.http.routers.lidarr.tls=true
+      - traefik.http.routers.lidarr.tls.certresolver=myresolver
+      - traefik.http.services.lidarr.loadbalancer.server.port=8686
+      - homepage.group=Media
+      - homepage.name=Lidarr
+      - homepage.icon=lidarr.png
+      - homepage.href=/lidarr
+      - homepage.description=Music management
+      - homepage.weight=2
+      - homepage.widget.type=lidarr
+      - homepage.widget.url=http://lidarr:8686/lidarr
+      - homepage.widget.key=${LIDARR_API_KEY}
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
