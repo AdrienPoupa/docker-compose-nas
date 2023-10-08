@@ -19,6 +19,8 @@ docker-compose.override.yml
 !/letsencrypt/.gitkeep
 /jellyfin
 !/jellyfin/.gitkeep
+/jellyseerr
+!/jellyseerr/.gitkeep
 /adguardhome/certs
 /adguardhome/conf
 !/adguardhome/conf/.gitkeep
