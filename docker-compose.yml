@@ -307,7 +307,7 @@ services:
       - homepage.widget.url=http://jellyfin:8096/jellyfin
       - homepage.widget.key=${JELLYFIN_API_KEY}
   homepage:
-    image: ghcr.io/benphelps/homepage:latest
+    image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     environment:
       - HOMEPAGE_VAR_TITLE=${HOMEPAGE_VAR_TITLE}
