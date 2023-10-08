@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   traefik:
-    image: traefik:v2.9
+    image: traefik:v2.10
     container_name: traefik
     restart: always
     environment:
