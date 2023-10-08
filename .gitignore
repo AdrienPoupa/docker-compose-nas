@@ -3,6 +3,8 @@
 docker-compose.override.yml
 /homepage/logs
 /homepage/*.yaml
+/homepage/*.css
+/homepage/*.js
 /sonarr
 !/sonarr/.gitkeep
 /radarr
