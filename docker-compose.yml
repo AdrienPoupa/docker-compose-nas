@@ -239,7 +239,7 @@ services:
       - ${DOWNLOAD_ROOT}:/data/torrents
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8080/api/v2/app/version" ]
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8080" ]
       interval: 5s
       retries: 10
     network_mode: "service:vpn"

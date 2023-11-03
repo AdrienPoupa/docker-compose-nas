@@ -195,8 +195,6 @@ The web UI login page can be disabled on for the local network in Settings > Web
 172.17.0.0/16
 ```
 
-Please enable `Bypass authentication for clients on localhost` as well to make qBittorrent's healthcheck work as well.
-
 ## Jellyfin
 
 To enable [hardware transcoding](https://jellyfin.org/docs/general/administration/hardware-acceleration/),
