@@ -37,6 +37,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
       * [DHCP](#dhcp)
       * [Expose DNS Server with Tailscale](#expose-dns-server-with-tailscale)
   * [Customization](#customization)
+    * [Optional: Using the VPN for *arr apps](#optional-using-the-vpn-for-arr-apps)
   * [Synology Quirks](#synology-quirks)
     * [Free Ports 80 and 443](#free-ports-80-and-443)
     * [Install Synology WireGuard](#install-synology-wireguard)
@@ -371,6 +372,21 @@ services:
       - TECHNOLOGY=NordLynx
       - NETWORK=192.168.1.0/24  # So it can be accessed within the local network
 ```
+
+### Optional: Using the VPN for *arr apps
+
+If you want to use the VPN for Prowlarr and other *arr applications, add the following block to all the desired containers:
+```yml
+    network_mode: "service:vpn"
+    depends_on:
+      vpn:
+        condition: service_healthy
+```
+
+Change the healthcheck to mark the containers as unhealthy when internet connection is not working by appending a URL
+to the healthcheck, eg: `test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping", "https://google.com" ]`
+
+Then in Prowlarr, use `localhost` rather than `vpn` as the hostname, since they are on the same network.
 
 ## Synology Quirks
 
