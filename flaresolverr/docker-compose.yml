@@ -15,3 +15,5 @@ services:
       - traefik.http.routers.flaresolverr.rule=PathPrefix(`/flaresolverr`)
       - traefik.http.routers.flaresolverr.tls=true
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
+    profiles:
+      - flaresolverr
