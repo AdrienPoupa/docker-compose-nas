@@ -107,6 +107,27 @@ services:
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696
       - homepage.widget.key=${PROWLARR_API_KEY}
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    ports:
+      - "8080:8080" # SABnzbd Web UI
+    environment:
+      - PUID=${USER_ID} # Replace with your user ID
+      - PGID=${GROUP_ID} # Replace with your group ID
+      - TZ=${TIMEZONE} # Replace with your timezone
+    volumes:
+      - ./sabnzbd/config:/config # Configuration files
+      - ${DATA_ROOT}/downloads:/downloads # Downloads
+      - ${DATA_ROOT}/incomplete-downloads:/incomplete-downloads # Incomplete downloads
+    restart: always
+    labels:
+      - homepage.group=Media
+      - homepage.name=SABnzbd
+      - homepage.icon=sabnzbd.png
+      - homepage.href=http://localhost:8080
+      - homepage.description=Usenet
+      - homepage.weight=6
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
