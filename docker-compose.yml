@@ -125,7 +125,7 @@ services:
       - ${DATA_ROOT}/incomplete-downloads:/incomplete-downloads # Incomplete downloads
     restart: always
     labels:
-      - homepage.group=Media
+      - homepage.group=Download
       - homepage.name=SABnzbd
       - homepage.icon=sabnzbd.png
       - homepage.href=http://localhost:8080
@@ -152,6 +152,45 @@ services:
       - homepage.href=http://localhost:8787
       - homepage.description=Ebook and Audiobook management
       - homepage.weight=3
+  # plex:
+  #   image: plexinc/pms-docker:latest
+  #   container_name: plex
+  #   network_mode: host
+  #   environment:
+  #     - TZ=${TIMEZONE} # Replace with your timezone, e.g., America/New_York
+  #     - PLEX_CLAIM= # Optional: Claim code from https://www.plex.tv/claim if needed
+  #     - ADVERTISE_IP=http://localhost:32400/ # Replace with your host IP address
+  #     - PUID=1000 # Replace with your user ID
+  #     - PGID=1000 # Replace with your group ID
+  #   volumes:
+  #     - ./plex:/config # Replace with the path to your config directory
+  #   labels:
+  #   restart: unless-stopped
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    ports:
+      - "32400:32400"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+      - VERSION=docker
+      - PLEX_CLAIM=claim-xbtn7VzfF6H1T6EhxVHS #optional
+    volumes:
+      - ./plex:/config
+      - ./plex/transcode:/transcode # Replace with the path to your transcode directory
+      - ./plex/media:/data # Replace with the path to your media library
+    restart: unless-stopped
+    labels:
+      - homepage.group=Media
+      - homepage.name=Plex
+      - homepage.icon=plex.png
+      - homepage.widget.type=plex
+      - homepage.widget.url=http://plex:32400
+      - homepage.description=Media Server
+      - homepage.href=http://localhost:32400
+      - homepage.weight=6
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage

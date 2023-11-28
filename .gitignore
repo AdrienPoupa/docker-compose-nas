@@ -21,6 +21,8 @@ docker-compose.override.yml
 !/pia/.gitkeep
 /pia-shared
 !/pia-shared/.gitkeep
+/plex
+!/plex/.gitkeep
 /letsencrypt
 !/letsencrypt/.gitkeep
 /jellyfin
