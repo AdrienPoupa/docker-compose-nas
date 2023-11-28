@@ -9,6 +9,8 @@ docker-compose.override.yml
 !/sonarr/.gitkeep
 /radarr
 !/radarr/.gitkeep
+/readarr
+!/readarr/.gitkeep
 /prowlarr
 !/prowlarr/.gitkeep
 /lidarr

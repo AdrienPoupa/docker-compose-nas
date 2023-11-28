@@ -25,6 +25,9 @@ services:
       - homepage.description=Series management
       - homepage.weight=0
       - homepage.widget.type=sonarr
+      # When you run multiple services in a Docker Compose file, Docker creates a default network for these services to communicate with each other. 
+      # Inside this network, containers can refer to each other by their service names as defined in the Docker Compose file. 
+      # In this case, the sonarr service can be reached at http://sonarr:8989 from any other service within the same Docker network.
       - homepage.widget.url=http://sonarr:8989
       - homepage.widget.key=${SONARR_API_KEY}
   radarr:
@@ -128,6 +131,27 @@ services:
       - homepage.href=http://localhost:8080
       - homepage.description=Usenet
       - homepage.weight=6
+  readarr:
+    image: lscr.io/linuxserver/readarr:nightly
+    container_name: readarr
+    ports:
+      - "8787:8787" # Readarr Web UI
+    environment:
+      - PUID=${USER_ID} # Replace with your user ID
+      - PGID=${GROUP_ID} # Replace with your group ID
+      - TZ=${TIMEZONE} # Replace with your timezone
+    volumes:
+      - ./readarr:/config # Configuration files
+      - ${DATA_ROOT}/books:/books # Books directory
+      - ${DATA_ROOT}/downloads:/downloads # Downloads
+    restart: always
+    labels:
+      - homepage.group=Media
+      - homepage.name=Readarr
+      - homepage.icon=readarr.png
+      - homepage.href=http://localhost:8787
+      - homepage.description=Ebook and Audiobook management
+      - homepage.weight=3
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
