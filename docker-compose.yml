@@ -152,20 +152,25 @@ services:
       - homepage.href=http://localhost:8787
       - homepage.description=Ebook and Audiobook management
       - homepage.weight=3
+      - homepage.widget.type=readarr
+      - homepage.widget.url=http://readarr:8787
+      - homepage.widget.key=${READARR_API_KEY}
   plex:
+    image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    image: plexinc/pms-docker
-    restart: unless-stopped
+    ports:
+      - "32400:32400"
     environment:
-      - PUID=${USER_ID} # Replace with your user ID
-      - PGID=${GROUP_ID} # Replace with your group ID
-      - TZ=${TIMEZONE} # Replace with your timezone
-      - PLEX_CLAIM=<claimToken>
-    network_mode: host
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+      - VERSION=docker
+      - PLEX_CLAIM=claim-xbtn7VzfF6H1T6EhxVHS #optional
     volumes:
       - ./plex:/config
       - ./plex/transcode:/transcode # Replace with the path to your transcode directory
       - ./plex/media:/data # Replace with the path to your media library
+    restart: unless-stopped
     labels:
       - homepage.group=Media
       - homepage.name=Plex
@@ -173,7 +178,7 @@ services:
       - homepage.widget.type=plex
       - homepage.widget.url=http://plex:32400
       - homepage.description=Media Server
-      - homepage.href=http://localhost:32400/web
+      - homepage.href=http://localhost:32400
       - homepage.weight=6
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
