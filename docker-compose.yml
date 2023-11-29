@@ -155,6 +155,30 @@ services:
       - homepage.widget.type=readarr
       - homepage.widget.url=http://readarr:8787
       - homepage.widget.key=${READARR_API_KEY}
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE}
+      - LOG_LEVE=debug
+      - PORT=5055
+    volumes:
+      - ./overseer/config:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+    labels:
+      - homepage.group=Media
+      - homepage.name=Overseerr
+      - homepage.icon=overseerr.png
+      - homepage.href=http://localhost:5055
+      - homepage.description=Media Discovery & Request Management
+      - homepage.weight=3
+      - homepage.widget.type=overseerr
+      - homepage.widget.url=http://overseerr:5055
+      - homepage.widget.key=${OVERSEERR_API_KEY}
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
