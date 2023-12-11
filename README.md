@@ -65,10 +65,10 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Homepage](https://gethomepage.dev)                                  | Application dashboard                                                                                                                                | [gethomepage/homepage](https://github.com/gethomepage/homepage/pkgs/container/homepage)  | /            |
 | [Traefik](https://traefik.io)                                        | Reverse proxy                                                                                                                                        | [traefik](https://hub.docker.com/_/traefik)                                              |              |
 | [Watchtower](https://containrrr.dev/watchtower/)                     | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                  |              |
-| [Autoheal](https://github.com/willfarrell/docker-autoheal/)          | Monitor and restart unhealthy docker containers                                                                                                      | [willfarrell/autoheal](https://hub.docker.com/r/willfarrell/autoheal)                    |              |
-| [SABnzbd](https://sabnzbd.org/)                                      | Optional - Free and easy binary newsreader                                                                                                           | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
-| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)         | Optional - Proxy server to bypass Cloudflare protection in Prowlarr                                                                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
-| [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)    | Optional - Network-wide software for blocking ads & tracking                                                                                         | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
+| [Autoheal](https://github.com/willfarrell/docker-autoheal/)          | Monitor and restart unhealthy Docker containers                                                                                                      | [willfarrell/autoheal](https://hub.docker.com/r/willfarrell/autoheal)                    |              |
+| [SABnzbd](https://sabnzbd.org/)                                      | Optional - Free and easy binary newsreader<br/>Enable with `COMPOSE_PROFILES=sabnzbd`                                                                | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
+| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)         | Optional - Proxy server to bypass Cloudflare protection in Prowlarr<br/>Enable with `COMPOSE_PROFILES=flaresolverr`                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
+| [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)    | Optional - Network-wide software for blocking ads & tracking<br/>Enable with `COMPOSE_PROFILES=adguardhome`                                          | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
 | [DHCP Relay](https://github.com/modem7/DHCP-Relay)                   | Optional - Docker DHCP Relay                                                                                                                         | [modem7/dhcprelay](https://hub.docker.com/r/modem7/dhcprelay)                            |              |
 | [Traefik Certs Dumper](https://github.com/ldez/traefik-certs-dumper) | Optional - Dump ACME data from Traefik to certificates                                                                                               | [ldez/traefik-certs-dumper](https://hub.docker.com/r/ldez/traefik-certs-dumper)          |              |
 
@@ -77,7 +77,7 @@ see [Optional Services](#optional-services) for more information.
 
 ## Quick Start
 
-`cp .env.example .env`, edit to your needs then `sudo docker compose up -d`.
+`cp .env.example .env`, edit to your needs then `docker compose up -d`.
 
 For the first time, run `./update-config.sh` to update the applications base URLs and set the API keys in `.env`.
 
@@ -87,8 +87,8 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 
 | Variable                       | Description                                                                                                                                                                                            | Default                                          |
 |--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
-| `COMPOSE_FILE`                 | Docker compose files to load                                                                                                                                                                           | `docker-compose.yml`                             |
-| `COMPOSE_PATH_SEPARATOR`       | Path separator between compose files to load                                                                                                                                                           | `:`                                              |
+| `COMPOSE_FILE`                 | Docker compose files to load                                                                                                                                                                           |                                                  |
+| `COMPOSE_PROFILES`             | Docker compose profiles to load (`flaresolverr`, `adguardhome`, `sabnzbd`)                                                                                                                             |                                                  |
 | `USER_ID`                      | ID of the user to use in Docker containers                                                                                                                                                             | `1000`                                           |
 | `GROUP_ID`                     | ID of the user group to use in Docker containers                                                                                                                                                       | `1000`                                           |
 | `TIMEZONE`                     | TimeZone used by the container.                                                                                                                                                                        | `America/New_York`                               |
@@ -294,10 +294,12 @@ and from the outside you need to connect to Tailscale first, then the NAS domain
 
 ## Optional Services
 
-As their name would suggest, optional services are not launched by default. They have their own `docker-compose.yml` file
-in their subfolders. To enable a service, append it to the `COMPOSE_FILE` environment variable.
+Optional services are not launched by default and enabled by appending their profile name to the 
+`COMPOSE_PROFILES` environment variable (see [Docker documentation](https://docs.docker.com/compose/profiles)).
 
-Say you want to enable FlareSolverr, you should have `COMPOSE_FILE=docker-compose.yml:flaresolverr/docker-compose.yml`
+Say you want to enable FlareSolverr, you should have `COMPOSE_PROFILES=flaresolverr`.
+
+Multiple optional services can be enabled separated by commas: `COMPOSE_PROFILES=flaresolverr,adguardhome`.
 
 ### FlareSolverr
 
@@ -305,11 +307,15 @@ In Prowlarr, add the FlareSolverr indexer with the URL http://flaresolverr:8191/
 
 ### SABnzbd
 
-Enable SABnzbd by setting `COMPOSE_FILE=docker-compose.yml:sabnzbd/docker-compose.yml`. It will be accessible at `/sabnzbd`.
+Enable SABnzbd by setting `COMPOSE_PROFILES=sabnzbd`. It will be accessible at `/sabnzbd`.
 
 If that is not the case, the `url_base` parameter in `sabnzbd.ini` should be set to `/sabnzbd`.
 
+Additionally, `host_whitelist` value should be set to your hostname.
+
 ### AdGuard Home
+
+Enable AdGuard Home by setting `COMPOSE_PROFILES=adguardhome`.
 
 Set the `ADGUARD_HOSTNAME`, I chose a different subdomain to use secure DNS without the folder.
 

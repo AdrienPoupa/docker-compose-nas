@@ -12,6 +12,8 @@ services:
       - NET_ADMIN
     network_mode: host
     mem_reservation: 6m
+    profiles:
+      - adguardhome
 
   adguardhome:
     image: adguard/adguardhome
@@ -48,6 +50,8 @@ services:
       - homepage.widget.url=https://${ADGUARD_HOSTNAME}
       - homepage.widget.username=${ADGUARD_USERNAME}
       - homepage.widget.password=${ADGUARD_PASSWORD}
+    profiles:
+      - adguardhome
 
   traefik-certs-dumper:
     image: ldez/traefik-certs-dumper
@@ -65,6 +69,8 @@ services:
     volumes:
       - ./letsencrypt:/data
       - ./adguardhome/certs:/certs
+    profiles:
+      - adguardhome
 
 networks:
   adguardhome:

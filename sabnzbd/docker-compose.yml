@@ -24,3 +24,5 @@ services:
       - homepage.href=/sabnzbd
       - homepage.description=Usenet
       - homepage.weight=6
+    profiles:
+      - sabnzbd
