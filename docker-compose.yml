@@ -1,4 +1,5 @@
-version: "3.9"
+version: '3.9'
+
 services:
   traefik:
     image: traefik:v2.10
@@ -128,6 +129,8 @@ services:
       - homepage.widget.type=lidarr
       - homepage.widget.url=http://lidarr:8686/lidarr
       - homepage.widget.key=${LIDARR_API_KEY}
+    profiles:
+      - lidarr
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -316,8 +319,6 @@ services:
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
       - UN_RADARR_0_URL=http://radarr:7878/radarr
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-      - UN_LIDARR_0_URL=http://lidarr:8686/lidarr
-      - UN_LIDARR_0_API_KEY=${LIDARR_API_KEY}
     security_opt:
       - no-new-privileges:true
   jellyfin:
