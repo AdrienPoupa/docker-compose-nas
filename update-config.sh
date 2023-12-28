@@ -34,12 +34,5 @@ done
 sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/prowlarr<\/UrlBase>/" ./prowlarr/config.xml && rm ./prowlarr/config.xml.bak
 sed -i.bak 's/^PROWLARR_API_KEY=.*/PROWLARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./prowlarr/config.xml)"'/' .env && rm .env.bak
 
-echo "Updating Jellyfin configuration..."
-until [ -f ./jellyfin/network.xml ]
-do
-  sleep 5
-done
-sed -i.bak "s/<BaseUrl \/>/<BaseUrl>\/jellyfin<\/BaseUrl>/" ./jellyfin/network.xml && rm ./jellyfin/network.xml.bak
-
 echo "Restarting containers..."
-docker compose restart radarr sonarr prowlarr jellyfin
+docker-compose restart radarr sonarr prowlarr

@@ -1,51 +1,37 @@
 version: '3.9'
 
 services:
-  dhcp-relay:
-    image: modem7/dhcprelay:latest
-    container_name: dhcp-relay
-    restart: always
-    depends_on:
-      - adguardhome
-    command: ["-id", "enp2s0", "-iu", "br_adguard", "10.0.0.10"]
-    cap_add:
-      - NET_ADMIN
-    network_mode: host
-    mem_reservation: 6m
-
   adguardhome:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: always
-    networks:
-      adguardhome:
-        ipv4_address: 10.0.0.10
-      default:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "68:68/tcp"
-      - "68:68/udp"
+      # Removed port 68 as DHCP won't be used and it clashes with synology DHCP (which gives issues after uninstall)
+      # DNS over TLS
       - "853:853/tcp"
+      - 9080:9080
     volumes:
       - ./adguardhome/work:/opt/adguardhome/work
       - ./adguardhome/conf:/opt/adguardhome/conf
       - ./adguardhome/certs:/opt/adguardhome/certs
     labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=docker-compose-nas"
-      - "traefik.http.services.adguardhome.loadbalancer.server.port=3000"
-      - "traefik.http.routers.adguardhome.rule=(Host(`${ADGUARD_HOSTNAME}`))"
-      - "traefik.http.routers.adguardhome.tls=true"
-      - "traefik.http.routers.adguardhome.tls.certresolver=myresolver"
+      # There is still something wrong when going through traefik - returning 404
+      # For now accessing through port
+      - traefik.enable=true
+      - traefik.http.routers.adguardhome.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/adguardhome`))
+      - traefik.http.routers.adguardhome.tls=true     
+      - traefik.http.routers.adguardhome.tls.certresolver=myresolver
+      - traefik.http.services.adguardhome.loadbalancer.server.port=9080
       - homepage.group=Utilities
       - homepage.name=Adguard
       - homepage.icon=adguard-home.png
-      - homepage.href=https://${ADGUARD_HOSTNAME}
+      - homepage.href=/adguardhome
       - homepage.description=DNS Adblocker
       - homepage.weight=0
       - homepage.widget.type=adguard
-      - homepage.widget.url=https://${ADGUARD_HOSTNAME}
+      - homepage.widget.url=https://${HOSTNAME}/adguardhome
       - homepage.widget.username=${ADGUARD_USERNAME}
       - homepage.widget.password=${ADGUARD_PASSWORD}
 
@@ -65,12 +51,3 @@ services:
     volumes:
       - ./letsencrypt:/data
       - ./adguardhome/certs:/certs
-
-networks:
-  adguardhome:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: br_adguard
-    ipam:
-      config:
-        - subnet: 10.0.0.0/24

@@ -1,5 +1,6 @@
 version: '3.9'
 
+# Had to host_whitelist = f5dfddd907db, nas.obrepalski.com, sabnzbd, localhost in sanzbd.ini for it to work
 services:
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -12,15 +13,20 @@ services:
       - ./sabnzbd:/config
       - ${DATA_ROOT}:/data
     restart: always
+    ports:
+      - 9999:9999
     labels:
       - traefik.enable=true
       - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`) || PathPrefix(`/sabnzbd`))
       - traefik.http.routers.sabnzbd.tls=true
       - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
-      - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
-      - homepage.group=Media
+      - traefik.http.services.sabnzbd.loadbalancer.server.port=9999
+      - homepage.group=Download
       - homepage.name=Sabnzbd
       - homepage.icon=sabnzbd.png
       - homepage.href=/sabnzbd
       - homepage.description=Usenet
       - homepage.weight=6
+      - homepage.widget.type=sabnzbd
+      - homepage.widget.url=http://sabnzbd:9999/sabnzbd
+      - homepage.widget.key=${SABNZBD_API_KEY}

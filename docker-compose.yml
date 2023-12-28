@@ -28,6 +28,9 @@ services:
       - --certificatesresolvers.myresolver.acme.caserver=${LETS_ENCRYPT_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --api.dashboard=true
+      - --api=true
+      - --api.insecure=true
     ports:
       - "80:80"
       - "443:443"
@@ -38,6 +41,8 @@ services:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
       interval: 5s
       retries: 10
+    labels:
+      - traefik.http.routers.api.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/api`))
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
@@ -128,75 +133,6 @@ services:
       - homepage.widget.type=lidarr
       - homepage.widget.url=http://lidarr:8686/lidarr
       - homepage.widget.key=${LIDARR_API_KEY}
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
-    environment:
-      - LOG_LEVEL=debug
-      - TZ=${TIMEZONE}
-    volumes:
-      - ./jellyseerr:/app/config
-    restart: always
-    healthcheck:
-      test: ["CMD", "wget", "http://127.0.0.1:5055/api/v1/status", "-qO", "/dev/null"]
-      interval: 5s
-      retries: 10
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyseerr`))
-      - traefik.http.routers.jellyseerr.tls=true
-      - traefik.http.routers.jellyseerr.tls.certresolver=myresolver
-      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
-      - traefik.http.routers.jellyseerr.middlewares=jellyseerr-stripprefix,jellyseerr-rewrite,jellyseerr-rewriteHeaders
-      - traefik.http.middlewares.jellyseerr-stripprefix.stripPrefix.prefixes=/jellyseerr
-      - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[0].header=location
-      - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[0].regex=^/(.+)$
-      - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[0].replacement=/jellyseerr/$1
-      - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[1].header=location
-      - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[1].regex=^/$
-      - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[1].replacement=/jellyseerr
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[0]=text/html
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[1]=application/javascript
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[2]=*/*
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[1].regex=/_next
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[1].replacement=/jellyseerr/_next
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].regex=\/_next\\/data\\//
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].replacement=\/jellyseerr\/_next\/data\//
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[3].regex=/api/v1
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[3].replacement=/jellyseerr/api/v1
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[4].regex=/login/plex/loading
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[4].replacement=/jellyseerr/login/plex/loading
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[5].regex=/images/
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[5].replacement=/jellyseerr/images/
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[6].regex=/favicon
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[6].replacement=/jellyseerr/favicon
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[7].regex=/logo_
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[7].replacement=/jellyseerr/logo_
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[8].regex=/site.webmanifest
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[8].replacement=/jellyseerr/site.webmanifest
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[9].regex=/sw.js
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[9].replacement=/jellyseerr/sw.js
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[10].regex=/offline.html
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[10].replacement=/jellyseerr/offline.html
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[11].regex=src="/os_logo_square.png"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[11].replacement=src="/jellyseerr/os_logo_square.png"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[12].regex=href="/(.*)"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[12].replacement=href="/jellyseerr/$1"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[13].regex=linkUrl:"/(.*)"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[13].replacement=linkUrl:"/jellyseerr/$1"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[14].regex="/([a-z]+)/".concat
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[14].replacement="/jellyseerr/$1/".concat
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[15].regex=url:"/(.*)"
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[15].replacement=url:"/jellyseerr/$1"
-      - homepage.group=Media
-      - homepage.name=JellySeerr
-      - homepage.icon=jellyseerr.png
-      - homepage.href=/jellyseerr
-      - homepage.description=Content Recommendations and Request Management
-      - homepage.weight=2
-      - homepage.widget.type=jellyseerr
-      - homepage.widget.url=http://jellyseerr:5055
-      - homepage.widget.key=${JELLYSEERR_API_KEY}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -273,73 +209,27 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: thrnz/docker-wireguard-pia
+    image: qmcgaw/gluetun
     container_name: vpn
-    volumes:
-      - ./pia:/pia
-      - ./pia-shared:/pia-shared
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
     environment:
-      - LOC=${PIA_LOCATION}
-      - USER=${PIA_USER}
-      - PASS=${PIA_PASS}
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-      - PORT_FORWARDING=1
-      - PORT_PERSIST=1
-      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=openvpn
+      - OPENVPN_USER=cD8yS5VBhCWBNBiL9JjyVUdt
+      - OPENVPN_PASSWORD=A83v7y2f3VS6Eifw5oHTnsXy
+      - SERVER_COUNTRIES=Poland
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8080:8080 #qbit
+      - 6881:6881 #qbit
+      - 6881:6881/udp #qbit
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
     restart: always
-    labels:
-      # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
-      - com.centurylinklabs.watchtower.enable=false
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin
-    container_name: jellyfin
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
-      - JELLYFIN_PublishedServerUrl=${HOSTNAME}/jellyfin
-    volumes:
-      - ./jellyfin:/config
-      - ${DATA_ROOT}:/data
-    ports:
-      - "7359:7359/udp"
-      - "1900:1900/udp"
-    devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card0:/dev/dri/card0
-    restart: always
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health" ]
-      interval: 5s
-      retries: 10
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`))
-      - traefik.http.routers.jellyfin.tls=true
-      - traefik.http.routers.jellyfin.tls.certresolver=myresolver
-      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
-      - homepage.group=Media
-      - homepage.name=Jellyfin
-      - homepage.icon=jellyfin.png
-      - homepage.href=/jellyfin
-      - homepage.description=Media server
-      - homepage.weight=3
-      - homepage.widget.type=jellyfin
-      - homepage.widget.url=http://jellyfin:8096/jellyfin
-      - homepage.widget.key=${JELLYFIN_API_KEY}
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
