@@ -72,7 +72,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)       | Optional - Proxy server to bypass Cloudflare protection in Prowlarr<br/>Enable with `COMPOSE_PROFILES=flaresolverr`                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
 | [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)  | Optional - Network-wide software for blocking ads & tracking<br/>Enable with `COMPOSE_PROFILES=adguardhome`                                          | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
 | [Tandoor](https://tandoor.dev)                                     | Optional - Smart recipe management<br/>Enable with `COMPOSE_PROFILES=tandoor`                                                                        | [vabene1111/recipes](https://hub.docker.com/r/vabene1111/recipes)                        | /recipes     |
-[README.md](README.md)
+
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
 
