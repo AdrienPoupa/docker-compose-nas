@@ -1,0 +1,71 @@
+version: '3.9'
+
+services:
+  tandoor:
+    image: vabene1111/recipes:latest
+    container_name: tandoor
+    restart: always
+    env_file:
+      - ./tandoor/.env
+    volumes:
+      - ./tandoor/database:/opt/recipes/database
+      - ./tandoor/mediafiles:/opt/recipes/mediafiles
+      - tandoor-staticfiles:/opt/recipes/staticfiles
+    healthcheck:
+      test: ["CMD", "wget", "http://127.0.0.1:8080/recipes", "-qO", "/dev/null"]
+      interval: 5s
+      retries: 10
+    profiles:
+      - tandoor
+
+  tandoor-nginx:
+    image: nginx:mainline-alpine
+    container_name: tandoor-nginx
+    restart: always
+    env_file:
+      - ./tandoor/.env
+    volumes:
+      - ./tandoor/nginx:/etc/nginx/conf.d:ro
+      - ./tandoor/mediafiles:/media:ro
+      - tandoor-staticfiles:/static:ro
+    healthcheck:
+      test: ["CMD", "wget", "http://127.0.0.1/recipes", "-qO", "/dev/null"]
+      interval: 5s
+      retries: 10
+    depends_on:
+      - tandoor
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tandoor.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/recipes`))
+      - traefik.http.routers.tandoor.tls=true
+      - traefik.http.routers.tandoor.tls.certresolver=myresolver
+      - traefik.http.services.tandoor.loadbalancer.server.port=80
+      - homepage.group=Apps
+      - homepage.name=Tandoor
+      - homepage.icon=tandoor.png
+      - homepage.href=/recipes
+      - homepage.description=Smart recipe management
+      - homepage.weight=1
+    profiles:
+      - tandoor
+
+  tandoor-backup:
+    image: adrienpoupa/rclone-backup:latest
+    container_name: tandoor-backup
+    restart: always
+    env_file:
+      - ./tandoor/backup.env
+    environment:
+      - BACKUP_FOLDER_NAME=mediafiles
+      - BACKUP_FOLDER_PATH=/data/mediafiles
+      - DB_TYPE=sqlite
+      - SQLITE_DATABASE=/database/recipes.db
+    volumes:
+      - ./tandoor/database:/database
+      - ./tandoor/mediafiles:/data/mediafiles
+      - ./tandoor/backup:/config
+    profiles:
+      - tandoor
+
+volumes:
+  tandoor-staticfiles:
