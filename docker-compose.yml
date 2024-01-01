@@ -354,12 +354,15 @@ services:
       - traefik.http.routers.sabnzbd.tls=true
       - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
       - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
-      - homepage.group=Media
+      - homepage.group=Download
       - homepage.name=Sabnzbd
       - homepage.icon=sabnzbd.png
       - homepage.href=/sabnzbd
       - homepage.description=Usenet
       - homepage.weight=6
+      - homepage.widget.type=sabnzbd
+      - homepage.widget.url=http://sabnzbd:8080/sabnzbd
+      - homepage.widget.key=${SABNZBD_API_KEY}
     profiles:
       - sabnzbd
   jellyfin:
