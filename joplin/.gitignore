@@ -1,0 +1,4 @@
+/database
+/storage
+.env
+backup.env

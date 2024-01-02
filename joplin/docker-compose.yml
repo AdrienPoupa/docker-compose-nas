@@ -1,0 +1,55 @@
+services:
+  joplin:
+    image: joplin/server:latest
+    user: root # Not pretty, but non-root breaks volumes: https://github.com/laurent22/joplin/issues/9489
+    container_name: joplin
+    restart: always
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=https://${HOSTNAME}/joplin
+      - HOSTNAME=${HOSTNAME}
+      - DB_CLIENT=sqlite3
+      - SQLITE_DATABASE=/database/joplin.db
+      - STORAGE_DRIVER=Type=Filesystem; Path=/storage
+    volumes:
+      - ./joplin/database:/database
+      - ./joplin/storage:/storage
+      - ./joplin/healthcheck:/healthcheck
+    healthcheck:
+      test: ["CMD", "node", "/healthcheck/healthcheck.js"]
+      interval: 5s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.joplin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/joplin`))
+      - traefik.http.routers.joplin.tls=true
+      - traefik.http.routers.joplin.tls.certresolver=myresolver
+      - traefik.http.routers.joplin.middlewares=joplin-stripprefix
+      - traefik.http.middlewares.joplin-stripprefix.stripPrefix.prefixes=/joplin
+      - traefik.http.services.joplin.loadbalancer.server.port=22300
+      - homepage.group=Apps
+      - homepage.name=joplin
+      - homepage.icon=joplin.png
+      - homepage.href=/joplin
+      - homepage.description=Note-taking application
+      - homepage.weight=2
+    profiles:
+      - joplin
+
+  joplin-backup:
+    image: adrienpoupa/rclone-backup:latest
+    container_name: joplin-backup
+    restart: always
+    env_file:
+      - ./joplin/backup.env
+    environment:
+      - BACKUP_FOLDER_NAME=storage
+      - BACKUP_FOLDER_PATH=/storage
+      - DB_TYPE=sqlite
+      - SQLITE_DATABASE=/database/joplin.db
+    volumes:
+      - ./joplin/database:/database
+      - ./joplin/storage:/storage
+      - ./joplin/backup:/config
+    profiles:
+      - joplin
