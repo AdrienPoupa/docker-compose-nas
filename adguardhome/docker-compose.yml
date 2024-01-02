@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   dhcp-relay:
     image: modem7/dhcprelay:latest

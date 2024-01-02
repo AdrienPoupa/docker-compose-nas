@@ -380,8 +380,6 @@ then appending it to the `COMPOSE_FILE` environment variable: `COMPOSE_FILE=dock
 For example, use a [different VPN provider](https://github.com/bubuntux/nordvpn):
 
 ```yml
-version: '3.9'
-
 services:
   vpn:
     image: ghcr.io/bubuntux/nordvpn
@@ -469,7 +467,6 @@ If you want to use separate paths for torrents download and long term storage, t
 set your `docker-compose.override.yml` to:
 
 ```yml
-version: "3.9"
 services:
   sonarr:
     volumes:

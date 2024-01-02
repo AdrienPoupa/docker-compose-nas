@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   tandoor:
     image: vabene1111/recipes:latest
