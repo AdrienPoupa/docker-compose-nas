@@ -4,6 +4,8 @@ services:
     user: root # Not pretty, but non-root breaks volumes: https://github.com/laurent22/joplin/issues/9489
     container_name: joplin
     restart: always
+    env_file:
+      - ./joplin/.env
     environment:
       - APP_PORT=22300
       - APP_BASE_URL=https://${HOSTNAME}/joplin
