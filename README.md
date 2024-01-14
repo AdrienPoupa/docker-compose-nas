@@ -181,6 +181,8 @@ In Lidarr, set the Root folder to `/data/media/music`.
 Then qBittorrent can be configured at Settings > Download Clients. Because all the networking for qBittorrent takes
 place in the VPN container, the hostname for qBittorrent is the hostname of the VPN container, ie `vpn`, and the port is `8080`:
 
+To use the VueTorrent WebUI just go to `qBittorrent`, `Options`, `Web UI`, `Use Alternative WebUI`, and enter `/vuetorrent`. Special thanks to gabe565 for the easy enablement with (https://github.com/gabe565/linuxserver-mod-vuetorrent).
+
 ## Prowlarr
 
 The indexers are configured through Prowlarr. They synchronize automatically to Radarr and Sonarr.

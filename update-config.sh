@@ -2,44 +2,30 @@
 
 # See https://stackoverflow.com/a/44864004 for the sed GNU/BSD compatible hack
 
-echo "Updating Radarr configuration..."
-until [ -f ./radarr/config.xml ]
-do
-  sleep 5
-done
-sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/radarr<\/UrlBase>/" ./radarr/config.xml && rm ./radarr/config.xml.bak
-sed -i.bak 's/^RADARR_API_KEY=.*/RADARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./radarr/config.xml)"'/' .env && rm .env.bak
+function update_config {
+  echo "Upadting ${1^} configuration..."
+  until [ -f ./$1/config.xml ]
+  do
+    sleep 5
+  done
+  sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/$1<\/UrlBase>/" ./$1/config.xml && rm ./$1/config.xml.bak
+  sed -i.bak 's/^'"${1^^}"'_API_KEY=.*/'"${1^^}"'_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./$1/config.xml)"'/' .env && rm .env.bak
+  echo "Update of ${1^} configuration complete."
+  echo "Restarting ${1^}..."
+  docker compose restart $1
+}
 
-echo "Updating Sonarr configuration..."
-until [ -f ./sonarr/config.xml ]
-do
-  sleep 5
+for container in $(docker ps --format '{{.Names}}'); do
+  if [[ $container =~ ^(radarr|sonarr|lidarr|prowlarr)$ ]]; then
+    update_config $container
+  elif [[ $container =~ ^(jellyfin)$ ]]; then
+    echo "Upadting ${container^} configuration..."
+    until [ -f ./$container/network.xml ]; do
+      sleep 5
+    done
+    sed -i.bak "s/<BaseUrl \/>/<BaseUrl>\/$container<\/BaseUrl>/" ./$container/network.xml && rm ./$container/network.xml.bak
+    echo "Update of ${container^} configuration complete."
+    echo "Restarting ${container^}..."
+    docker compose restart $container
+  fi
 done
-sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/sonarr<\/UrlBase>/" ./sonarr/config.xml && rm ./sonarr/config.xml.bak
-sed -i.bak 's/^SONARR_API_KEY=.*/SONARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./sonarr/config.xml)"'/' .env && rm .env.bak
-
-echo "Updating Lidarr configuration..."
-until [ -f ./lidarr/config.xml ]
-do
-  sleep 5
-done
-sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/lidarr<\/UrlBase>/" ./lidarr/config.xml && rm ./lidarr/config.xml.bak
-sed -i.bak 's/^LIDARR_API_KEY=.*/LIDARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./lidarr/config.xml)"'/' .env && rm .env.bak
-
-echo "Updating Prowlarr configuration..."
-until [ -f ./prowlarr/config.xml ]
-do
-  sleep 5
-done
-sed -i.bak "s/<UrlBase><\/UrlBase>/<UrlBase>\/prowlarr<\/UrlBase>/" ./prowlarr/config.xml && rm ./prowlarr/config.xml.bak
-sed -i.bak 's/^PROWLARR_API_KEY=.*/PROWLARR_API_KEY='"$(sed -n 's/.*<ApiKey>\(.*\)<\/ApiKey>.*/\1/p' ./prowlarr/config.xml)"'/' .env && rm .env.bak
-
-echo "Updating Jellyfin configuration..."
-until [ -f ./jellyfin/network.xml ]
-do
-  sleep 5
-done
-sed -i.bak "s/<BaseUrl \/>/<BaseUrl>\/jellyfin<\/BaseUrl>/" ./jellyfin/network.xml && rm ./jellyfin/network.xml.bak
-
-echo "Restarting containers..."
-docker compose restart radarr sonarr prowlarr jellyfin
