@@ -11,7 +11,7 @@ services:
     network_mode: host
     mem_reservation: 6m
     profiles:
-      - adguardhome
+      - adguardhome-dhcp
 
   adguardhome:
     image: adguard/adguardhome

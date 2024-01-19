@@ -367,6 +367,8 @@ dhcp:
       - 6 ips 192.168.0.10,192.168.0.10
 ```
 
+Enable DHCP Relay by setting `COMPOSE_PROFILES=adguardhome-dhcp`.
+
 #### Expose DNS Server with Tailscale
 
 Based on [Tailscale's documentation](https://tailscale.com/kb/1114/pi-hole), it is easy to use your AdGuard server everywhere.
