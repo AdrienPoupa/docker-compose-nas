@@ -17,6 +17,10 @@ services:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: always
+    healthcheck:
+      test: [ "CMD", "wget", "http://127.0.0.1:3000", "-qO", "/dev/null" ]
+      interval: 5s
+      retries: 10
     networks:
       adguardhome:
         ipv4_address: 10.0.0.10
