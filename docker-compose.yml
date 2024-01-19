@@ -37,7 +37,7 @@ services:
       - host.docker.internal:172.17.0.1
     healthcheck:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
-      interval: 5s
+      interval: 30s
       retries: 10
   sonarr:
     image: lscr.io/linuxserver/sonarr
@@ -52,7 +52,7 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
@@ -82,7 +82,7 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
@@ -112,7 +112,7 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
@@ -142,7 +142,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:5055/api/v1/status", "-qO", "/dev/null"]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
@@ -212,7 +212,7 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
@@ -262,7 +262,7 @@ services:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
       # see: https://github.com/qdm12/gluetun/issues/641#issuecomment-933856220
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8080", "https://google.com" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     network_mode: "service:vpn"
     depends_on:
@@ -386,7 +386,7 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
@@ -418,7 +418,7 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8123" ]
-      interval: 5s
+      interval: 30s
       retries: 10
     privileged: true
     labels:

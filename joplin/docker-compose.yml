@@ -19,7 +19,7 @@ services:
       - ./joplin/healthcheck:/healthcheck
     healthcheck:
       test: ["CMD", "node", "/healthcheck/healthcheck.js"]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true

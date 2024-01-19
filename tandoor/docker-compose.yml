@@ -11,7 +11,7 @@ services:
       - tandoor-staticfiles:/opt/recipes/staticfiles
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:8080/recipes", "-qO", "/dev/null"]
-      interval: 5s
+      interval: 30s
       retries: 10
     profiles:
       - tandoor
@@ -28,7 +28,7 @@ services:
       - tandoor-staticfiles:/static:ro
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1/recipes", "-qO", "/dev/null"]
-      interval: 5s
+      interval: 30s
       retries: 10
     depends_on:
       - tandoor
