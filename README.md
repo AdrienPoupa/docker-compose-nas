@@ -38,6 +38,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
       * [Expose DNS Server with Tailscale](#expose-dns-server-with-tailscale)
     * [Tandoor](#tandoor)
     * [Joplin](#joplin)
+    * [Home Assistant](#home-assistant)
   * [Customization](#customization)
     * [Optional: Using the VPN for *arr apps](#optional-using-the-vpn-for-arr-apps)
   * [Synology Quirks](#synology-quirks)
@@ -54,26 +55,27 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 
 ## Applications
 
-| **Application**                                                    | **Description**                                                                                                                                      | **Image**                                                                                | **URL**      |
-|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
-| [Sonarr](https://sonarr.tv)                                        | PVR for newsgroup and bittorrent users                                                                                                               | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                        | /sonarr      |
-| [Radarr](https://radarr.video)                                     | Movie collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                        | /radarr      |
-| [Prowlarr](https://github.com/Prowlarr/Prowlarr)                   | Indexer aggregator for Sonarr and Radarr                                                                                                             | [linuxserver/prowlarr:latest](https://hub.docker.com/r/linuxserver/prowlarr)             | /prowlarr    |
+| **Application**                                                   | **Description**                                                                                                                                      | **Image**                                                                                | **URL**      |
+|-------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
+| [Sonarr](https://sonarr.tv)                                       | PVR for newsgroup and bittorrent users                                                                                                               | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                        | /sonarr      |
+| [Radarr](https://radarr.video)                                    | Movie collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                        | /radarr      |
+| [Prowlarr](https://github.com/Prowlarr/Prowlarr)                  | Indexer aggregator for Sonarr and Radarr                                                                                                             | [linuxserver/prowlarr:latest](https://hub.docker.com/r/linuxserver/prowlarr)             | /prowlarr    |
 | [PIA WireGuard VPN](https://github.com/thrnz/docker-wireguard-pia) | Encapsulate qBittorrent traffic in [PIA](https://www.privateinternetaccess.com/) using [WireGuard](https://www.wireguard.com/) with port forwarding. | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)        |              |
-| [qBittorrent](https://www.qbittorrent.org)                         | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent |
-| [Unpackerr](https://unpackerr.zip)                                 | Automated Archive Extractions                                                                                                                        | [golift/unpackerr](https://hub.docker.com/r/golift/unpackerr)                            |              |
-| [Jellyfin](https://jellyfin.org)                                   | Media server designed to organize, manage, and share digital media files to networked devices                                                        | [linuxserver/jellyfin](https://hub.docker.com/r/linuxserver/jellyfin)                    | /jellyfin    |
-| [Jellyseer](https://jellyfin.org)                                  | Manages requests for your media library                                                                                                              | [fallenbagel/jellyseerr](https://hub.docker.com/r/fallenbagel/jellyseerr)                | /jellyseer   |
-| [Homepage](https://gethomepage.dev)                                | Application dashboard                                                                                                                                | [gethomepage/homepage](https://github.com/gethomepage/homepage/pkgs/container/homepage)  | /            |
-| [Traefik](https://traefik.io)                                      | Reverse proxy                                                                                                                                        | [traefik](https://hub.docker.com/_/traefik)                                              |              |
-| [Watchtower](https://containrrr.dev/watchtower/)                   | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                  |              |
-| [Autoheal](https://github.com/willfarrell/docker-autoheal/)        | Monitor and restart unhealthy Docker containers                                                                                                      | [willfarrell/autoheal](https://hub.docker.com/r/willfarrell/autoheal)                    |              |
-| [Lidarr](https://lidarr.audio)                                     | Optional - Music collection manager for Usenet and BitTorrent users<br/>Enable with `COMPOSE_PROFILES=lidarr`                                        | [linuxserver/lidarr](https://hub.docker.com/r/linuxserver/lidarr)                        | /lidarr      |
-| [SABnzbd](https://sabnzbd.org/)                                    | Optional - Free and easy binary newsreader<br/>Enable with `COMPOSE_PROFILES=sabnzbd`                                                                | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
-| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)       | Optional - Proxy server to bypass Cloudflare protection in Prowlarr<br/>Enable with `COMPOSE_PROFILES=flaresolverr`                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
-| [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)  | Optional - Network-wide software for blocking ads & tracking<br/>Enable with `COMPOSE_PROFILES=adguardhome`                                          | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
-| [Tandoor](https://tandoor.dev)                                     | Optional - Smart recipe management<br/>Enable with `COMPOSE_PROFILES=tandoor`                                                                        | [vabene1111/recipes](https://hub.docker.com/r/vabene1111/recipes)                        | /recipes     |
-| [Joplin](https://joplinapp.org/)                                   | Optional - Note taking application<br/>Enable with `COMPOSE_PROFILES=joplin`                                                                         | [joplin/server](https://hub.docker.com/r/joplin/server)                                  | /joplin      |
+| [qBittorrent](https://www.qbittorrent.org)                        | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent |
+| [Unpackerr](https://unpackerr.zip)                                | Automated Archive Extractions                                                                                                                        | [golift/unpackerr](https://hub.docker.com/r/golift/unpackerr)                            |              |
+| [Jellyfin](https://jellyfin.org)                                  | Media server designed to organize, manage, and share digital media files to networked devices                                                        | [linuxserver/jellyfin](https://hub.docker.com/r/linuxserver/jellyfin)                    | /jellyfin    |
+| [Jellyseer](https://jellyfin.org)                                 | Manages requests for your media library                                                                                                              | [fallenbagel/jellyseerr](https://hub.docker.com/r/fallenbagel/jellyseerr)                | /jellyseer   |
+| [Homepage](https://gethomepage.dev)                               | Application dashboard                                                                                                                                | [gethomepage/homepage](https://github.com/gethomepage/homepage/pkgs/container/homepage)  | /            |
+| [Traefik](https://traefik.io)                                     | Reverse proxy                                                                                                                                        | [traefik](https://hub.docker.com/_/traefik)                                              |              |
+| [Watchtower](https://containrrr.dev/watchtower/)                  | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                  |              |
+| [Autoheal](https://github.com/willfarrell/docker-autoheal/)       | Monitor and restart unhealthy Docker containers                                                                                                      | [willfarrell/autoheal](https://hub.docker.com/r/willfarrell/autoheal)                    |              |
+| [Lidarr](https://lidarr.audio)                                    | Optional - Music collection manager for Usenet and BitTorrent users<br/>Enable with `COMPOSE_PROFILES=lidarr`                                        | [linuxserver/lidarr](https://hub.docker.com/r/linuxserver/lidarr)                        | /lidarr      |
+| [SABnzbd](https://sabnzbd.org/)                                   | Optional - Free and easy binary newsreader<br/>Enable with `COMPOSE_PROFILES=sabnzbd`                                                                | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
+| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)      | Optional - Proxy server to bypass Cloudflare protection in Prowlarr<br/>Enable with `COMPOSE_PROFILES=flaresolverr`                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
+| [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) | Optional - Network-wide software for blocking ads & tracking<br/>Enable with `COMPOSE_PROFILES=adguardhome`                                          | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
+| [Tandoor](https://tandoor.dev)                                    | Optional - Smart recipe management<br/>Enable with `COMPOSE_PROFILES=tandoor`                                                                        | [vabene1111/recipes](https://hub.docker.com/r/vabene1111/recipes)                        | /recipes     |
+| [Joplin](https://joplinapp.org/)                                  | Optional - Note taking application<br/>Enable with `COMPOSE_PROFILES=joplin`                                                                         | [joplin/server](https://hub.docker.com/r/joplin/server)                                  | /joplin      |
+| [Home Assistant](https://www.home-assistant.io/)                  | Optional - Open source home automation that puts local control and privacy first<br/>Enable with `COMPOSE_PROFILES=homeassistant`                    | [home-assistant/home-assistant:stable](https://ghcr.io/home-assistant/home-assistant)    |              |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
@@ -377,6 +379,25 @@ See [here](./tandoor/README.md).
 ### Joplin
 
 See [here](./joplin/README.md).
+
+### Home Assistant
+
+Enable Home Assistant by setting `COMPOSE_PROFILES=homeassistant`.
+
+Set the `HOMEASSISTANT_HOSTNAME`, since it does not support 
+[running in a subfolder](https://github.com/home-assistant/architecture/issues/156). 
+Add the necessary DNS records in your domain.
+
+You will need to allow Traefik to access Home Assistant by adding the following in `homeassistant/configuration.yaml`:
+
+```yaml
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.0.0.0/8 # You can put a more precise range instead
+```
+
+Set the `HOMEASSISTANT_ACCESS_TOKEN` for homepage support.
 
 ## Customization
 

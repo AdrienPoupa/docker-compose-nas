@@ -17,7 +17,6 @@ docker-compose.override.yml
 /jellyseerr
 /adguardhome/certs
 /adguardhome/conf
-!/adguardhome/conf/.gitkeep
 /adguardhome/work
-!/adguardhome/work/.gitkeep
 /sabnzbd
+/homeassistant
