@@ -3,7 +3,7 @@
 # See https://stackoverflow.com/a/44864004 for the sed GNU/BSD compatible hack
 
 function update_config {
-  echo "Upadting ${1^} configuration..."
+  echo "Updating ${1^} configuration..."
   until [ -f ./$1/config.xml ]
   do
     sleep 5
@@ -19,7 +19,7 @@ for container in $(docker ps --format '{{.Names}}'); do
   if [[ $container =~ ^(radarr|sonarr|lidarr|prowlarr)$ ]]; then
     update_config $container
   elif [[ $container =~ ^(jellyfin)$ ]]; then
-    echo "Upadting ${container^} configuration..."
+    echo "Updating ${container^} configuration..."
     until [ -f ./$container/network.xml ]; do
       sleep 5
     done
