@@ -59,6 +59,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 |-------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|--------------|
 | [Sonarr](https://sonarr.tv)                                       | PVR for newsgroup and bittorrent users                                                                                                               | [linuxserver/sonarr](https://hub.docker.com/r/linuxserver/sonarr)                        | /sonarr      |
 | [Radarr](https://radarr.video)                                    | Movie collection manager for Usenet and BitTorrent users                                                                                             | [linuxserver/radarr](https://hub.docker.com/r/linuxserver/radarr)                        | /radarr      |
+| [Bazarr](https://www.bazarr.media/)                                    | Companion application to Sonarr and Radarr that manages and downloads subtitles                                                                 | [linuxserver/bazarr](https://hub.docker.com/r/linuxserver/bazarr)                        | /bazarr      |
 | [Prowlarr](https://github.com/Prowlarr/Prowlarr)                  | Indexer aggregator for Sonarr and Radarr                                                                                                             | [linuxserver/prowlarr:latest](https://hub.docker.com/r/linuxserver/prowlarr)             | /prowlarr    |
 | [PIA WireGuard VPN](https://github.com/thrnz/docker-wireguard-pia) | Encapsulate qBittorrent traffic in [PIA](https://www.privateinternetaccess.com/) using [WireGuard](https://www.wireguard.com/) with port forwarding. | [thrnz/docker-wireguard-pia](https://hub.docker.com/r/thrnz/docker-wireguard-pia)        |              |
 | [qBittorrent](https://www.qbittorrent.org)                        | Bittorrent client with a complete web UI<br/>Uses VPN network<br/>Using Libtorrent 1.x                                                               | [linuxserver/qbittorrent:libtorrentv1](https://hub.docker.com/r/linuxserver/qbittorrent) | /qbittorrent |
@@ -89,6 +90,7 @@ For the first time, run `./update-config.sh` to update the applications base URL
 Get your qBittorrent password from `docker compose logs qbittorrent` and change it in the UI and in `.env.`
 
 If you want to show Jellyfin information in the homepage, create it in Jellyfin settings and fill `JELLYFIN_API_KEY`.
+If you want to show Bazarr information in the homepage, open `./bazarr/config/config.yml`, find the apikey line and copy it in your .env file in a new line: `BAZARR_API_KEY='your_bazar_api_key'`
 
 ## Environment Variables
 
@@ -150,7 +152,7 @@ The location of the server it will connect to is set by `LOC=ca`, defaulting to 
 You need to fill the credentials in the `PIA_*` environment variable, 
 otherwise the VPN container will exit and qBittorrent will not start.
 
-## Sonarr, Radarr & Lidarr
+## Sonarr, Radarr, Lidarr & Bazarr
 
 ### File Structure
 
