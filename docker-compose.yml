@@ -131,6 +131,36 @@ services:
       - homepage.widget.key=${LIDARR_API_KEY}
     profiles:
       - lidarr
+  bazarr:
+    image: lscr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./bazarr/config:/config
+      - ${DATA_ROOT}:/data
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
+      interval: 5s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bazarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/bazarr`))
+      - traefik.http.routers.bazarr.tls=true
+      - traefik.http.routers.bazarr.tls.certresolver=myresolver
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+      - homepage.group=Media
+      - homepage.name=Bazarr
+      - homepage.icon=bazarr.png
+      - homepage.href=/bazarr
+      - homepage.description=Subtitles management
+      - homepage.weight=0
+      - homepage.widget.type=bazarr
+      - homepage.widget.url=http://bazarr:6767/bazarr
+      - homepage.widget.key=${BAZARR_API_KEY}
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
