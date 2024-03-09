@@ -131,6 +131,36 @@ services:
       - homepage.widget.key=${LIDARR_API_KEY}
     profiles:
       - lidarr
+  bazarr:
+    image: lscr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ./bazarr/config:/config
+      - ${DATA_ROOT}:/data
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
+      interval: 5s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bazarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/bazarr`))
+      - traefik.http.routers.bazarr.tls=true
+      - traefik.http.routers.bazarr.tls.certresolver=myresolver
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+      - homepage.group=Download
+      - homepage.name=Bazarr
+      - homepage.icon=bazarr.png
+      - homepage.href=/bazarr
+      - homepage.description=Subtitles management
+      - homepage.weight=4
+      - homepage.widget.type=bazarr
+      - homepage.widget.url=http://bazarr:6767/bazarr
+      - homepage.widget.key=${BAZARR_API_KEY}
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -225,7 +255,7 @@ services:
       - homepage.icon=prowlarr.png
       - homepage.href=/prowlarr
       - homepage.description=Indexers management
-      - homepage.weight=4
+      - homepage.weight=1
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696/prowlarr
       - homepage.widget.key=${PROWLARR_API_KEY}
@@ -287,7 +317,7 @@ services:
       - homepage.icon=qbittorrent.png
       - homepage.href=/qbittorrent
       - homepage.description=Bittorrent client
-      - homepage.weight=5
+      - homepage.weight=2
       - homepage.widget.type=qbittorrent
       - homepage.widget.url=http://vpn:8080
       - homepage.widget.username=${QBITTORRENT_USERNAME}
@@ -360,7 +390,7 @@ services:
       - homepage.icon=sabnzbd.png
       - homepage.href=/sabnzbd
       - homepage.description=Usenet
-      - homepage.weight=6
+      - homepage.weight=3
       - homepage.widget.type=sabnzbd
       - homepage.widget.url=http://sabnzbd:8080/sabnzbd
       - homepage.widget.key=${SABNZBD_API_KEY}

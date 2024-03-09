@@ -30,7 +30,7 @@ services:
       - traefik.http.middlewares.joplin-stripprefix.stripPrefix.prefixes=/joplin
       - traefik.http.services.joplin.loadbalancer.server.port=22300
       - homepage.group=Apps
-      - homepage.name=joplin
+      - homepage.name=Joplin
       - homepage.icon=joplin.png
       - homepage.href=/joplin
       - homepage.description=Note-taking application
