@@ -31,7 +31,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ${CONFIG_ROOT:.}/letsencrypt:/letsencrypt
+      - ${CONFIG_ROOT:-.}/letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     extra_hosts:
       - host.docker.internal:172.17.0.1
@@ -47,7 +47,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/sonarr:/config
+      - ${CONFIG_ROOT:-.}/sonarr:/config
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
@@ -77,7 +77,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/radarr:/config
+      - ${CONFIG_ROOT:-.}/radarr:/config
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
@@ -107,7 +107,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/lidarr:/config
+      - ${CONFIG_ROOT:-.}/lidarr:/config
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
@@ -139,7 +139,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/bazarr/config:/config
+      - ${CONFIG_ROOT:-.}/bazarr/config:/config
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
@@ -168,7 +168,7 @@ services:
       - LOG_LEVEL=debug
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/jellyseerr:/app/config
+      - ${CONFIG_ROOT:-.}/jellyseerr:/app/config
     restart: always
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:5055/api/v1/status", "-qO", "/dev/null"]
@@ -238,7 +238,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/prowlarr:/config
+      - ${CONFIG_ROOT:-.}/prowlarr:/config
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
@@ -285,7 +285,7 @@ services:
       - WEBUI_PORT=8080
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
     volumes:
-      - ${CONFIG_ROOT:.}/qbittorrent:/config
+      - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
     restart: always
     healthcheck:
@@ -326,8 +326,8 @@ services:
     image: thrnz/docker-wireguard-pia
     container_name: vpn
     volumes:
-      - ${CONFIG_ROOT:.}/pia:/pia
-      - ${CONFIG_ROOT:.}/pia-shared:/pia-shared
+      - ${CONFIG_ROOT:-.}/pia:/pia
+      - ${CONFIG_ROOT:-.}/pia-shared:/pia-shared
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -376,7 +376,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/sabnzbd:/config
+      - ${CONFIG_ROOT:-.}/sabnzbd:/config
       - ${DATA_ROOT}:/data
     restart: always
     labels:
@@ -405,7 +405,7 @@ services:
       - TZ=${TIMEZONE}
       - JELLYFIN_PublishedServerUrl=${HOSTNAME}/jellyfin
     volumes:
-      - ${CONFIG_ROOT:.}/jellyfin:/config
+      - ${CONFIG_ROOT:-.}/jellyfin:/config
       - ${DATA_ROOT}:/data
     ports:
       - "7359:7359/udp"
@@ -442,7 +442,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:.}/homeassistant:/config
+      - ${CONFIG_ROOT:-.}/homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     restart: always
@@ -481,7 +481,7 @@ services:
       - HOMEPAGE_VAR_WEATHER_TIME=${TIMEZONE}
       - HOMEPAGE_VAR_WEATHER_UNIT=${HOMEPAGE_VAR_WEATHER_UNIT}
     volumes:
-      - ${CONFIG_ROOT:.}/homepage:/app/config
+      - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_ROOT}:/data
     restart: always
