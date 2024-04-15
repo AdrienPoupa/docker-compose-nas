@@ -4,10 +4,10 @@ services:
     container_name: tandoor
     restart: always
     env_file:
-      - ./tandoor/.env
+      - ${CONFIG_ROOT:-.}/tandoor/.env
     volumes:
-      - ./tandoor/database:/opt/recipes/database
-      - ./tandoor/mediafiles:/opt/recipes/mediafiles
+      - ${CONFIG_ROOT:-.}/tandoor/database:/opt/recipes/database
+      - ${CONFIG_ROOT:-.}/tandoor/mediafiles:/opt/recipes/mediafiles
       - tandoor-staticfiles:/opt/recipes/staticfiles
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:8080/recipes", "-qO", "/dev/null"]
@@ -21,10 +21,10 @@ services:
     container_name: tandoor-nginx
     restart: always
     env_file:
-      - ./tandoor/.env
+      - ${CONFIG_ROOT:-.}/tandoor/.env
     volumes:
-      - ./tandoor/nginx:/etc/nginx/conf.d:ro
-      - ./tandoor/mediafiles:/media:ro
+      - ${CONFIG_ROOT:-.}/tandoor/nginx:/etc/nginx/conf.d:ro
+      - ${CONFIG_ROOT:-.}/tandoor/mediafiles:/media:ro
       - tandoor-staticfiles:/static:ro
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1/recipes", "-qO", "/dev/null"]
@@ -52,16 +52,16 @@ services:
     container_name: tandoor-backup
     restart: always
     env_file:
-      - ./tandoor/backup.env
+      - ${CONFIG_ROOT:-.}/tandoor/backup.env
     environment:
       - BACKUP_FOLDER_NAME=mediafiles
       - BACKUP_FOLDER_PATH=/data/mediafiles
       - DB_TYPE=sqlite
       - SQLITE_DATABASE=/database/recipes.db
     volumes:
-      - ./tandoor/database:/database
-      - ./tandoor/mediafiles:/data/mediafiles
-      - ./tandoor/backup:/config
+      - ${CONFIG_ROOT:-.}/tandoor/database:/database
+      - ${CONFIG_ROOT:-.}/tandoor/mediafiles:/data/mediafiles
+      - ${CONFIG_ROOT:-.}/tandoor/backup:/config
     profiles:
       - tandoor
 

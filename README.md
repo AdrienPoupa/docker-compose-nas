@@ -387,22 +387,7 @@ See [here](./joplin/README.md).
 
 ### Home Assistant
 
-Enable Home Assistant by setting `COMPOSE_PROFILES=homeassistant`.
-
-Set the `HOMEASSISTANT_HOSTNAME`, since it does not support 
-[running in a subfolder](https://github.com/home-assistant/architecture/issues/156). 
-Add the necessary DNS records in your domain.
-
-You will need to allow Traefik to access Home Assistant by adding the following in `homeassistant/configuration.yaml`:
-
-```yaml
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 172.0.0.0/8 # You can put a more precise range instead
-```
-
-Set the `HOMEASSISTANT_ACCESS_TOKEN` for homepage support.
+See [here](./homeassistant/README.md).
 
 ## Customization
 
