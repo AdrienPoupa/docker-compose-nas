@@ -1,0 +1,114 @@
+services:
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:release
+    environment:
+      DB_HOSTNAME: immich_postgres
+      DB_PASSWORD: ${IMMICH_DB_PASSWORD}
+      DB_USERNAME: postgres
+      DB_DATABASE_NAME: immich
+    command: ['start.sh', 'immich']
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+      - ${CONFIG_ROOT:-.}/immich/healthcheck:/healthcheck
+    depends_on:
+      - immich-redis
+      - immich-database
+    restart: always
+    healthcheck:
+      test: [ "CMD", "node", "/healthcheck/healthcheck.js" ]
+      interval: 30s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.immich.rule=(Host(`${IMMICH_HOSTNAME}`))
+      - traefik.http.routers.immich.tls=true
+      - traefik.http.routers.immich.tls.certresolver=myresolver
+      - traefik.http.services.immich.loadbalancer.server.port=3001
+      - homepage.group=Apps
+      - homepage.name=immich
+      - homepage.icon=immich.png
+      - homepage.href=https://${IMMICH_HOSTNAME}
+      - homepage.description=Self-hosted photo and video management solution
+      - homepage.weight=4
+      - homepage.widget.type=immich
+      - homepage.widget.url=http://immich:3001
+      - homepage.widget.key=${IMMICH_API_KEY}
+    profiles:
+      - immich
+
+  immich-microservices:
+    container_name: immich_microservices
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    environment:
+      DB_HOSTNAME: immich_postgres
+      DB_PASSWORD: ${IMMICH_DB_PASSWORD}
+      DB_USERNAME: postgres
+      DB_DATABASE_NAME: immich
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      - /dev/dri/card0:/dev/dri/card0
+    command: ['start.sh', 'microservices']
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - immich-redis
+      - immich-database
+    restart: always
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "exec 5<>/dev/tcp/127.0.0.1/3002" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - immich
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    volumes:
+      - immich-model-cache:/cache
+    restart: always
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "exec 5<>/dev/tcp/127.0.0.1/3003" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - immich
+
+  immich-redis:
+    container_name: immich_redis
+    image: registry.hub.docker.com/library/redis:6.2-alpine@sha256:84882e87b54734154586e5f8abd4dce69fe7311315e2fc6d67c29614c8de2672
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - immich
+
+  immich-database:
+    container_name: immich_postgres
+    image: registry.hub.docker.com/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+    environment:
+      DB_HOSTNAME: immich_postgres
+      POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+    volumes:
+      - ${CONFIG_ROOT:-.}/immich/postgresql:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - immich
+
+volumes:
+  immich-model-cache:
