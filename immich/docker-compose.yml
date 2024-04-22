@@ -33,7 +33,7 @@ services:
       - homepage.description=Self-hosted photo and video management solution
       - homepage.weight=4
       - homepage.widget.type=immich
-      - homepage.widget.url=http://immich:3001
+      - homepage.widget.url=http://immich-server:3001
       - homepage.widget.key=${IMMICH_API_KEY}
     profiles:
       - immich
