@@ -131,6 +131,38 @@ services:
       - homepage.widget.key=${LIDARR_API_KEY}
     profiles:
       - lidarr
+  readarr:
+    image: lscr.io/linuxserver/readarr
+    container_name: readarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${CONFIG_ROOT:-.}/readarr:/config
+      - ${DATA_ROOT}:/data
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8787/readarr/ping" ]
+      interval: 30s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.readarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/readarr`))
+      - traefik.http.routers.readarr.tls=true
+      - traefik.http.routers.readarr.tls.certresolver=myresolver
+      - traefik.http.services.readarr.loadbalancer.server.port=8787
+      - homepage.group=Media
+      - homepage.name=Readarr
+      - homepage.icon=readarr.png
+      - homepage.href=/readarr
+      - homepage.description=eBook management
+      - homepage.weight=0
+      - homepage.widget.type=readarr
+      - homepage.widget.url=http://readarr:8787/readarr
+      - homepage.widget.key=${READARR_API_KEY}
+    profiles:
+      - readarr
   bazarr:
     image: lscr.io/linuxserver/bazarr
     container_name: bazarr

@@ -19,7 +19,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
   * [Quick Start](#quick-start)
   * [Environment Variables](#environment-variables)
   * [PIA WireGuard VPN](#pia-wireguard-vpn)
-  * [Sonarr, Radarr & Lidarr](#sonarr-radarr--lidarr)
+  * [Sonarr, Radarr, Lidarr, Readarr](#sonarr-radarr--lidarr--readarr)
     * [File Structure](#file-structure)
     * [Download Client](#download-client)
   * [Prowlarr](#prowlarr)
@@ -72,6 +72,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Watchtower](https://containrrr.dev/watchtower/)                   | Automated Docker images update                                                                                                                       | [containrrr/watchtower](https://hub.docker.com/r/containrrr/watchtower)                  |              |
 | [Autoheal](https://github.com/willfarrell/docker-autoheal/)        | Monitor and restart unhealthy Docker containers                                                                                                      | [willfarrell/autoheal](https://hub.docker.com/r/willfarrell/autoheal)                    |              |
 | [Lidarr](https://lidarr.audio)                                     | Optional - Music collection manager for Usenet and BitTorrent users<br/>Enable with `COMPOSE_PROFILES=lidarr`                                        | [linuxserver/lidarr](https://hub.docker.com/r/linuxserver/lidarr)                        | /lidarr      |
+| [Readarr](https://readarr.com/)                                     | Optional - Book Manager and Automation (Sonarr for Ebooks)<br/>Enable with `COMPOSE_PROFILES=readarr`                                        | [linuxserver/readarr](https://hub.docker.com/r/linuxserver/readarr)                        | /readarr      |
 | [SABnzbd](https://sabnzbd.org/)                                    | Optional - Free and easy binary newsreader<br/>Enable with `COMPOSE_PROFILES=sabnzbd`                                                                | [linuxserver/sabnzbd](https://hub.docker.com/r/linuxserver/sabnzbd)                      | /sabnzbd     |
 | [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)       | Optional - Proxy server to bypass Cloudflare protection in Prowlarr<br/>Enable with `COMPOSE_PROFILES=flaresolverr`                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
 | [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)  | Optional - Network-wide software for blocking ads & tracking<br/>Enable with `COMPOSE_PROFILES=adguardhome`                                          | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
@@ -125,6 +126,7 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `SONARR_API_KEY`               | Sonarr API key to show information in the homepage                                                                                                                                                     |                                                  |
 | `RADARR_API_KEY`               | Radarr API key to show information in the homepage                                                                                                                                                     |                                                  |
 | `LIDARR_API_KEY`               | Lidarr API key to show information in the homepage                                                                                                                                                     |                                                  |
+| `READARR_API_KEY`              | Readarr API key to show information in the homepage                                                                                                                                                     |                                                  |
 | `PROWLARR_API_KEY`             | Prowlarr API key to show information in the homepage                                                                                                                                                   |                                                  |
 | `BAZARR_API_KEY`               | Bazarr API key to show information in the homepage                                                                                                                                                     |                                                  |
 | `JELLYFIN_API_KEY`             | Jellyfin API key to show information in the homepage                                                                                                                                                   |                                                  |
@@ -155,11 +157,11 @@ The location of the server it will connect to is set by `LOC=ca`, defaulting to 
 You need to fill the credentials in the `PIA_*` environment variable, 
 otherwise the VPN container will exit and qBittorrent will not start.
 
-## Sonarr, Radarr & Lidarr
+## Sonarr, Radarr, Lidarr & Readarr
 
 ### File Structure
 
-Sonarr, Radarr, and Lidarr must be configured to support hardlinks, to allow instant moves and prevent using twice the storage
+Sonarr, Radarr, Lidarr and Readarr must be configured to support hardlinks, to allow instant moves and prevent using twice the storage
 (Bittorrent downloads and final file). The trick is to use a single volume shared by the Bittorrent client and the *arrs.
 Subfolders are used to separate the TV shows from the movies.
 
@@ -176,12 +178,14 @@ data
    ├── movies = Radarr
    └── tv = Sonarr
    └── music = Lidarr
+   └── books = Readarr
 ```
 
 Go to Settings > Management.
 In Sonarr, set the Root folder to `/data/media/tv`.
 In Radarr, set the Root folder to `/data/media/movies`.
 In Lidarr, set the Root folder to `/data/media/music`.
+In Readarr, set the Root folder to `/data/media/books`.
 
 ### Download Client
 
@@ -193,7 +197,7 @@ place in the VPN container, the hostname for qBittorrent is the hostname of the 
 The indexers are configured through Prowlarr. They synchronize automatically to Radarr and Sonarr.
 
 Radarr and Sonarr may then be added via Settings > Apps. The Prowlarr server is `http://prowlarr:9696/prowlarr`, the Radarr server
-is `http://radarr:7878/radarr` Sonarr `http://sonarr:8989/sonarr`, and Lidarr `http://lidarr:8686/lidarr`.
+is `http://radarr:7878/radarr`, Sonarr `http://sonarr:8989/sonarr`, Lidarr `http://lidarr:8686/lidarr`, and Readdarr `http://readarr:8787/readarr`.
 
 Their API keys can be found in Settings > Security > API Key.
 
