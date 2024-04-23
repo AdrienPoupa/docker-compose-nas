@@ -141,6 +141,8 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `HOMEPAGE_VAR_WEATHER_LAT`     | Homepage weather city latitude                                                                                                                                                                         |                                                  |
 | `HOMEPAGE_VAR_WEATHER_LONG`    | Homepage weather city longitude                                                                                                                                                                        |                                                  |
 | `HOMEPAGE_VAR_WEATHER_UNIT`    | Homepage weather unit, either `metric` or `imperial`                                                                                                                                                   | `metric`                                         |
+| `CALIBRE_USER`                 | Calibre user for healthcheck & readarr                                                                                                                                           |                                          |
+| `CALIBRE_PASS`                 | Calibre password  for healthcheck & readarr                                                                                                                                           |                                          |
 
 ## PIA WireGuard VPN
 
