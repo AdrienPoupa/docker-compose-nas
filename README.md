@@ -19,7 +19,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
   * [Quick Start](#quick-start)
   * [Environment Variables](#environment-variables)
   * [PIA WireGuard VPN](#pia-wireguard-vpn)
-  * [Sonarr, Radarr, Lidarr, Readarr](#sonarr-radarr--lidarr--readarr)
+  * [Sonarr, Radarr, Lidarr, Readarr](#sonarr-radarr-lidarr--readarr)
     * [File Structure](#file-structure)
     * [Download Client](#download-client)
   * [Prowlarr](#prowlarr)
