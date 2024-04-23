@@ -40,6 +40,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     * [Joplin](#joplin)
     * [Home Assistant](#home-assistant)
     * [Immich](#immich)
+    * [Calibre](#calibre)
   * [Customization](#customization)
     * [Optional: Using the VPN for *arr apps](#optional-using-the-vpn-for-arr-apps)
   * [Synology Quirks](#synology-quirks)
@@ -79,7 +80,8 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Tandoor](https://tandoor.dev)                                     | Optional - Smart recipe management<br/>Enable with `COMPOSE_PROFILES=tandoor`                                                                        | [vabene1111/recipes](https://hub.docker.com/r/vabene1111/recipes)                        | /recipes     |
 | [Joplin](https://joplinapp.org/)                                   | Optional - Note taking application<br/>Enable with `COMPOSE_PROFILES=joplin`                                                                         | [joplin/server](https://hub.docker.com/r/joplin/server)                                  | /joplin      |
 | [Home Assistant](https://www.home-assistant.io/)                   | Optional - Open source home automation that puts local control and privacy first<br/>Enable with `COMPOSE_PROFILES=homeassistant`                    | [home-assistant/home-assistant:stable](https://ghcr.io/home-assistant/home-assistant)    |              |
-| [Immich](https://immich.app//)                                     | Optional - Self-hosted photo and video management solution<br/>Enable with `COMPOSE_PROFILES=immich`                                                 | [immich-app/immich-server:release](https://ghcr.io/immich-app/immich-server)             |              |
+| [Immich](https://immich.app/)                                     | Optional - Self-hosted photo and video management solution<br/>Enable with `COMPOSE_PROFILES=immich`                                                 | [immich-app/immich-server:release](https://ghcr.io/immich-app/immich-server)             |              |
+| [Calibre](https://calibre-ebook.com//)                                     | Optional - Powerful and easy to use e-book manager<br/>Enable with `COMPOSE_PROFILES=calibre`                                                 | [rloomans/calibre-server](https://hub.docker.com/r/rloomans/calibre-server)             |              |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
@@ -185,12 +187,34 @@ Go to Settings > Management.
 In Sonarr, set the Root folder to `/data/media/tv`.
 In Radarr, set the Root folder to `/data/media/movies`.
 In Lidarr, set the Root folder to `/data/media/music`.
-In Readarr, set the Root folder to `/data/media/books`.
+In Readarr, set the Root folder to `/data/media/books`. If also using Calibre, see [Readarr with Calibre](#readarr-with-calibre)
 
 ### Download Client
 
 Then qBittorrent can be configured at Settings > Download Clients. Because all the networking for qBittorrent takes
 place in the VPN container, the hostname for qBittorrent is the hostname of the VPN container, ie `vpn`, and the port is `8080`:
+
+## Readarr with Calibre
+
+When using Readarr with Calibre, special care has to be taken with sharing the library files. [Documentation](https://wiki.servarr.com/readarr/quick-start-guide#root-folders-and-calibre-integration)
+
+When configuring the Readarr root folder, enable advanced mode to see the `Calibre Url Base` setting.
+
+Set the following settings for the Root Folder:
+ - Metadata Profile: None
+ - Use Calibre Content Server: check
+ - Calibre Host: calibre
+ - Calibre Port: 8080
+ - Calibre Url Base: /calibre
+ - Calibre Username: Same as the one from the Calibre setup
+ - Calibre Password: Same as the one from the Calibre setup
+ - Calibre Library: Leave blank
+ - Convert To Format: Leave empty or select your prefered format(s):
+   - MOBI, EPUB, AZW3, DOCX, FB2, HTMLZ, LIT, LRF, PDB, PDF, PMLZ, RB, RTF, SNB, TCR, TXT, TXTZ, ZIP
+ - Calibre output profile: Default or the one matching your ebook device
+ - USe SSL: uncheck
+
+Since Calibre cannot function with AudioBooks, removing the audio profile in `Settings -> Profile` will protect you against wrong downloads.
 
 ## Prowlarr
 
@@ -398,6 +422,10 @@ See [here](./homeassistant/README.md).
 ### Immich
 
 See [here](./immich/README.md).
+
+### Calibre
+
+See [here](./calibre/README.md).
 
 ## Customization
 

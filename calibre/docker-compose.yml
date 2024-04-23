@@ -1,0 +1,27 @@
+services:
+  calibre:
+    image: rloomans/calibre-server
+    container_name: calibre
+    command: /start-calibre-server.sh --url-prefix=/calibre --enable-auth --userdb=/config/users.sqlite --auth-mode=basic
+    volumes:
+      - ${DATA_ROOT}/media/books:/library
+      - ${CONFIG_ROOT:-.}/calibre:/config
+    healthcheck:
+      test: [ "CMD", "curl", "-u", "${CALIBRE_USER}:${CALIBRE_PASS}", "--fail", "http://127.0.0.1:8080/calibre/ajax/search" ]
+      interval: 30s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.calibre.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/calibre`))
+      - traefik.http.routers.calibre.tls=true
+      - traefik.http.routers.calibre.tls.certresolver=myresolver
+      - traefik.http.services.calibre.loadbalancer.server.port=8080
+      - homepage.group=App
+      - homepage.name=Calibre
+      - homepage.icon=calibre.png
+      - homepage.href=/calibre
+      - homepage.description=eBook Library Management and Reader
+      - homepage.weight=2
+    restart: always
+    profiles:
+      - calibre
