@@ -3,25 +3,65 @@ services:
     image: rloomans/calibre-server
     container_name: calibre
     command: /start-calibre-server.sh --url-prefix=/calibre --enable-auth --userdb=/config/users.sqlite --auth-mode=basic
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
     volumes:
+      - ${CONFIG_ROOT:-.}/calibre/calibre:/config
       - ${DATA_ROOT}/media/books:/library
-      - ${CONFIG_ROOT:-.}/calibre:/config
     healthcheck:
       test: [ "CMD", "curl", "-u", "${CALIBRE_USER}:${CALIBRE_PASS}", "--fail", "http://127.0.0.1:8080/calibre/ajax/search" ]
       interval: 30s
       retries: 10
     labels:
-      - traefik.enable=true
+      - traefik.enable=false
       - traefik.http.routers.calibre.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/calibre`))
       - traefik.http.routers.calibre.tls=true
       - traefik.http.routers.calibre.tls.certresolver=myresolver
       - traefik.http.services.calibre.loadbalancer.server.port=8080
-      - homepage.group=App
+      - homepage.group=Apps
       - homepage.name=Calibre
       - homepage.icon=calibre.png
-      - homepage.href=/calibre
-      - homepage.description=eBook Library Management and Reader
+      # - homepage.href=/calibre
+      - homepage.description=eBook Library Management
       - homepage.weight=2
+    restart: always
+    profiles:
+      - calibre
+  calibreweb:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+    volumes:
+      - ${CONFIG_ROOT:-.}/calibre/calibreweb:/config
+      - ${DATA_ROOT}/media/books:/library
+    healthcheck:
+      test: [ "CMD", "curl", "-u", "admin:admin123", "--fail", "http://calibreweb:8083/opds/stats" ]
+      interval: 30s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.calibreweb.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/calibreweb`))
+      - traefik.http.routers.calibreweb.tls=true
+      - traefik.http.routers.calibreweb.tls.certresolver=myresolver
+      - traefik.http.routers.calibreweb.middlewares=calibreweb-pathheader
+      - traefik.http.middlewares.calibreweb-pathheader.headers.customrequestheaders.X-Script-Name=/calibreweb
+      - traefik.http.services.calibreweb.loadbalancer.server.port=8083
+      - homepage.group=Media
+      - homepage.name=CalibreWeb
+      - homepage.icon=calibre-web.png
+      - homepage.href=/calibreweb
+      - homepage.description=eBook Reader
+      - homepage.weight=2
+      - homepage.widget.type=calibreweb
+      - homepage.widget.url=http://calibreweb:8083
+      - homepage.widget.username=admin
+      - homepage.widget.password=admin123
     restart: always
     profiles:
       - calibre

@@ -1,6 +1,9 @@
-# Calibre Content Server
+# Calibre Content Server & CalibreWeb
 
-The calibre Content server allows you to access your calibre libraries and read books directly in a browser on your favorite mobile phone or tablet device.
+The calibre Content server allows you to manage, import, convert and curate your ebook collection / calibre database.
+CalibreWeb is a browser ebook reader with very nice searching and user management capabilities.
+
+You could enable only CalibreWeb and use a it on an existing calibre library. To use Readarr, you'll need Calibre Content Server.
 
 ## Installation
 

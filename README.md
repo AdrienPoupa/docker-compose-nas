@@ -40,7 +40,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     * [Joplin](#joplin)
     * [Home Assistant](#home-assistant)
     * [Immich](#immich)
-    * [Calibre](#calibre)
+    * [Calibre](#calibre--calibre-web)
   * [Customization](#customization)
     * [Optional: Using the VPN for *arr apps](#optional-using-the-vpn-for-arr-apps)
   * [Synology Quirks](#synology-quirks)
@@ -203,7 +203,6 @@ When using Readarr with Calibre, special care has to be taken with sharing the l
 When configuring the Readarr root folder, enable advanced mode to see the `Calibre Url Base` setting.
 
 Set the following settings for the Root Folder:
- - Metadata Profile: None
  - Use Calibre Content Server: check
  - Calibre Host: calibre
  - Calibre Port: 8080
@@ -211,7 +210,7 @@ Set the following settings for the Root Folder:
  - Calibre Username: Same as the one from the Calibre setup
  - Calibre Password: Same as the one from the Calibre setup
  - Calibre Library: Leave blank
- - Convert To Format: Leave empty or select your prefered format(s):
+ - Convert To Format: EPUB or select your prefered format(s):
    - MOBI, EPUB, AZW3, DOCX, FB2, HTMLZ, LIT, LRF, PDB, PDF, PMLZ, RB, RTF, SNB, TCR, TXT, TXTZ, ZIP
  - Calibre output profile: Default or the one matching your ebook device
  - USe SSL: uncheck
@@ -425,7 +424,7 @@ See [here](./homeassistant/README.md).
 
 See [here](./immich/README.md).
 
-### Calibre
+### Calibre & Calibre-Web
 
 See [here](./calibre/README.md).
 
