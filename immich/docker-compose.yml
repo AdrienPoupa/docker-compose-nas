@@ -7,6 +7,7 @@ services:
       DB_PASSWORD: ${IMMICH_DB_PASSWORD}
       DB_USERNAME: postgres
       DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: immich_redis
     command: ['start.sh', 'immich']
     volumes:
       - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
