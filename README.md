@@ -89,8 +89,6 @@ see [Optional Services](#optional-services) for more information.
 
 For the first time, run `./update-config.sh` to update the applications base URLs and set the API keys in `.env`.
 
-Get your qBittorrent password from `docker compose logs qbittorrent` and change it in the UI and in `.env.`
-
 If you want to show Jellyfin information in the homepage, create it in Jellyfin settings and fill `JELLYFIN_API_KEY`.
 
 ## Environment Variables
@@ -114,7 +112,7 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `ADGUARD_USERNAME`             | Optional - AdGuard Home username to show details in the homepage, if enabled                                                                                                                           |                                                  |
 | `ADGUARD_PASSWORD`             | Optional - AdGuard Home password to show details in the homepage, if enabled                                                                                                                           |                                                  |
 | `QBITTORRENT_USERNAME`         | qBittorrent username to access the web UI                                                                                                                                                              | `admin`                                          |
-| `QBITTORRENT_PASSWORD`         | qBittorrent password to access the web UI                                                                                                                                                              | None, please set your password                   |
+| `QBITTORRENT_PASSWORD`         | qBittorrent password to access the web UI                                                                                                                                                              | `adminadmin`                                     |
 | `DNS_CHALLENGE`                | Enable/Disable DNS01 challenge, set to `false` to disable.                                                                                                                                             | `true`                                           |
 | `DNS_CHALLENGE_PROVIDER`       | Provider for DNS01 challenge, [see list here](https://doc.traefik.io/traefik/https/acme/#providers).                                                                                                   | `cloudflare`                                     |
 | `LETS_ENCRYPT_CA_SERVER`       | Let's Encrypt CA Server used to generate certificates, set to production by default.<br/>Set to `https://acme-staging-v02.api.letsencrypt.org/directory` to test your changes with the staging server. | `https://acme-v02.api.letsencrypt.org/directory` |
@@ -199,7 +197,8 @@ Their API keys can be found in Settings > Security > API Key.
 
 ## qBittorrent
 
-Since qBittorrent v4.6.2, a temporary password is generated on startup. Get it with `docker compose logs qbittorrent`:
+Running `update-config.sh` will set qBittorrent's password to `adminadmin`. If you wish to update the password manually,
+since qBittorrent v4.6.2, a temporary password is generated on startup. Get it with `docker compose logs qbittorrent`:
 ```
 The WebUI administrator username is: admin
 The WebUI administrator password was not set. A temporary password is provided for this session: <some_password>
@@ -223,7 +222,7 @@ To use the VueTorrent WebUI just go to `qBittorrent`, `Options`, `Web UI`, `Use 
 ## Jellyfin
 
 To enable [hardware transcoding](https://jellyfin.org/docs/general/administration/hardware-acceleration/),
-depending on your system, you may need to update the following block:
+depending on your system, you may need to add the following block:
 
 ```    
 devices:

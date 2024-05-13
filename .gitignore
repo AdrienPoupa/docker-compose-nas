@@ -14,7 +14,6 @@ docker-compose.override.yml
 /pia
 /pia-shared
 /letsencrypt
-/jellyfin
 /jellyseerr
 /adguardhome/certs
 /adguardhome/conf
