@@ -410,9 +410,6 @@ services:
     ports:
       - "7359:7359/udp"
       - "1900:1900/udp"
-    devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card0:/dev/dri/card0
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health" ]
