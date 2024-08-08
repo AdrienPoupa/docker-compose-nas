@@ -221,7 +221,6 @@ services:
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[14].replacement="/jellyseerr/$1/".concat
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[15].regex=url:"/([/a-zA-Z?=]*)"
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[15].replacement=url:"/jellyseerr/$1"
-      
       - homepage.group=Media
       - homepage.name=JellySeerr
       - homepage.icon=jellyseerr.png
@@ -336,6 +335,8 @@ services:
       - LOC=${PIA_LOCATION}
       - USER=${PIA_USER}
       - PASS=${PIA_PASS}
+      - QBT_USER=${QBITTORRENT_USERNAME}
+      - QBT_PASS=${QBITTORRENT_PASSWORD}
       - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
       - PORT_FORWARDING=1
       - PORT_PERSIST=1
