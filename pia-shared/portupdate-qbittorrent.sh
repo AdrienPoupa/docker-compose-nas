@@ -1,8 +1,6 @@
 #!/bin/bash
 
 port="$1"
-QBT_USER=admin
-QBT_PASS=adminadmin
 QBT_PORT=8080
 
 echo "Setting qBittorrent port settings ($port)..."
