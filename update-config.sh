@@ -14,9 +14,12 @@ function update_arr_config {
 
 function update_qbittorrent_config {
     echo "Updating ${container} configuration..."
+    QBITTORRENT_SUBNET=$(docker network inspect -f '{{ (index .IPAM.Config 0).Subnet }}' docker-compose-nas)
     docker compose stop "$container"
     until [ -f "${CONFIG_ROOT:-.}"/"$container"/qBittorrent/qBittorrent.conf ]; do sleep 1; done
-    sed -i.bak '/WebUI\\ServerDomains=*/a WebUI\\Password_PBKDF2="@ByteArray(ARQ77eY1NUZaQsuDHbIMCA==:0WMRkYTUWVT9wVvdDtHAjU9b3b7uB8NR1Gur2hmQCvCDpm39Q+PsJRJPaCU51dEiz+dTzh8qbPsL8WkFljQYFQ==)"' "${CONFIG_ROOT:-.}"/"$container"/qBittorrent/qBittorrent.conf && rm "${CONFIG_ROOT:-.}"/"$container"/qBittorrent/qBittorrent.conf.bak
+    echo "WebUI\AuthSubnetWhitelist=${QBITTORRENT_SUBNET}" >> "${CONFIG_ROOT:-.}"/"$container"/qBittorrent/qBittorrent.conf
+    echo "WebUI\AuthSubnetWhitelistEnabled=true" >> "${CONFIG_ROOT:-.}"/"$container"/qBittorrent/qBittorrent.conf
+    echo "WebUI\HostHeaderValidation=false" >> "${CONFIG_ROOT:-.}"/"$container"/qBittorrent/qBittorrent.conf
     echo "Update of ${container} configuration complete, restarting..."
     docker compose start "$container"
 }

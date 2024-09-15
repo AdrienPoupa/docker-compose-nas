@@ -294,10 +294,6 @@ services:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8080", "https://google.com" ]
       interval: 30s
       retries: 10
-    network_mode: "service:vpn"
-    depends_on:
-      vpn:
-        condition: service_healthy
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/qbittorrent`))
@@ -319,42 +315,7 @@ services:
       - homepage.description=Bittorrent client
       - homepage.weight=2
       - homepage.widget.type=qbittorrent
-      - homepage.widget.url=http://vpn:8080
-      - homepage.widget.username=${QBITTORRENT_USERNAME}
-      - homepage.widget.password=${QBITTORRENT_PASSWORD}
-  vpn:
-    image: thrnz/docker-wireguard-pia
-    container_name: vpn
-    volumes:
-      - ${CONFIG_ROOT:-.}/pia:/pia
-      - ${CONFIG_ROOT:-.}/pia-shared:/pia-shared
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    environment:
-      - LOC=${PIA_LOCATION}
-      - USER=${PIA_USER}
-      - PASS=${PIA_PASS}
-      - QBT_USER=${QBITTORRENT_USERNAME}
-      - QBT_PASS=${QBITTORRENT_PASSWORD}
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-      - PORT_FORWARDING=1
-      - PORT_PERSIST=1
-      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
-    healthcheck:
-      test: ping -c 1 www.google.com || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
-    labels:
-      # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
-      - com.centurylinklabs.watchtower.enable=false
+      - homepage.widget.url=http://qbittorrent:8080
   unpackerr:
     image: golift/unpackerr
     container_name: unpackerr
