@@ -3,30 +3,15 @@ services:
     image: traefik:v3.1
     container_name: traefik
     restart: always
-    environment:
-      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
-      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
-      - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
-      - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
       - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
-      - --entrypoints.web-secure.address=:443
-      - --entrypoints.web.http.redirections.entryPoint.to=web-secure
-      - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --entrypoints.web.http.redirections.entrypoint.permanent=true
       - --experimental.plugins.rewrite-body.modulename=github.com/packruler/rewrite-body
       - --experimental.plugins.rewrite-body.version=v1.2.0
       - --experimental.plugins.rewriteHeaders.modulename=github.com/XciD/traefik-plugin-rewrite-headers
       - --experimental.plugins.rewriteHeaders.version=v0.0.3
-      - --certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE:-true}
-      - --certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
-      - --certificatesresolvers.myresolver.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
-      - --certificatesresolvers.myresolver.acme.caserver=${LETS_ENCRYPT_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
-      - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     ports:
       - "80:80"
       - "443:443"
@@ -57,8 +42,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sonarr`))
-      - traefik.http.routers.sonarr.tls=true
-      - traefik.http.routers.sonarr.tls.certresolver=myresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
       - homepage.group=Media
       - homepage.name=Sonarr
@@ -87,8 +70,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/radarr`))
-      - traefik.http.routers.radarr.tls=true
-      - traefik.http.routers.radarr.tls.certresolver=myresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
       - homepage.group=Media
       - homepage.name=Radarr
@@ -117,8 +98,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.lidarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/lidarr`))
-      - traefik.http.routers.lidarr.tls=true
-      - traefik.http.routers.lidarr.tls.certresolver=myresolver
       - traefik.http.services.lidarr.loadbalancer.server.port=8686
       - homepage.group=Media
       - homepage.name=Lidarr
@@ -131,36 +110,6 @@ services:
       - homepage.widget.key=${LIDARR_API_KEY}
     profiles:
       - lidarr
-  bazarr:
-    image: lscr.io/linuxserver/bazarr
-    container_name: bazarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - ${CONFIG_ROOT:-.}/bazarr/config:/config
-      - ${DATA_ROOT}:/data
-    restart: always
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
-      interval: 5s
-      retries: 10
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.bazarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/bazarr`))
-      - traefik.http.routers.bazarr.tls=true
-      - traefik.http.routers.bazarr.tls.certresolver=myresolver
-      - traefik.http.services.bazarr.loadbalancer.server.port=6767
-      - homepage.group=Download
-      - homepage.name=Bazarr
-      - homepage.icon=bazarr.png
-      - homepage.href=/bazarr
-      - homepage.description=Subtitles management
-      - homepage.weight=4
-      - homepage.widget.type=bazarr
-      - homepage.widget.url=http://bazarr:6767/bazarr
-      - homepage.widget.key=${BAZARR_API_KEY}
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -177,8 +126,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyseerr`))
-      - traefik.http.routers.jellyseerr.tls=true
-      - traefik.http.routers.jellyseerr.tls.certresolver=myresolver
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
       - traefik.http.routers.jellyseerr.middlewares=jellyseerr-stripprefix,jellyseerr-rewrite,jellyseerr-rewriteHeaders
       - traefik.http.middlewares.jellyseerr-stripprefix.stripPrefix.prefixes=/jellyseerr
@@ -244,11 +191,13 @@ services:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
       retries: 10
+    network_mode: "service:vpn"
+    depends_on:
+      vpn:
+        condition: service_healthy
     labels:
       - traefik.enable=true
       - traefik.http.routers.prowlarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/prowlarr`))
-      - traefik.http.routers.prowlarr.tls=true
-      - traefik.http.routers.prowlarr.tls.certresolver=myresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
       - homepage.group=Download
       - homepage.name=Prowlarr
@@ -268,10 +217,13 @@ services:
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=${TIMEZONE}
+    network_mode: "service:vpn"
+    depends_on:
+      vpn:
+        condition: service_healthy
     labels:
       - traefik.enable=true
       - traefik.http.routers.flaresolverr.rule=PathPrefix(`/flaresolverr`)
-      - traefik.http.routers.flaresolverr.tls=true
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
     profiles:
       - flaresolverr
@@ -301,8 +253,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/qbittorrent`))
-      - traefik.http.routers.qbittorrent.tls=true
-      - traefik.http.routers.qbittorrent.tls.certresolver=myresolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
       - traefik.http.routers.qbittorrent.middlewares=qbittorrent-strip-slash,qbittorrent-stripprefix
       # https://github.com/qbittorrent/qBittorrent/issues/5693#issuecomment-552146296
@@ -323,24 +273,18 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: thrnz/docker-wireguard-pia
-    container_name: vpn
-    volumes:
-      - ${CONFIG_ROOT:-.}/pia:/pia
-      - ${CONFIG_ROOT:-.}/pia-shared:/pia-shared
+    image: ghcr.io/bubuntux/nordvpn
+    container_name: nordvpn
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
+      - NET_RAW
     environment:
-      - LOC=${PIA_LOCATION}
-      - USER=${PIA_USER}
-      - PASS=${PIA_PASS}
-      - QBT_USER=${QBITTORRENT_USERNAME}
-      - QBT_PASS=${QBITTORRENT_PASSWORD}
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-      - PORT_FORWARDING=1
-      - PORT_PERSIST=1
-      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+      - TOKEN=${NORDVPN_TOKEN}
+      - CONNECT=United_Kingdom
+      - TECHNOLOGY=NordLynx
+      - NETWORK=192.168.1.0/24
+    ports:
+      - 8080:8080
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.default.disable_ipv6=1
@@ -355,49 +299,6 @@ services:
     labels:
       # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
       - com.centurylinklabs.watchtower.enable=false
-  unpackerr:
-    image: golift/unpackerr
-    container_name: unpackerr
-    volumes:
-      - ${DOWNLOAD_ROOT}:/data/torrents
-    restart: always
-    user: ${USER_ID}:${GROUP_ID}
-    environment:
-      - TZ=${TIMEZONE}
-      - UN_SONARR_0_URL=http://sonarr:8989/sonarr
-      - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
-      - UN_RADARR_0_URL=http://radarr:7878/radarr
-      - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-    security_opt:
-      - no-new-privileges:true
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    container_name: sabnzbd
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
-    volumes:
-      - ${CONFIG_ROOT:-.}/sabnzbd:/config
-      - ${DATA_ROOT}:/data
-    restart: always
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`) || PathPrefix(`/sabnzbd`))
-      - traefik.http.routers.sabnzbd.tls=true
-      - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
-      - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
-      - homepage.group=Download
-      - homepage.name=Sabnzbd
-      - homepage.icon=sabnzbd.png
-      - homepage.href=/sabnzbd
-      - homepage.description=Usenet
-      - homepage.weight=3
-      - homepage.widget.type=sabnzbd
-      - homepage.widget.url=http://sabnzbd:8080/sabnzbd
-      - homepage.widget.key=${SABNZBD_API_KEY}
-    profiles:
-      - sabnzbd
   jellyfin:
     image: lscr.io/linuxserver/jellyfin
     container_name: jellyfin
@@ -420,8 +321,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`))
-      - traefik.http.routers.jellyfin.tls=true
-      - traefik.http.routers.jellyfin.tls.certresolver=myresolver
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
       - homepage.group=Media
       - homepage.name=Jellyfin
@@ -453,8 +352,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.homepage.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
-      - traefik.http.routers.homepage.tls=true
-      - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
   watchtower:
     image: containrrr/watchtower
