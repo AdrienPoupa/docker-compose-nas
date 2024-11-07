@@ -324,7 +324,7 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: "qmcgaw/gluetun:${VER_GLUETUN}"
+    image: "qmcgaw/gluetun:latest"
     container_name: vpn
     cap_add:
       - NET_ADMIN
