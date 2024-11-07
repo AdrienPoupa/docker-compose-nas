@@ -10,6 +10,7 @@ services:
       - AWS_HOSTED_ZONE_ID=${AWS_HOSTED_ZONE_ID}
       - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
+      - --log.level=DEBUG
       - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -28,9 +29,14 @@ services:
       - --certificatesresolvers.myresolver.acme.caserver=${LETS_ENCRYPT_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --api.dashboard=true
+      - --api.insecure=false
+      - --api=true
+      - --serverstransport.insecureskipverify=true
     ports:
       - "80:80"
       - "443:443"
+      - "8090:8080"
     volumes:
       - ${CONFIG_ROOT:-.}/letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -40,6 +46,24 @@ services:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
       interval: 30s
       retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`${HOSTNAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.routers.dashboard.tls=true
+      - traefik.http.routers.dashboard.tls.certresolver=myresolver
+      - traefik.http.routers.dashboard.entrypoints=web-secure
+      - traefik.http.routers.dashboard.middlewares=auth
+      
+      # IP/localhost dashboard access (using HostRegexp instead of !Host)
+      - traefik.http.routers.dashboard-ip.rule=HostRegexp(`{ip:[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard-ip.service=api@internal
+      - traefik.http.routers.dashboard-ip.entrypoints=web-secure
+      - traefik.http.routers.dashboard-ip.tls=true
+      - traefik.http.routers.dashboard-ip.middlewares=auth
+      
+      # Auth middleware
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
