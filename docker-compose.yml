@@ -295,8 +295,9 @@ services:
       - TZ=${TIMEZONE}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.flaresolverr.rule=PathPrefix(`/flaresolverr`)
+      - traefik.http.routers.flaresolverr.rule=Host(`${HOSTNAME}`) && PathPrefix(`/flaresolverr`)
       - traefik.http.routers.flaresolverr.tls=true
+      - traefik.http.routers.flaresolverr.tls.certresolver=myresolver
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
     profiles:
       - flaresolverr
