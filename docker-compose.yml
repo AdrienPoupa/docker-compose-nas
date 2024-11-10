@@ -311,6 +311,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
+      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
