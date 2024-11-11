@@ -6,7 +6,7 @@
   items:
     - name: Sonarr
       icon: sonarr.png
-      href: https://home.brettswift.com/sonarr
+      href: /sonarr
       description: Series management
     - name: Radarr
       icon: radarr.png
