@@ -474,6 +474,7 @@ services:
       - HOMEPAGE_VAR_WEATHER_UNIT=${HOMEPAGE_VAR_WEATHER_UNIT}
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
+      - LOG_LEVEL=debug
     volumes:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -482,10 +483,20 @@ services:
     command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.homepage.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
+      - traefik.http.routers.homepage.rule=Host(`${HOSTNAME}`) && PathPrefix(`/`)
       - traefik.http.routers.homepage.tls=true
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
+      # Headers middleware for CORS and security
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowOriginList=*
+      - traefik.http.middlewares.homepage-headers.headers.addVaryHeader=true
+      - traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+      - traefik.http.middlewares.homepage-security.headers.stsSeconds=31536000
+      - traefik.http.middlewares.homepage-security.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.homepage-security.headers.stsPreload=true
+      # Apply both middlewares
+      - traefik.http.routers.homepage.middlewares=homepage-headers,homepage-security
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
