@@ -4,11 +4,13 @@ services:
     container_name: traefik
     restart: always
     environment:
-      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
-      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
-      - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_HOSTED_ZONE_ID=${AWS_HOSTED_ZONE_ID}
       - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
+      - --log.level=DEBUG
       - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
@@ -21,15 +23,20 @@ services:
       - --experimental.plugins.rewrite-body.version=v1.2.0
       - --experimental.plugins.rewriteHeaders.modulename=github.com/XciD/traefik-plugin-rewrite-headers
       - --experimental.plugins.rewriteHeaders.version=v0.0.3
-      - --certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE:-true}
-      - --certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
+      - --certificatesresolvers.myresolver.acme.dnschallenge=true
+      - --certificatesresolvers.myresolver.acme.dnschallenge.provider=route53
       - --certificatesresolvers.myresolver.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
       - --certificatesresolvers.myresolver.acme.caserver=${LETS_ENCRYPT_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --api.dashboard=true
+      - --api.insecure=false
+      - --api=true
+      - --serverstransport.insecureskipverify=true
     ports:
       - "80:80"
       - "443:443"
+      - "8090:8080"
     volumes:
       - ${CONFIG_ROOT:-.}/letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -39,6 +46,24 @@ services:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
       interval: 30s
       retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`${HOSTNAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard.service=api@internal
+      - traefik.http.routers.dashboard.tls=true
+      - traefik.http.routers.dashboard.tls.certresolver=myresolver
+      - traefik.http.routers.dashboard.entrypoints=web-secure
+      - traefik.http.routers.dashboard.middlewares=auth
+      
+      # IP/localhost dashboard access (using HostRegexp instead of !Host)
+      - traefik.http.routers.dashboard-ip.rule=HostRegexp(`{ip:[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard-ip.service=api@internal
+      - traefik.http.routers.dashboard-ip.entrypoints=web-secure
+      - traefik.http.routers.dashboard-ip.tls=true
+      - traefik.http.routers.dashboard-ip.middlewares=auth
+      
+      # Auth middleware
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
@@ -270,9 +295,12 @@ services:
       - TZ=${TIMEZONE}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.flaresolverr.rule=PathPrefix(`/flaresolverr`)
+      - traefik.http.routers.flaresolverr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/flaresolverr`))
       - traefik.http.routers.flaresolverr.tls=true
+      - traefik.http.routers.flaresolverr.tls.certresolver=myresolver
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
+      - traefik.http.routers.flaresolverr.middlewares=flaresolverr-stripprefix
+      - traefik.http.middlewares.flaresolverr-stripprefix.stripPrefix.prefixes=/flaresolverr
     profiles:
       - flaresolverr
   qbittorrent:
@@ -283,7 +311,8 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
-      - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
+      - WEBUI_PASSWORD=${QBITTORRENT_PASSWORD}
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
@@ -323,29 +352,28 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: thrnz/docker-wireguard-pia
+    image: "qmcgaw/gluetun:latest"
     container_name: vpn
-    volumes:
-      - ${CONFIG_ROOT:-.}/pia:/pia
-      - ${CONFIG_ROOT:-.}/pia-shared:/pia-shared
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      - 7878:7878 # radarr
+      - 8989:8989 # sonarr
+      - 8080:8080 #qbittorrent web
+      - 6881:6881 #qbit
+      - 6881:6881/udp #qbit
+    volumes:
+      - ${CONFIG_ROOT:-.}/gluetun:/gluetun
     environment:
-      - LOC=${PIA_LOCATION}
-      - USER=${PIA_USER}
-      - PASS=${PIA_PASS}
-      - QBT_USER=${QBITTORRENT_USERNAME}
-      - QBT_PASS=${QBITTORRENT_PASSWORD}
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-      - PORT_FORWARDING=1
-      - PORT_PERSIST=1
-      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - VPN_SERVICE_PROVIDER=ipvanish
+      - SERVER_COUNTRIES=Canada,United States
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -444,6 +472,8 @@ services:
       - HOMEPAGE_VAR_WEATHER_LONG=${HOMEPAGE_VAR_WEATHER_LONG}
       - HOMEPAGE_VAR_WEATHER_TIME=${TIMEZONE}
       - HOMEPAGE_VAR_WEATHER_UNIT=${HOMEPAGE_VAR_WEATHER_UNIT}
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
     volumes:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
