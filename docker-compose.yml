@@ -396,6 +396,8 @@ services:
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
       - UN_RADARR_0_URL=http://radarr:7878/radarr
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
+      - UN_PATHS_0_TRIGGER=true
+      - UN_DEBUG=true
     security_opt:
       - no-new-privileges:true
   sabnzbd:
@@ -483,19 +485,23 @@ services:
     command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
+      # Main router for UI and API
       - traefik.http.routers.homepage.rule=Host(`${HOSTNAME}`) && PathPrefix(`/`)
       - traefik.http.routers.homepage.tls=true
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
-      # Headers middleware for CORS and security
-      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT
+      # Headers middleware with updated CORS settings
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,HEAD
       - traefik.http.middlewares.homepage-headers.headers.accessControlAllowOriginList=*
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowHeaders=*
+      - traefik.http.middlewares.homepage-headers.headers.accessControlMaxAge=100
       - traefik.http.middlewares.homepage-headers.headers.addVaryHeader=true
-      - traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+      - traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.Cache-Control=no-store
+      # Security headers
       - traefik.http.middlewares.homepage-security.headers.stsSeconds=31536000
       - traefik.http.middlewares.homepage-security.headers.stsIncludeSubdomains=true
       - traefik.http.middlewares.homepage-security.headers.stsPreload=true
-      # Apply both middlewares
+      # Apply middlewares
       - traefik.http.routers.homepage.middlewares=homepage-headers,homepage-security
   watchtower:
     image: containrrr/watchtower
