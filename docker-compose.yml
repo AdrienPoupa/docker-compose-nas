@@ -485,15 +485,15 @@ services:
     command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
-      # Main router for UI and API
       - traefik.http.routers.homepage.rule=Host(`${HOSTNAME}`) && PathPrefix(`/`)
       - traefik.http.routers.homepage.tls=true
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
-      # Headers middleware with updated CORS settings
+      # Headers middleware with updated CORS and auth settings
       - traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,HEAD
       - traefik.http.middlewares.homepage-headers.headers.accessControlAllowOriginList=*
-      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowHeaders=*
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowHeaders=*,Authorization
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowCredentials=true
       - traefik.http.middlewares.homepage-headers.headers.accessControlMaxAge=100
       - traefik.http.middlewares.homepage-headers.headers.addVaryHeader=true
       - traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.Cache-Control=no-store
