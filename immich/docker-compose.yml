@@ -1,7 +1,7 @@
 services:
   immich-server:
     container_name: immich_server
-    image: ghcr.io/immich-app/immich-server:v1.113.0
+    image: ghcr.io/immich-app/immich-server:v1.120.2
     environment:
       DB_HOSTNAME: immich_postgres
       DB_PASSWORD: ${IMMICH_DB_PASSWORD}
@@ -16,16 +16,12 @@ services:
       - immich-redis
       - immich-database
     restart: always
-    healthcheck:
-      test: [ "CMD", "node", "/healthcheck/healthcheck.js" ]
-      interval: 30s
-      retries: 10
     labels:
       - traefik.enable=true
       - traefik.http.routers.immich.rule=(Host(`${IMMICH_HOSTNAME}`))
       - traefik.http.routers.immich.tls=true
       - traefik.http.routers.immich.tls.certresolver=myresolver
-      - traefik.http.services.immich.loadbalancer.server.port=3001
+      - traefik.http.services.immich.loadbalancer.server.port=2283
       - homepage.group=Apps
       - homepage.name=immich
       - homepage.icon=immich.png
@@ -33,22 +29,17 @@ services:
       - homepage.description=Self-hosted photo and video management solution
       - homepage.weight=4
       - homepage.widget.type=immich
-      - homepage.widget.url=http://immich-server:3001
+      - homepage.widget.url=http://immich-server:2283
       - homepage.widget.key=${IMMICH_API_KEY}
     profiles:
       - immich
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.113.0
+    image: ghcr.io/immich-app/immich-machine-learning:v1.120.2
     volumes:
       - immich-model-cache:/cache
     restart: always
-    healthcheck:
-      test: [ "CMD", "bash", "-c", "exec 5<>/dev/tcp/127.0.0.1/3003" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     profiles:
       - immich
 
@@ -57,10 +48,7 @@ services:
     image: registry.hub.docker.com/library/redis:6.2-alpine@sha256:e3b17ba9479deec4b7d1eeec1548a253acc5374d68d3b27937fcfe4df8d18c7e
     restart: always
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: redis-cli ping || exit 1
     profiles:
       - immich
 
@@ -80,7 +68,22 @@ services:
       interval: 5m
       start_interval: 30s
       start_period: 5m
-    command: ["postgres", "-c", "shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
+    command:
+      [
+        'postgres',
+        '-c',
+        'shared_preload_libraries=vectors.so',
+        '-c',
+        'search_path="$$user", public, vectors',
+        '-c',
+        'logging_collector=on',
+        '-c',
+        'max_wal_size=2GB',
+        '-c',
+        'shared_buffers=512MB',
+        '-c',
+        'wal_compression=on',
+      ]
     profiles:
       - immich
 
