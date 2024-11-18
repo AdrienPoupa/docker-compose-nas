@@ -23,7 +23,7 @@ services:
       - traefik.http.routers.immich.tls.certresolver=myresolver
       - traefik.http.services.immich.loadbalancer.server.port=2283
       - homepage.group=Apps
-      - homepage.name=immich
+      - homepage.name=Immich
       - homepage.icon=immich.png
       - homepage.href=https://${IMMICH_HOSTNAME}
       - homepage.description=Self-hosted photo and video management solution
@@ -31,6 +31,7 @@ services:
       - homepage.widget.type=immich
       - homepage.widget.url=http://immich-server:2283
       - homepage.widget.key=${IMMICH_API_KEY}
+      - homepage.widget.version=2
     profiles:
       - immich
 
