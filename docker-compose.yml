@@ -54,14 +54,14 @@ services:
       - traefik.http.routers.dashboard.tls.certresolver=myresolver
       - traefik.http.routers.dashboard.entrypoints=web-secure
       - traefik.http.routers.dashboard.middlewares=auth
-      
+
       # IP/localhost dashboard access (using HostRegexp instead of !Host)
       - traefik.http.routers.dashboard-ip.rule=HostRegexp(`{ip:[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       - traefik.http.routers.dashboard-ip.service=api@internal
       - traefik.http.routers.dashboard-ip.entrypoints=web-secure
       - traefik.http.routers.dashboard-ip.tls=true
       - traefik.http.routers.dashboard-ip.middlewares=auth
-      
+
       # Auth middleware
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
   sonarr:
@@ -190,8 +190,11 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=debug    # Make sure this is debug
+      - DEBUG=1
       - TZ=${TIMEZONE}
+      - BASE_URL=/jellyseerr
+      - JELLYFIN_API_KEY=${JELLYFIN_API_KEY}
     volumes:
       - ${CONFIG_ROOT:-.}/jellyseerr:/app/config
     restart: always
@@ -316,6 +319,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
+      - ${DATA_ROOT}/media:/data/media
     restart: always
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
@@ -396,6 +400,8 @@ services:
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
       - UN_RADARR_0_URL=http://radarr:7878/radarr
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
+      - UN_PATHS_0_TRIGGER=true
+      - UN_DEBUG=true
     security_opt:
       - no-new-privileges:true
   sabnzbd:
@@ -474,6 +480,7 @@ services:
       - HOMEPAGE_VAR_WEATHER_UNIT=${HOMEPAGE_VAR_WEATHER_UNIT}
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
+      - LOG_LEVEL=debug
     volumes:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -482,10 +489,24 @@ services:
     command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.homepage.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
+      - traefik.http.routers.homepage.rule=Host(`${HOSTNAME}`) && PathPrefix(`/`)
       - traefik.http.routers.homepage.tls=true
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
+      # Headers middleware with updated CORS and auth settings
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,HEAD
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowOriginList=*
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowHeaders=*,Authorization
+      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowCredentials=true
+      - traefik.http.middlewares.homepage-headers.headers.accessControlMaxAge=100
+      - traefik.http.middlewares.homepage-headers.headers.addVaryHeader=true
+      - traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.Cache-Control=no-store
+      # Security headers
+      - traefik.http.middlewares.homepage-security.headers.stsSeconds=31536000
+      - traefik.http.middlewares.homepage-security.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.homepage-security.headers.stsPreload=true
+      # Apply middlewares
+      - traefik.http.routers.homepage.middlewares=homepage-headers,homepage-security
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
