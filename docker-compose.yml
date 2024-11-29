@@ -54,14 +54,14 @@ services:
       - traefik.http.routers.dashboard.tls.certresolver=myresolver
       - traefik.http.routers.dashboard.entrypoints=web-secure
       - traefik.http.routers.dashboard.middlewares=auth
-      
+
       # IP/localhost dashboard access (using HostRegexp instead of !Host)
       - traefik.http.routers.dashboard-ip.rule=HostRegexp(`{ip:[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       - traefik.http.routers.dashboard-ip.service=api@internal
       - traefik.http.routers.dashboard-ip.entrypoints=web-secure
       - traefik.http.routers.dashboard-ip.tls=true
       - traefik.http.routers.dashboard-ip.middlewares=auth
-      
+
       # Auth middleware
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
   sonarr:
@@ -190,8 +190,11 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=debug    # Make sure this is debug
+      - DEBUG=1
       - TZ=${TIMEZONE}
+      - BASE_URL=/jellyseerr
+      - JELLYFIN_API_KEY=${JELLYFIN_API_KEY}
     volumes:
       - ${CONFIG_ROOT:-.}/jellyseerr:/app/config
     restart: always
@@ -316,6 +319,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
+      - ${DATA_ROOT}/media:/data/media
     restart: always
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
