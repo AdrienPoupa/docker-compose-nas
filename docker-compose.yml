@@ -47,23 +47,24 @@ services:
       interval: 30s
       retries: 10
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`${HOSTNAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
-      - traefik.http.routers.dashboard.service=api@internal
-      - traefik.http.routers.dashboard.tls=true
-      - traefik.http.routers.dashboard.tls.certresolver=myresolver
-      - traefik.http.routers.dashboard.entrypoints=web-secure
-      - traefik.http.routers.dashboard.middlewares=auth
-
-      # IP/localhost dashboard access (using HostRegexp instead of !Host)
-      - traefik.http.routers.dashboard-ip.rule=HostRegexp(`{ip:[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
-      - traefik.http.routers.dashboard-ip.service=api@internal
-      - traefik.http.routers.dashboard-ip.entrypoints=web-secure
-      - traefik.http.routers.dashboard-ip.tls=true
-      - traefik.http.routers.dashboard-ip.middlewares=auth
-
-      # Auth middleware
-      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
+      - traefik.http.routers.homepage.middlewares=homepage-headers,homepage-security,homepage-stripprefix
+        #      - traefik.enable=true
+        #      - traefik.http.routers.dashboard.rule=Host(`${HOSTNAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+        #      - traefik.http.routers.dashboard.service=api@internal
+        #      - traefik.http.routers.dashboard.tls=true
+        #      - traefik.http.routers.dashboard.tls.certresolver=myresolver
+        #      - traefik.http.routers.dashboard.entrypoints=web-secure
+        #      - traefik.http.routers.dashboard.middlewares=auth
+        #
+        #      # IP/localhost dashboard access (using HostRegexp instead of !Host)
+        #      - traefik.http.routers.dashboard-ip.rule=HostRegexp(`{ip:[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+        #      - traefik.http.routers.dashboard-ip.service=api@internal
+        #      - traefik.http.routers.dashboard-ip.entrypoints=web-secure
+        #      - traefik.http.routers.dashboard-ip.tls=true
+        #      - traefik.http.routers.dashboard-ip.middlewares=auth
+        #
+        #      # Auth middleware
+        #      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
@@ -417,7 +418,7 @@ services:
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`) || PathPrefix(`/sabnzbd`))
+      - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`))
       - traefik.http.routers.sabnzbd.tls=true
       - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
       - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
@@ -493,20 +494,22 @@ services:
       - traefik.http.routers.homepage.tls=true
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
+      # testing to get widgets working
+      - traefik.http.middlewares.homepage-preserve.headers.customrequestheaders.X-Forwarded-Prefix=/
       # Headers middleware with updated CORS and auth settings
-      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,HEAD
-      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowOriginList=*
-      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowHeaders=*,Authorization
-      - traefik.http.middlewares.homepage-headers.headers.accessControlAllowCredentials=true
-      - traefik.http.middlewares.homepage-headers.headers.accessControlMaxAge=100
-      - traefik.http.middlewares.homepage-headers.headers.addVaryHeader=true
-      - traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.Cache-Control=no-store
-      # Security headers
-      - traefik.http.middlewares.homepage-security.headers.stsSeconds=31536000
-      - traefik.http.middlewares.homepage-security.headers.stsIncludeSubdomains=true
-      - traefik.http.middlewares.homepage-security.headers.stsPreload=true
-      # Apply middlewares
-      - traefik.http.routers.homepage.middlewares=homepage-headers,homepage-security
+      #- traefik.http.middlewares.homepage-headers.headers.accessControlAllowMethods=GET,OPTIONS,PUT,HEAD
+      #- traefik.http.middlewares.homepage-headers.headers.accessControlAllowOriginList=*
+      #- traefik.http.middlewares.homepage-headers.headers.accessControlAllowHeaders=*,Authorization
+      #- traefik.http.middlewares.homepage-headers.headers.accessControlAllowCredentials=true
+      #- traefik.http.middlewares.homepage-headers.headers.accessControlMaxAge=100
+      #- traefik.http.middlewares.homepage-headers.headers.addVaryHeader=true
+      #- traefik.http.middlewares.homepage-headers.headers.customResponseHeaders.Cache-Control=no-store
+      ## Security headers
+      #- traefik.http.middlewares.homepage-security.headers.stsSeconds=31536000
+      #- traefik.http.middlewares.homepage-security.headers.stsIncludeSubdomains=true
+      #- traefik.http.middlewares.homepage-security.headers.stsPreload=true
+      ## Apply middlewares
+      #- traefik.http.routers.homepage.middlewares=homepage-headers,homepage-security
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
