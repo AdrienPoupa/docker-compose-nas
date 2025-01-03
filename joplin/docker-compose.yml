@@ -13,6 +13,8 @@ services:
       - DB_CLIENT=sqlite3
       - SQLITE_DATABASE=/database/joplin.db
       - STORAGE_DRIVER=Type=Filesystem; Path=/storage
+      - EVENTS_AUTO_DELETE_ENABLED=true
+      - EVENTS_AUTO_DELETE_AFTER_DAYS=7
     volumes:
       - ${CONFIG_ROOT:-.}/joplin/database:/database
       - ${CONFIG_ROOT:-.}/joplin/storage:/storage
