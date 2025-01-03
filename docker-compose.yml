@@ -352,9 +352,6 @@ services:
       timeout: 10s
       retries: 3
     restart: always
-    labels:
-      # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
-      - com.centurylinklabs.watchtower.enable=false
   unpackerr:
     image: golift/unpackerr
     container_name: unpackerr
