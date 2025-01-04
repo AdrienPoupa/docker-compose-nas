@@ -226,7 +226,7 @@ services:
       - homepage.icon=jellyseerr.png
       - homepage.href=/jellyseerr
       - homepage.description=Content Recommendations and Request Management
-      - homepage.weight=2
+      - homepage.weight=3
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_API_KEY}
@@ -352,11 +352,8 @@ services:
       timeout: 10s
       retries: 3
     restart: always
-    labels:
-      # network mode is not supported: https://github.com/containrrr/watchtower/issues/1286#issuecomment-1214291660
-      - com.centurylinklabs.watchtower.enable=false
   unpackerr:
-    image: golift/unpackerr
+    image: golift/unpackerr:latest
     container_name: unpackerr
     volumes:
       - ${DOWNLOAD_ROOT}:/data/torrents
@@ -399,7 +396,7 @@ services:
     profiles:
       - sabnzbd
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin
+    image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     environment:
       - PUID=${USER_ID}
@@ -428,10 +425,45 @@ services:
       - homepage.icon=jellyfin.png
       - homepage.href=/jellyfin
       - homepage.description=Media server
-      - homepage.weight=3
+      - homepage.weight=4
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096/jellyfin
       - homepage.widget.key=${JELLYFIN_API_KEY}
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+    volumes:
+      - ${CONFIG_ROOT:-.}/calibre-web:/config
+      - ${DATA_ROOT}/books:/books
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.calibre-headers.headers.customRequestHeaders.X-Scheme=https
+      - traefik.http.middlewares.calibre-headers.headers.customRequestHeaders.X-Script-Name=/calibre
+      - traefik.http.middlewares.calibre-stripprefixregex.stripPrefixRegex.regex=/calibre
+      - traefik.http.routers.calibre.middlewares=calibre-headers,calibre-stripprefixregex
+      - traefik.http.routers.calibre.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/calibre`))
+      - traefik.http.routers.calibre.tls=true
+      - traefik.http.routers.calibre.tls.certresolver=myresolver
+      - traefik.http.services.calibre.loadbalancer.server.port=8083
+      - homepage.group=Media
+      - homepage.name=Calibre-Web
+      - homepage.icon=calibre-web.png
+      - homepage.href=/calibre
+      - homepage.description=Books management
+      - homepage.weight=5
+      - homepage.widget.type=calibreweb
+      - homepage.widget.url=http://calibre-web:8083
+      - homepage.widget.username=${CALIBRE_USERNAME}
+      - homepage.widget.password=${CALIBRE_PASSWORD}
+    profiles:
+      - calibre-web
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage

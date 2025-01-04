@@ -19,3 +19,4 @@ docker-compose.override.yml
 /adguardhome/conf
 /adguardhome/work
 /sabnzbd
+/calibre-web

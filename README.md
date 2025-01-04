@@ -76,9 +76,10 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr)       | Optional - Proxy server to bypass Cloudflare protection in Prowlarr<br/>Enable with `COMPOSE_PROFILES=flaresolverr`                                  | [flaresolverr/flaresolverr](https://hub.docker.com/r/flaresolverr/flaresolverr)          |              |
 | [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)  | Optional - Network-wide software for blocking ads & tracking<br/>Enable with `COMPOSE_PROFILES=adguardhome`                                          | [adguard/adguardhome](https://hub.docker.com/r/adguard/adguardhome)                      |              |
 | [Tandoor](https://tandoor.dev)                                     | Optional - Smart recipe management<br/>Enable with `COMPOSE_PROFILES=tandoor`                                                                        | [vabene1111/recipes](https://hub.docker.com/r/vabene1111/recipes)                        | /recipes     |
-| [Joplin](https://joplinapp.org/)                                   | Optional - Note taking application<br/>Enable with `COMPOSE_PROFILES=joplin`                                                                         | [joplin/server](https://hub.docker.com/r/joplin/server)                                  | /joplin      |
-| [Home Assistant](https://www.home-assistant.io/)                   | Optional - Open source home automation that puts local control and privacy first<br/>Enable with `COMPOSE_PROFILES=homeassistant`                    | [home-assistant/home-assistant:stable](https://ghcr.io/home-assistant/home-assistant)    |              |
-| [Immich](https://immich.app//)                                     | Optional - Self-hosted photo and video management solution<br/>Enable with `COMPOSE_PROFILES=immich`                                                 | [immich-app/immich-server:release](https://ghcr.io/immich-app/immich-server)             |              |
+| [Joplin](https://joplinapp.org)                                    | Optional - Note taking application<br/>Enable with `COMPOSE_PROFILES=joplin`                                                                         | [joplin/server](https://hub.docker.com/r/joplin/server)                                  | /joplin      |
+| [Home Assistant](https://www.home-assistant.io)                    | Optional - Open source home automation that puts local control and privacy first<br/>Enable with `COMPOSE_PROFILES=homeassistant`                    | [home-assistant/home-assistant:stable](https://ghcr.io/home-assistant/home-assistant)    |              |
+| [Immich](https://immich.app)                                       | Optional - Self-hosted photo and video management solution<br/>Enable with `COMPOSE_PROFILES=immich`                                                 | [immich-app/immich-server:release](https://ghcr.io/immich-app/immich-server)             |              |
+| [Calibre-Web](https://github.com/janeczku/calibre-web)             | Optional - Web app for browsing, reading and downloading eBooks stored in a Calibre database<br/>Enable with `COMPOSE_PROFILES=calibre-web`          | [linuxserver/calibre-web](https://hub.docker.com/r/linuxserver/calibre-web)              | /calibre     |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
@@ -135,6 +136,8 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `HOMEPAGE_VAR_WEATHER_LAT`     | Homepage weather city latitude                                                                                                                                                                         |                                                  |
 | `HOMEPAGE_VAR_WEATHER_LONG`    | Homepage weather city longitude                                                                                                                                                                        |                                                  |
 | `HOMEPAGE_VAR_WEATHER_UNIT`    | Homepage weather unit, either `metric` or `imperial`                                                                                                                                                   | `metric`                                         |
+| `CALIBRE_USERNAME`             | Optional - Calibre-Web username to show details in the homepage, if enabled                                                                                                                            | `admin`                                          |
+| `CALIBRE_PASSWORD`             | Optional - Calibre-Web password to show details in the homepage, if enabled                                                                                                                            | `admin123`                                       |
 
 ## PIA WireGuard VPN
 
@@ -393,6 +396,18 @@ See [here](./homeassistant/README.md).
 ### Immich
 
 See [here](./immich/README.md).
+
+### Calibre-Web
+
+If you do not have a Calibre database, download a sample from: https://github.com/janeczku/calibre-web/raw/master/library/metadata.db
+and place it in `${DATA_ROOT}/books`.
+
+On the initial setup screen, enter `/books` as your calibre library location.
+
+**Default admin login:** Username: `admin` Password: `admin123`.
+
+Unrar is included by default and needs to be set in the Calibre-Web admin page (Basic Configuration:External Binaries) 
+with a path of `/usr/bin/unrar`.
 
 ## Customization
 
