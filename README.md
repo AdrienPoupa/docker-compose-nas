@@ -40,6 +40,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     * [Joplin](#joplin)
     * [Home Assistant](#home-assistant)
     * [Immich](#immich)
+    * [Calibre-Web](#calibre-web)
   * [Customization](#customization)
     * [Optional: Using the VPN for *arr apps](#optional-using-the-vpn-for-arr-apps)
   * [Synology Quirks](#synology-quirks)
