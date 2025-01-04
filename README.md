@@ -36,11 +36,11 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
       * [Encryption](#encryption)
       * [DHCP](#dhcp)
       * [Expose DNS Server with Tailscale](#expose-dns-server-with-tailscale)
+    * [Calibre-Web](#calibre-web)
     * [Tandoor](#tandoor)
     * [Joplin](#joplin)
     * [Home Assistant](#home-assistant)
     * [Immich](#immich)
-    * [Calibre-Web](#calibre-web)
   * [Customization](#customization)
     * [Optional: Using the VPN for *arr apps](#optional-using-the-vpn-for-arr-apps)
   * [Synology Quirks](#synology-quirks)
@@ -382,6 +382,18 @@ Enable DHCP Relay by setting `COMPOSE_PROFILES=adguardhome-dhcp`.
 Based on [Tailscale's documentation](https://tailscale.com/kb/1114/pi-hole), it is easy to use your AdGuard server everywhere.
 Just make sure that AdGuard Home listens to all interfaces.
 
+### Calibre-Web
+
+If you do not have a Calibre database, download a sample from: https://github.com/janeczku/calibre-web/raw/master/library/metadata.db
+and place it in `${DATA_ROOT}/books`.
+
+On the initial setup screen, enter `/books` as your calibre library location.
+
+**Default admin login:** Username: `admin` Password: `admin123`.
+
+Unrar is included by default and needs to be set in the Calibre-Web admin page (Basic Configuration:External Binaries)
+with a path of `/usr/bin/unrar`.
+
 ### Tandoor
 
 See [here](./tandoor/README.md).
@@ -397,18 +409,6 @@ See [here](./homeassistant/README.md).
 ### Immich
 
 See [here](./immich/README.md).
-
-### Calibre-Web
-
-If you do not have a Calibre database, download a sample from: https://github.com/janeczku/calibre-web/raw/master/library/metadata.db
-and place it in `${DATA_ROOT}/books`.
-
-On the initial setup screen, enter `/books` as your calibre library location.
-
-**Default admin login:** Username: `admin` Password: `admin123`.
-
-Unrar is included by default and needs to be set in the Calibre-Web admin page (Basic Configuration:External Binaries) 
-with a path of `/usr/bin/unrar`.
 
 ## Customization
 
