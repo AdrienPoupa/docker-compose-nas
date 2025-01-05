@@ -2,3 +2,5 @@
 !README.md
 !docker-compose.yml
 !backup.env.example
+!mosquitto.env.example
+!mosquitto/config/mosquitto.conf

@@ -34,6 +34,27 @@ services:
       - homepage.widget.key=${HOMEASSISTANT_ACCESS_TOKEN}
     profiles:
       - homeassistant
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    restart: always
+    user: ${USER_ID}:${GROUP_ID}
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+    volumes:
+      - ${CONFIG_ROOT:-.}/homeassistant/mosquitto/config:/mosquitto/config
+      - ${CONFIG_ROOT:-.}/homeassistant/mosquitto/data:/mosquitto/data
+      - ${CONFIG_ROOT:-.}/homeassistant/mosquitto/log:/mosquitto/log
+    ports:
+      - "1883:1883"
+    healthcheck:
+      test: [ "CMD", "mosquitto_sub", "-p", "1880", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3" ]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    profiles:
+      - mqtt
   homeassistant-backup:
     image: adrienpoupa/rclone-backup:latest
     container_name: homeassistant-backup
