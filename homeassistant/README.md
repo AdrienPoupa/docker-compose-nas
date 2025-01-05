@@ -21,6 +21,21 @@ http:
 
 Set the `HOMEASSISTANT_ACCESS_TOKEN` for homepage support.
 
+## MQTT
+
+If you need to use MQTT, you can enable it by setting `COMPOSE_PROFILES=homeassistant,mqtt`.
+
+Copy the Mosquitto environment file to `mosquitto.env` and fill the username and password:
+`cp mosquitto.env.exmple mosquitto.env`.
+
+Start the container, create a user in mosquitto with the following command and the credentials defined in the `mosquitto.env` file:
+
+`docker compose exec mosquitto mosquitto_passwd -b /mosquitto/config/pwfile <username> <password>`
+
+Restart the Mosquitto container to apply the changes.
+
+In HomeAssistant, add the MQTT integration with hostname `localhost`, port 1883 and the username and password defined in the `mosquitto.env` file.
+
 ## Backup
 
 ### Enable Backups in HomeAssistant
