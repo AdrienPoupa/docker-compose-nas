@@ -1,7 +1,7 @@
 services:
   immich-server:
     container_name: immich_server
-    image: ghcr.io/immich-app/immich-server:v1.123.0
+    image: ghcr.io/immich-app/immich-server:v1.124.2
     environment:
       DB_HOSTNAME: immich_postgres
       DB_PASSWORD: ${IMMICH_DB_PASSWORD}
@@ -37,7 +37,7 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.123.0
+    image: ghcr.io/immich-app/immich-machine-learning:v1.124.2
     volumes:
       - immich-model-cache:/cache
     restart: always
