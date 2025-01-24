@@ -221,6 +221,8 @@ services:
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[14].replacement="/jellyseerr/$1/".concat
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[15].regex=url:"/([/a-zA-Z?=]*)"
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[15].replacement=url:"/jellyseerr/$1"
+      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[16].regex=/imageproxy/
+      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[16].replacement=/jellyseerr/imageproxy/
       - homepage.group=Media
       - homepage.name=JellySeerr
       - homepage.icon=jellyseerr.png
