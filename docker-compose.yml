@@ -262,7 +262,7 @@ services:
       - homepage.widget.url=http://prowlarr:9696/prowlarr
       - homepage.widget.key=${PROWLARR_API_KEY}
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: 21hsmw/flaresolverr:nodriver
     container_name: flaresolverr
     restart: always
     environment:
