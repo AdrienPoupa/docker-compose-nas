@@ -316,35 +316,37 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: thrnz/docker-wireguard-pia
+    # Use semver tags or sha256 hashes of manifests.
+    # using latest tag can lead to issues when used with
+    # automatic image updaters like watchtower/podman.
+    image: ghcr.io/tprasadtp/protonwire:latest
     container_name: vpn
     volumes:
-      - ${CONFIG_ROOT:-.}/pia:/pia
-      - ${CONFIG_ROOT:-.}/pia-shared:/pia-shared
+      - type: tmpfs
+        target: /tmp
     cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
+      - NET_ADMIN # NET_ADMIN capability is mandatory!
     environment:
-      - LOC=${PIA_LOCATION}
-      - USER=${PIA_USER}
-      - PASS=${PIA_PASS}
-      - QBT_USER=${QBITTORRENT_USERNAME}
-      - QBT_PASS=${QBITTORRENT_PASSWORD}
-      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
-      - PORT_FORWARDING=1
-      - PORT_PERSIST=1
-      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+      PROTONVPN_SERVER: ${PROTONVPN_SERVER}  # Quote this value as server name can contain '#'. # NL-FREE#100070
+      DEBUG: "0" # Set this to 1 to show debug logs for issue forms.
+      KILL_SWITCH: "1" # Set this to 0 to disable kill-switch.
+      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY}
+    # sysctl net.ipv4.conf.all.rp_filter is mandatory!
+    # net.ipv6.conf.all.disable_ipv6 disables IPv6 as protonVPN does not support IPv6.
+    # 'net.*' sysctls are not required on application containers,
+    # as they share network stack with protonwire container.
     sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
+      net.ipv4.conf.all.rp_filter: 2
+      net.ipv6.conf.all.disable_ipv6: 1
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: always
+    init: true
+    restart: unless-stopped
+    ports:
+      - 8000:80
   unpackerr:
     image: golift/unpackerr:latest
     container_name: unpackerr
