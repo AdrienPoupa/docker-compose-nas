@@ -75,18 +75,14 @@ services:
       - homepage.widget.url=http://sonarr:8989/sonarr
       - homepage.widget.key=${SONARR_API_KEY}
   radarr:
+    <<: *default-container
     image: lscr.io/linuxserver/radarr
     container_name: radarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/radarr:/config
       - ${DATA_ROOT}:/data
       - ${MEDIA_ROOT}/movies:/movies
       - ${DOWNLOAD_ROOT}:/downloads
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
       interval: 30s
