@@ -49,6 +49,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/sonarr:/config
       - ${DATA_ROOT}:/data
+      - ${MEDIA_ROOT}/tv:/tv
+      - ${DOWNLOAD_ROOT}:/downloads
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
@@ -79,6 +81,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/radarr:/config
       - ${DATA_ROOT}:/data
+      - ${MEDIA_ROOT}/movies:/movies
+      - ${DOWNLOAD_ROOT}:/downloads
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
@@ -290,7 +294,7 @@ services:
       - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
-      - ${DOWNLOAD_ROOT}:/data/torrents
+      - ${DOWNLOAD_ROOT}:/downloads
     restart: always
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
@@ -410,6 +414,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/jellyfin:/config
       - ${DATA_ROOT}:/data
+      - ${MEDIA_ROOT}/movies:/Movies:rw
+      - ${MEDIA_ROOT}/tv:/Shows:rw
     ports:
       - "7359:7359/udp"
       - "1900:1900/udp"
