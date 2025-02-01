@@ -433,7 +433,7 @@ services:
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
     volumes:
       - ${CONFIG_ROOT:-.}/calibre-web:/config
-      - ${DATA_ROOT}/books:/books
+      - ${MEDIA_ROOT}/books:/books
     restart: unless-stopped
     labels:
       - traefik.enable=true
