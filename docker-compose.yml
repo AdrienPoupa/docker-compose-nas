@@ -81,6 +81,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/radarr:/config
       - ${DATA_ROOT}:/data
+      - ${MEDIA_ROOT}/movies:/movies
+      - ${DOWNLOAD_ROOT}:/downloads
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
