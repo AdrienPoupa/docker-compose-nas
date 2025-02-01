@@ -363,16 +363,12 @@ services:
     security_opt:
       - no-new-privileges:true
   sabnzbd:
+    <<: *default-container
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/sabnzbd:/config
       - ${DATA_ROOT}:/data
-    restart: always
     labels:
       - traefik.enable=true
       - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`) || PathPrefix(`/sabnzbd`))
