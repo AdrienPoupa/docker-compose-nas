@@ -230,15 +230,11 @@ services:
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_API_KEY}
   prowlarr:
+    <<: *default-container
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/prowlarr:/config
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
