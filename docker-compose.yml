@@ -513,6 +513,11 @@ services:
       - traefik.http.services.cabernet.loadbalancer.server.port=6077
     profiles:
       - cabernet
+  iptv-app:
+    container_name: iptv-app
+    image: arbupo/free-iptv-channels
+    profiles:
+      - iptv
 
 networks:
   default:
