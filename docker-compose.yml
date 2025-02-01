@@ -1,3 +1,10 @@
+x-default-container: &default-container
+  environment:
+    - PUID=${USER_ID}
+    - PGID=${GROUP_ID}
+    - TZ=${TIMEZONE}
+  restart: always
+
 services:
   traefik:
     image: traefik:v3.3
