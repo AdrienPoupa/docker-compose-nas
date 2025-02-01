@@ -47,18 +47,14 @@ services:
       interval: 30s
       retries: 10
   sonarr:
+    <<: *default-container
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/sonarr:/config
       - ${DATA_ROOT}:/data
       - ${MEDIA_ROOT}/tv:/tv
       - ${DOWNLOAD_ROOT}:/downloads
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
       interval: 30s
