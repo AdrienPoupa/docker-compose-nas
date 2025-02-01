@@ -1,3 +1,10 @@
+x-default-container: &default-container
+  environment:
+    - PUID=${USER_ID}
+    - PGID=${GROUP_ID}
+    - TZ=${TIMEZONE}
+  restart: always
+
 services:
   traefik:
     image: traefik:v3.3
@@ -40,18 +47,14 @@ services:
       interval: 30s
       retries: 10
   sonarr:
+    <<: *default-container
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/sonarr:/config
       - ${DATA_ROOT}:/data
       - ${MEDIA_ROOT}/tv:/tv
       - ${DOWNLOAD_ROOT}:/downloads
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
       interval: 30s
@@ -72,18 +75,14 @@ services:
       - homepage.widget.url=http://sonarr:8989/sonarr
       - homepage.widget.key=${SONARR_API_KEY}
   radarr:
+    <<: *default-container
     image: lscr.io/linuxserver/radarr
     container_name: radarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/radarr:/config
       - ${DATA_ROOT}:/data
       - ${MEDIA_ROOT}/movies:/movies
       - ${DOWNLOAD_ROOT}:/downloads
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
       interval: 30s
@@ -104,16 +103,12 @@ services:
       - homepage.widget.url=http://radarr:7878/radarr
       - homepage.widget.key=${RADARR_API_KEY}
   lidarr:
+    <<: *default-container
     image: lscr.io/linuxserver/lidarr
     container_name: lidarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/lidarr:/config
       - ${DATA_ROOT}:/data
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
       interval: 30s
@@ -136,16 +131,12 @@ services:
     profiles:
       - lidarr
   bazarr:
+    <<: *default-container
     image: lscr.io/linuxserver/bazarr
     container_name: bazarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/bazarr/config:/config
       - ${DATA_ROOT}:/data
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
       interval: 5s
@@ -239,15 +230,11 @@ services:
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_API_KEY}
   prowlarr:
+    <<: *default-container
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/prowlarr:/config
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
@@ -376,16 +363,12 @@ services:
     security_opt:
       - no-new-privileges:true
   sabnzbd:
+    <<: *default-container
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/sabnzbd:/config
       - ${DATA_ROOT}:/data
-    restart: always
     labels:
       - traefik.enable=true
       - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`) || PathPrefix(`/sabnzbd`))
