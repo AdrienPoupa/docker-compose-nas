@@ -49,6 +49,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/sonarr:/config
       - ${DATA_ROOT}:/data
+      - ${MEDIA_ROOT}/tv:/tv
+      - ${DOWNLOAD_ROOT}:/downloads
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
