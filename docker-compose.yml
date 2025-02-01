@@ -131,16 +131,12 @@ services:
     profiles:
       - lidarr
   bazarr:
+    <<: *default-container
     image: lscr.io/linuxserver/bazarr
     container_name: bazarr
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/bazarr/config:/config
       - ${DATA_ROOT}:/data
-    restart: always
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
       interval: 5s
