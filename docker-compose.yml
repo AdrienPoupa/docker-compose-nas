@@ -489,6 +489,35 @@ services:
       - homepage.widget.password=${CALIBRE_PASSWORD}
     profiles:
       - cwa
+  cwabd:
+    image: ghcr.io/calibrain/calibre-web-automated-book-downloader:latest
+    container_name: cwabd
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - FLASK_PORT=8084
+      - FLASK_DEBUG='true'
+      - CLOUDFLARE_PROXY_URL=${CLOUDFLARE_PROXY_URL}
+      - INGEST_DIR=${INGEST_DIR}
+      - BOOK_LANGUAGE=${BOOK_LANGUAGE}
+    volumes:
+      - ${DOWNLOAD_ROOT}/book-ingest:${INGEST_DIR:-/cwa-book-ingest}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/request/api/status"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cwabd.rule=(Host(`${CWABD_SUBDOMAIN}.${DOMAIN}`))
+      - traefik.http.routers.cwabd.tls=true
+      - traefik.http.routers.cwabd.tls.certresolver=myresolver
+      - traefik.http.services.cwabd.loadbalancer.server.port=8084
+    profiles:
+      - cwad
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
