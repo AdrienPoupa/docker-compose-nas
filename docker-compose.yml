@@ -518,6 +518,11 @@ services:
       - traefik.http.services.cwabd.loadbalancer.server.port=8084
     profiles:
       - cwad
+  cloudflarebypassforscraping:
+    image: ghcr.io/sarperavci/cloudflarebypassforscraping:latest
+    restart: unless-stopped
+    profiles:
+      - cloudflarebypassforscraping
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
