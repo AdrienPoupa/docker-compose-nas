@@ -147,6 +147,9 @@ If you want to show Jellyfin information in the homepage, create it in Jellyfin 
 | `HOMEPAGE_VAR_WEATHER_UNIT`    | Homepage weather unit, either `metric` or `imperial`                                                                                                                                                   | `metric`                                         |
 | `CALIBRE_USERNAME`             | Optional - Calibre-Web username to show details in the homepage, if enabled                                                                                                                            | `admin`                                          |
 | `CALIBRE_PASSWORD`             | Optional - Calibre-Web password to show details in the homepage, if enabled                                                                                                                            | `admin123`                                       |
+| `CLOUDFLARE_PROXY_URL`             | Optional - Add flare resolver url for CWABD                                                                                                                            | `http://cloudflarebypassforscraping:8000`                                       |
+| `BOOK_LANGUAGE`             | Optional - Add supported book for CWABD                                                                                                                            | `"en,es"`                                       |
+| `INGEST_DIR`             | Optional - Add directory where books are downloaded inside cwabd container                                                                                                                            | `/cwa-book-ingest"`                                       |
 
 ## PIA WireGuard VPN
 
