@@ -397,8 +397,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/jellyfin:/config
       - ${DATA_ROOT}:/data
-      - ${MEDIA_ROOT}/movies:/Movies:rw
-      - ${MEDIA_ROOT}/tv:/Shows:rw
+      - ${MEDIA_ROOT}/movies:/movies:rw
+      - ${MEDIA_ROOT}/tv:/tv:rw
     ports:
       - "7359:7359/udp"
       - "1900:1900/udp"
