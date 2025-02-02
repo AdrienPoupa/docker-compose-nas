@@ -457,6 +457,38 @@ services:
       - homepage.widget.password=${CALIBRE_PASSWORD}
     profiles:
       - calibre-web
+  calibre-web-automated:
+    image: crocodilestick/calibre-web-automated:latest
+    container_name: calibre-web-automated
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+    volumes:
+      - ${CONFIG_ROOT:-.}/calibre-web-automated/config:/config
+      - ${DOWNLOAD_ROOT_NOBRL}/book-ingest:/cwa-book-ingest
+      - ${MEDIA_ROOT_NOBRL}/books/calibre-library:/calibre-library
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cwa.rule=Host(`${CWA_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.cwa.tls=true
+      - traefik.http.routers.cwa.tls.certresolver=myresolver
+      - traefik.http.services.cwa.loadbalancer.server.port=8083
+      - homepage.group=Media
+      - homepage.name=Calibre-Web-Automated
+      - homepage.icon=calibre-web.png
+      - homepage.href=/cwa
+      - homepage.description=Books management
+      - homepage.weight=5
+      - homepage.widget.type=calibrewebautomated
+      - homepage.widget.url=http://calibre-web-automated:8083
+      - homepage.widget.username=${CALIBRE_USERNAME}
+      - homepage.widget.password=${CALIBRE_PASSWORD}
+    profiles:
+      - cwa
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
