@@ -234,6 +234,49 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
 5. Add Sonarr configuration.
 6. Add Radarr configuration.
 
+### Configure Cabernet
+
+1. **Login to Cabernet**.  
+   - Open your browser and go to: `http://cabernet.{hostname}`  
+
+2. **Install the M3U Plugin**.  
+   - Go to *Plugins* → *Catalog*.  
+   - Find **M3U**, click on it, then click the **hamburger menu** button and select **Install Plugin**.  
+
+3. **Update Configuration File**.  
+   - Edit the `config.ini` file located at: `cabernet/data/config.ini`  
+   - Add the following configuration:  
+
+   ```ini
+   [m3u_plutotv]
+   label = M3U PlutoTV US
+   channel-m3u_file = http://iptv-app:4242/PlutoTV/us/name.m3u
+   epg-xmltv_file = https://i.mjh.nz/PlutoTV/us.xml
+   enabled = True
+   channel-group_name = plutotv
+   player-enable_pts_resync = True
+   channel-import_groups = True
+   epg-min_refresh_rate = 3600
+   ```
+4. **Restart Cabernet**.
+   - Restart Cabernet via its web interface.
+5. **Refresh Channels and EPG**.
+   - Go to Functions → Scheduled Tasks and:
+     - Click Refresh Channels under Channels.
+     - Click Refresh EPG under EPG.
+6. **Verify Channels**.
+   - Go to XML/JSON Links and check `channels.m3u`.
+   - Ensure it has pulled the correct channels.
+7. **Login to Jellyfin**. 
+   - Open your browser and go to: `http://{hostname}/jellyfin`
+8. **Add M3U Tuner in Jellyfin**.
+   - Go to *Dashboard* → *Live TV* → *Add Tuner Devices*.
+   - Select tuner type: *M3U Tuner*.
+   - Enter the URL: `http://cabernet:6077/channels.m3u` and click Save.
+9. **Add XMLTV Guide Data in Jellyfin.**
+   - Go to *Live TV* → *Add TV Guide Data Providers*.
+   - Select XMLTV.
+   - Enter the URL: `http://cabernet:6077/xmltv.xml` and click Save.
 
 ## Additionals  
 ### Get IP and location
