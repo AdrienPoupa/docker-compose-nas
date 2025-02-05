@@ -584,6 +584,31 @@ services:
     image: arbupo/free-iptv-channels
     profiles:
       - iptv
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG_ROOT:-.}/prometheus:/etc/prometheus
+      - prom_data:/prometheus
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prometheus.rule=Host(`prometheus_app.${DOMAIN}`)
+      - traefik.http.routers.prometheus.tls=true
+      - traefik.http.routers.prometheus.tls.certresolver=myresolver
+      - traefik.http.services.prometheus.loadbalancer.server.port=9090
+      - homepage.group=Observability
+      - homepage.name=Prometheus
+      - homepage.icon=prometheus.png
+      - homepage.href=https://prometheus_app.${DOMAIN}
+      - homepage.description=Observability
+      - homepage.weight=4
+      - homepage.widget.type=prometheus
+      - homepage.widget.url=http://prometheus:9090/
+    profiles:
+      - prometheus
 
 networks:
   default:
