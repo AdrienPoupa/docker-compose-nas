@@ -610,6 +610,9 @@ services:
     profiles:
       - prometheus
 
+volumes:
+  prom_data:
+
 networks:
   default:
     name: docker-compose-nas
