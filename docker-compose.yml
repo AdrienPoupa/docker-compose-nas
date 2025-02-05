@@ -584,6 +584,44 @@ services:
     image: arbupo/free-iptv-channels
     profiles:
       - iptv
+  beszel:
+    image: 'henrygd/beszel'
+    container_name: 'beszel'
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG_ROOT:-.}/beszel/data:/beszel_data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.beszel.rule=Host(`beszel_app.${DOMAIN}`)
+      - traefik.http.routers.beszel.tls=true
+      - traefik.http.routers.beszel.tls.certresolver=myresolver
+      - traefik.http.services.beszel.loadbalancer.server.port=8090
+      - homepage.group=Utilities
+      - homepage.name=Beszel
+      - homepage.icon=beszel.png
+      - homepage.href=https://beszel_app.${DOMAIN}
+      - homepage.description=Utilities
+      - homepage.weight=4
+      - homepage.widget.type=beszel
+      - homepage.widget.url=http://beszel:8090/
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    profiles:
+      - beszel
+  beszel-agent:
+    image: 'henrygd/beszel-agent'
+    container_name: 'beszel-agent'
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # monitor other disks / partitions by mounting a folder in /extra-filesystems
+      # - /mnt/disk/.beszel:/extra-filesystems/sda1:ro
+    environment:
+      PORT: 45876
+      # FILESYSTEM: /dev/sda1 # set to the correct filesystem for disk I/O stats
+      KEY: ${BESZEL_KEY}
+    profiles:
+      - beszel
   prometheus:
     image: prom/prometheus
     container_name: prometheus
