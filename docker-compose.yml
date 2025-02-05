@@ -687,6 +687,16 @@ services:
       - traefik.http.services.loki.loadbalancer.server.port=3100
     profiles:
       - loki
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - /var/log:/var/log
+      - ${CONFIG_ROOT:-.}/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    profiles:
+      - loki
 
 volumes:
   prom_data:

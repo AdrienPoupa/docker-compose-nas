@@ -91,6 +91,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Beszel](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel](https://registry.hub.docker.com/r/henrygd/beszel)              |      |
 | [Beszel Agent](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring - agent,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel-agent](https://registry.hub.docker.com/r/henrygd/beszel-agent)              |      |
 | [Loki](https://github.com/grafana/loki)             | Optional - Loki: like Prometheus, but for logs.<br/>Enable with `COMPOSE_PROFILES=loki`          | [grafana/loki](https://hub.docker.com/r/grafana/loki)              |      |
+| [Promtail](https://github.com/jhuix/promtail)             | Optional - The reserve forward promtail is the agent based on loki promtail with reserve forward server and client, responsible for gathering logs and sending them to Loki.<br/>Enable with `COMPOSE_PROFILES=loki`          | [grafana/promtail](https://hub.docker.com/r/grafana/promtail)              |      |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
