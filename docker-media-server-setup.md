@@ -278,6 +278,24 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
    - Select XMLTV.
    - Enter the URL: `http://cabernet:6077/xmltv.xml` and click Save.
 
+
+### Configure Beszel
+
+1. **Login to Beszel**.  
+   - Open your browser and go to: `http://beszel.{hostname}`  
+
+2. **Add beszel agent**.  
+   - Go to *Add System*
+   - Copy the *Public Key* and update your .env file by adding:
+   ```bash
+   BESZEL_KEY=<your_public_key>
+   ```
+   - Fill out the form with the following details:
+      - Name: `Docker containers`
+      - Host: `beszel-agent`
+      - Port: `45876`
+
+
 ## Additionals  
 ### Get IP and location
 Get Container IP:
