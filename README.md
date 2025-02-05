@@ -90,6 +90,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Portainer](https://github.com/portainer/portainer)             | Optional - lightweight service delivery platform for containerized applications,<br/>Enable with `COMPOSE_PROFILES=protainer`          | [portainer/portainer](https://hub.docker.com/r/portainer/portainer)              |      |
 | [Beszel](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel](https://registry.hub.docker.com/r/henrygd/beszel)              |      |
 | [Beszel Agent](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring - agent,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel-agent](https://registry.hub.docker.com/r/henrygd/beszel-agent)              |      |
+| [Loki](https://github.com/grafana/loki)             | Optional - Loki: like Prometheus, but for logs.<br/>Enable with `COMPOSE_PROFILES=loki`          | [grafana/loki](https://hub.docker.com/r/grafana/loki)              |      |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
