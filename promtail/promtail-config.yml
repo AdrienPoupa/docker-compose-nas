@@ -1,0 +1,21 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  # Temporary file to store the last read position for each log stream. Useful in case of a crash or restart.
+  filename: /tmp/positions.yaml
+
+clients:
+  # The URL where your Loki instance is running
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker
+    pipeline_stages:
+      - docker: {}
+    static_configs:
+      - labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*-json.log
+
