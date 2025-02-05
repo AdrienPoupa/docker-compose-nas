@@ -88,7 +88,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [CloudFareByPassForScrapping](https://github.com/sarperavci/CloudflareBypassForScraping)             | Optional - Script for bypassing the Cloudflare protection on websites,<br/>Enable with `COMPOSE_PROFILES=cloudflarebypassforscraping`          | [sarperavci/cloudflarebypassforscraping](https://ghcr.io/sarperavci/cloudflarebypassforscraping)              |      |
 | [Prometheus](https://github.com/prometheus/prometheus)             | Optional - Systems and service monitoring system,<br/>Enable with `COMPOSE_PROFILES=prometheus`          | [prom/prometheus](https://hub.docker.com/r/prom/prometheus)              |      |
 | [Beszel](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel](https://registry.hub.docker.com/r/henrygd/beszel)              |      |
-| [Beszel Agente](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring - agent,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel-agent](https://registry.hub.docker.com/r/henrygd/beszel-agent)              |      |
+| [Beszel Agent](https://github.com/henrygd/beszel)             | Optional - Simple, lightweight server monitoring - agent,<br/>Enable with `COMPOSE_PROFILES=beszel`          | [henrygd/beszel-agent](https://registry.hub.docker.com/r/henrygd/beszel-agent)              |      |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
