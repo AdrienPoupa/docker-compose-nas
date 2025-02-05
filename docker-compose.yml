@@ -672,6 +672,21 @@ services:
       - homepage.widget.url=http://prometheus:9090/
     profiles:
       - prometheus
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    volumes:
+      - ${CONFIG_ROOT:-.}/loki/loki-config.yml:/etc/loki/loki-config.yml
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.loki.rule=Host(`loki_app.${DOMAIN}`)
+      - traefik.http.routers.loki.tls=true
+      - traefik.http.routers.loki.tls.certresolver=myresolver
+      - traefik.http.services.loki.loadbalancer.server.port=3100
+    profiles:
+      - loki
 
 volumes:
   prom_data:
