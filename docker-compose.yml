@@ -584,6 +584,31 @@ services:
     image: arbupo/free-iptv-channels
     profiles:
       - iptv
+  portainer: # Portainer helps debugging and monitors the containers
+    <<: *default-container
+    image: portainer/portainer-ce
+    container_name: portainer
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_ROOT:-.}/portainer:/data
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer_app.${DOMAIN}`)
+      - traefik.http.routers.portainer.tls=true
+      - traefik.http.routers.portainer.tls.certresolver=myresolver
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - homepage.group=Utilities
+      - homepage.name=Portainer
+      - homepage.icon=portainer.png
+      - homepage.href=https://portainer_app.${DOMAIN}
+      - homepage.description=Utilities
+      - homepage.weight=4
+      - homepage.widget.type=portainer
+      - homepage.widget.url=http://portainer:9000/
+    profiles:
+      - portainer
   beszel:
     image: 'henrygd/beszel'
     container_name: 'beszel'
