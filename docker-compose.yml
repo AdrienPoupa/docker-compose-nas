@@ -658,7 +658,7 @@ services:
       - prom_data:/prometheus
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prometheus.rule=Host(`prometheus_app.${DOMAIN}`)
+      - traefik.http.routers.prometheus.rule=Host(`prometheus-app.${DOMAIN}`)
       - traefik.http.routers.prometheus.tls=true
       - traefik.http.routers.prometheus.tls.certresolver=myresolver
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
