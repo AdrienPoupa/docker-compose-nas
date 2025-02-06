@@ -42,11 +42,9 @@ ingester:
     dir: /tmp/loki/wal
   chunk_idle_period: 5m
   chunk_retain_period: 30s
-  max_transfer_retries: 0
 
 # Improve log retention & prevent Loki from rejecting logs
 limits_config:
-  enforce_metric_name: false
   reject_old_samples: true
   reject_old_samples_max_age: 168h  # Keep logs for 7 days
   max_entries_limit_per_query: 50000
@@ -55,7 +53,6 @@ limits_config:
 # Optimized compaction for better storage efficiency
 compactor:
   working_directory: /tmp/loki/boltdb-shipper-compactor
-  shared_store: filesystem
   compaction_interval: 10m
 
 # Ruler settings for alerting (optional)
