@@ -296,6 +296,76 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
       - Port: `45876`
 
 
+### Configure Grafana Cloud
+#### Add a New Loki Data Source in Grafana
+
+1. **Open Grafana**
+- Log in to your **Grafana** instance.
+- Click on the **Gear Icon (⚙️) → Data Sources**.
+
+2. **Add a New Data Source**
+- Click **"Add data source"**.
+- Search for **"Loki"** and select it.
+
+3. **Configure Loki Data Source**
+- In the **URL** field, enter:
+``` bash
+http://your-loki-server:3100
+```
+(Replace `your-loki-server` with your actual Loki server address.)
+e.g could be `https://loki.myapp.com`
+
+- Enable **Basic Auth**
+- Enter your **Grafana Cloud username & API key**
+
+4. **Save & Test**
+- Click **"Save & Test"**.
+- If successful, you’ll see a message:  
+✅ **Data source is working**
+
+5. **Query Logs**
+- Go to **"Explore" (Compass Icon 🧭)**.
+- Select **Loki** as the data source.
+- Run queries like:
+```logql
+{job="your-app"}
+```
+
+#### Add a New Prometheus Data Source in Grafana
+
+1. **Open Grafana**
+- Log in to your **Grafana** instance.
+- Click on the **Gear Icon (⚙️) → Data Sources**.
+
+2. **Add a New Data Source**
+- Click **"Add data source"**.
+- Search for **"Prometheus"** and select it.
+
+3. **Configure Prometheus Data Source**
+- In the **URL** field, enter:
+```bash
+http://your-prometheus-server:9090
+```
+(Replace your-prometheus-server with your actual Prometheus server address.)
+e.g., could be `https://prometheus.myapp.com`
+
+- Enable **Basic Auth**
+- Enter your **Grafana Cloud username & API key**
+
+4. **Save & Test**
+- Click **"Save & Test"**.
+- If successful, you’ll see a message:  
+✅ **Data source is working**
+
+5. **Query Metrics**
+- Go to **"Explore" (Compass Icon 🧭)**.
+- Select **Prometheus** as the data source.
+- Run queries like:
+```promql
+node_cpu_seconds_total
+```
+
+
 ## Additionals  
 ### Get IP and location
 Get Container IP:
@@ -312,6 +382,24 @@ docker inspect --format='{{json .State.Health.Status}}' protonwire
 1. Access qbittorrent docker container: `docker exec -it qbittorrent sh`
 2. `cd /config/qBittorrent/logs`
 3. `tail -n 50 qbittorrent.log`
+### Viewing Traefik Logs for Invalid Certificate Issues
+
+To monitor Traefik logs and identify invalid certificate errors, follow these steps:
+
+1. **Open a terminal and run the following command:**  
+   ```bash
+   docker logs -f traefik
+   ```
+   - The -f flag ensures live log streaming.
+   - Look for SSL/TLS errors related to certificate validation.
+
+2. **Filter logs for SSL-related messages (optional):**
+   ```bash
+   docker logs -f traefik | grep -i "certificate"
+   ```
+
+3. **Check the Traefik dashboard or logs for details on the invalid certificate issue.**
+
 
 
 
