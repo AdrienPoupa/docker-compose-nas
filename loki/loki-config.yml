@@ -1,11 +1,8 @@
-# You can enable authentication to prevent unauthorized access to your logs
 auth_enabled: false
 
 server:
-  # This is the port where Loki will receive logs from Docker (or Promtail)
-  http_listen_port: 3100
-  # This is the port where Loki will expose its API
-  grpc_listen_port: 9096
+  http_listen_port: 3100   # Port where Loki receives logs
+  grpc_listen_port: 9096   # API access port
 
 common:
   instance_addr: 127.0.0.1
@@ -19,6 +16,7 @@ common:
     kvstore:
       store: inmemory
 
+# Enable caching for better performance
 query_range:
   results_cache:
     cache:
@@ -26,6 +24,7 @@ query_range:
         enabled: true
         max_size_mb: 100
 
+# Schema configuration (keep using TSDB for efficient log storage)
 schema_config:
   configs:
     - from: 2020-10-24
@@ -36,6 +35,29 @@ schema_config:
         prefix: index_
         period: 24h
 
+# Enable Loki to work with Promtail sending Docker logs
+ingester:
+  wal:
+    enabled: true  # Prevents log loss on crashes
+    dir: /tmp/loki/wal
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
+  max_transfer_retries: 0
+
+# Improve log retention & prevent Loki from rejecting logs
+limits_config:
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h  # Keep logs for 7 days
+  max_entries_limit_per_query: 50000
+  max_streams_per_user: 5000  # Prevents log ingestion issues
+
+# Optimized compaction for better storage efficiency
+compactor:
+  working_directory: /tmp/loki/boltdb-shipper-compactor
+  shared_store: filesystem
+  compaction_interval: 10m
+
+# Ruler settings for alerting (optional)
 ruler:
   alertmanager_url: http://localhost:9093
-
