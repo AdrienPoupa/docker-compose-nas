@@ -694,6 +694,7 @@ services:
     volumes:
       - /var/log:/var/log
       - ${CONFIG_ROOT:-.}/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: -config.file=/etc/promtail/promtail-config.yml
     profiles:
       - loki
