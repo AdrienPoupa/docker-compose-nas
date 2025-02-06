@@ -617,7 +617,7 @@ services:
       - ${CONFIG_ROOT:-.}/beszel/data:/beszel_data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.beszel.rule=Host(`beszel_app.${DOMAIN}`)
+      - traefik.http.routers.beszel.rule=Host(`beszel-app.${DOMAIN}`)
       - traefik.http.routers.beszel.tls=true
       - traefik.http.routers.beszel.tls.certresolver=myresolver
       - traefik.http.services.beszel.loadbalancer.server.port=8090
