@@ -13,7 +13,21 @@ clients:
 scrape_configs:
   - job_name: docker
     pipeline_stages:
-      - docker: {}
+      - docker: {}  # Auto-parse Docker logs (JSON format)
+
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s  # Check for new containers every 5s
+
+    relabel_configs:
+      - source_labels: [__meta_docker_container_id]
+        target_label: container_id
+      - source_labels: [__meta_docker_container_name]
+        target_label: container_name
+      - source_labels: [__meta_docker_image]
+        target_label: image_name
+
+    # Keep this in case direct file access is needed
     static_configs:
       - labels:
           job: docker
