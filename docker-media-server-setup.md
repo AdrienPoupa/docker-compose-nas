@@ -382,6 +382,24 @@ docker inspect --format='{{json .State.Health.Status}}' protonwire
 1. Access qbittorrent docker container: `docker exec -it qbittorrent sh`
 2. `cd /config/qBittorrent/logs`
 3. `tail -n 50 qbittorrent.log`
+### Viewing Traefik Logs for Invalid Certificate Issues
+
+To monitor Traefik logs and identify invalid certificate errors, follow these steps:
+
+1. **Open a terminal and run the following command:**  
+   ```bash
+   docker logs -f traefik
+   ```
+   - The -f flag ensures live log streaming.
+   - Look for SSL/TLS errors related to certificate validation.
+
+2. **Filter logs for SSL-related messages (optional):**
+   ```bash
+   docker logs -f traefik | grep -i "certificate"
+   ```
+
+3. **Check the Traefik dashboard or logs for details on the invalid certificate issue.**
+
 
 
 
