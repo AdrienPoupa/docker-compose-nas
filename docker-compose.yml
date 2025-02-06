@@ -624,7 +624,7 @@ services:
       - homepage.group=Utilities
       - homepage.name=Beszel
       - homepage.icon=beszel.png
-      - homepage.href=https://beszel_app.${DOMAIN}
+      - homepage.href=https://beszel-app.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=beszel
