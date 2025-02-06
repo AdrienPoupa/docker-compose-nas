@@ -595,14 +595,14 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.portainer.rule=Host(`portainer_app.${DOMAIN}`)
+      - traefik.http.routers.portainer.rule=Host(`portainer-app.${DOMAIN}`)
       - traefik.http.routers.portainer.tls=true
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       - homepage.group=Utilities
       - homepage.name=Portainer
       - homepage.icon=portainer.png
-      - homepage.href=https://portainer_app.${DOMAIN}
+      - homepage.href=https://portainer-app.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=portainer
@@ -617,14 +617,14 @@ services:
       - ${CONFIG_ROOT:-.}/beszel/data:/beszel_data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.beszel.rule=Host(`beszel_app.${DOMAIN}`)
+      - traefik.http.routers.beszel.rule=Host(`beszel-app.${DOMAIN}`)
       - traefik.http.routers.beszel.tls=true
       - traefik.http.routers.beszel.tls.certresolver=myresolver
       - traefik.http.services.beszel.loadbalancer.server.port=8090
       - homepage.group=Utilities
       - homepage.name=Beszel
       - homepage.icon=beszel.png
-      - homepage.href=https://beszel_app.${DOMAIN}
+      - homepage.href=https://beszel-app.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=beszel
@@ -658,14 +658,14 @@ services:
       - prom_data:/prometheus
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prometheus.rule=Host(`prometheus_app.${DOMAIN}`)
+      - traefik.http.routers.prometheus.rule=Host(`prometheus-app.${DOMAIN}`)
       - traefik.http.routers.prometheus.tls=true
       - traefik.http.routers.prometheus.tls.certresolver=myresolver
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
       - homepage.group=Observability
       - homepage.name=Prometheus
       - homepage.icon=prometheus.png
-      - homepage.href=https://prometheus_app.${DOMAIN}
+      - homepage.href=https://prometheus-app.${DOMAIN}
       - homepage.description=Observability
       - homepage.weight=4
       - homepage.widget.type=prometheus
@@ -681,7 +681,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yml
     labels:
       - traefik.enable=true
-      - traefik.http.routers.loki.rule=Host(`loki_app.${DOMAIN}`)
+      - traefik.http.routers.loki.rule=Host(`loki-app.${DOMAIN}`)
       - traefik.http.routers.loki.tls=true
       - traefik.http.routers.loki.tls.certresolver=myresolver
       - traefik.http.services.loki.loadbalancer.server.port=3100
