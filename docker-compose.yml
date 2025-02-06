@@ -595,7 +595,7 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.portainer.rule=Host(`portainer_app.${DOMAIN}`)
+      - traefik.http.routers.portainer.rule=Host(`portainer-app.${DOMAIN}`)
       - traefik.http.routers.portainer.tls=true
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
@@ -665,7 +665,7 @@ services:
       - homepage.group=Observability
       - homepage.name=Prometheus
       - homepage.icon=prometheus.png
-      - homepage.href=https://prometheus_app.${DOMAIN}
+      - homepage.href=https://prometheus-app.${DOMAIN}
       - homepage.description=Observability
       - homepage.weight=4
       - homepage.widget.type=prometheus
@@ -681,7 +681,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yml
     labels:
       - traefik.enable=true
-      - traefik.http.routers.loki.rule=Host(`loki_app.${DOMAIN}`)
+      - traefik.http.routers.loki.rule=Host(`loki-app.${DOMAIN}`)
       - traefik.http.routers.loki.tls=true
       - traefik.http.routers.loki.tls.certresolver=myresolver
       - traefik.http.services.loki.loadbalancer.server.port=3100
