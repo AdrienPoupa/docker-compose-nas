@@ -330,6 +330,42 @@ e.g could be `https://loki.myapp.com`
 ```logql
 {job="your-app"}
 ```
+
+#### Add a New Prometheus Data Source in Grafana
+
+1. **Open Grafana**
+- Log in to your **Grafana** instance.
+- Click on the **Gear Icon (⚙️) → Data Sources**.
+
+2. **Add a New Data Source**
+- Click **"Add data source"**.
+- Search for **"Prometheus"** and select it.
+
+3. **Configure Prometheus Data Source**
+- In the **URL** field, enter:
+```bash
+http://your-prometheus-server:9090
+```
+(Replace your-prometheus-server with your actual Prometheus server address.)
+e.g., could be `https://prometheus.myapp.com`
+
+- Enable **Basic Auth**
+- Enter your **Grafana Cloud username & API key**
+
+4. **Save & Test**
+- Click **"Save & Test"**.
+- If successful, you’ll see a message:  
+✅ **Data source is working**
+
+5. **Query Metrics**
+- Go to **"Explore" (Compass Icon 🧭)**.
+- Select **Prometheus** as the data source.
+- Run queries like:
+```promql
+node_cpu_seconds_total
+```
+
+
 ## Additionals  
 ### Get IP and location
 Get Container IP:
