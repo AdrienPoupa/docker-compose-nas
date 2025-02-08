@@ -59,8 +59,8 @@ To make this mount persistent across reboots, add the following line to /etc/fst
 3. Additional Mount Configurations
 Add these two lines to /etc/fstab to enable multiple mount points:
 ``` bash
-//u439025.your-storagebox.de/backup /mnt/data cifs iocharset=utf8,rw,credentials=/etc/backup-credentials.txt,file_mode=0770,dir_mode=0770,uid=1000,gid=1000 0 0
-//u439025.your-storagebox.de/backup /mnt/data_nobrl cifs nobrl,iocharset=utf8,rw,credentials=/etc/backup-credentials.txt,file_mode=0770,dir_mode=0770,uid=1000,gid=1000,vers=3.0 0 0
+//u439025.your-storagebox.de/backup /mnt/data cifs rw,credentials=/etc/backup-credentials.txt,file_mode=0770,dir_mode=0770,uid=1000,gid=1000 0 0
+//u439025.your-storagebox.de/backup /mnt/data_nobrl cifs nobrl,rw,credentials=/etc/backup-credentials.txt,file_mode=0770,dir_mode=0770,uid=1000,gid=1000,vers=3.0 0 0
 ```
 The first line is for general file storage, and the second enables write access for databases.
 
