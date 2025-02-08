@@ -459,7 +459,7 @@ services:
       - calibre-web
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:latest
-    container_name: calibre-web-automated
+    container_name: cwa
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
@@ -473,7 +473,7 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cwa.rule=Host(`${CWA_SUBDOMAIN}.${DOMAIN}`)
+      - traefik.http.routers.cwa.rule=Host(`cwab.${DOMAIN}`)
       - traefik.http.routers.cwa.tls=true
       - traefik.http.routers.cwa.tls.certresolver=myresolver
       - traefik.http.services.cwa.loadbalancer.server.port=8083
@@ -484,7 +484,7 @@ services:
       - homepage.description=Books management
       - homepage.weight=5
       - homepage.widget.type=calibrewebautomated
-      - homepage.widget.url=http://calibre-web-automated:8083
+      - homepage.widget.url=http://cwa:8083
       - homepage.widget.username=${CALIBRE_USERNAME}
       - homepage.widget.password=${CALIBRE_PASSWORD}
     profiles:
@@ -512,7 +512,7 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cwabd.rule=(Host(`${CWABD_SUBDOMAIN}.${DOMAIN}`))
+      - traefik.http.routers.cwabd.rule=(Host(`cwabd.${DOMAIN}`))
       - traefik.http.routers.cwabd.tls=true
       - traefik.http.routers.cwabd.tls.certresolver=myresolver
       - traefik.http.services.cwabd.loadbalancer.server.port=8084
@@ -573,7 +573,7 @@ services:
       - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cabernet.rule=(Host(`${CABERNET_SUBDOMAIN}.${DOMAIN}`))
+      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
       - traefik.http.routers.cabernet.tls=true
       - traefik.http.routers.cabernet.tls.certresolver=myresolver
       - traefik.http.services.cabernet.loadbalancer.server.port=6077
@@ -697,8 +697,10 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/promtail-config.yml
-    profiles:
+    depends_on:
       - loki
+    profiles:
+      - promtail
 
 volumes:
   prom_data:
