@@ -298,38 +298,88 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
 
 ### Configure Grafana Cloud
 #### Add a New Loki Data Source in Grafana
+1. **Pre-requisities**
+      ##### Installing Docker Plugins for Loki
+      To efficiently send logs from your Docker containers to Loki for monitoring and analysis, you'll need to install the Docker plugin for Loki. This plugin acts as a log driver for Docker and ensures that container logs are directed to Loki.
 
-1. **Open Grafana**
-- Log in to your **Grafana** instance.
-- Click on the **Gear Icon (⚙️) → Data Sources**.
+      1. ***Install Docker Plugin***
+      To start using Loki with Docker, install the Grafana Loki Docker driver. Run the following command in your terminal:
+      ```bash
+      docker plugin install grafana/loki-docker-driver:2.9.1 --alias loki --grant-all-permissions
+      ```
+      2. ***Configure Docker Daemon***
+      Next, configure Docker to use the Loki log driver by modifying the daemon.json file, which is Docker's configuration file. This step is necessary to direct container logs to Loki.
+         - Open the `/etc/docker/daemon.json` file on your system.
+         - Paste the following configuration:
+      ```json
+      {
+      "log-driver": "loki",
+      "log-opts": {
+         "loki-url": "http://localhost:3100/loki/api/v1/push",
+         "loki-batch-size": "400"
+      }
+      }
+      ```
+      3. ***Restart Docker***
+      Once you have updated the configuration file, you need to restart Docker for the changes to take effect. You can restart Docker with the following command:
+      ```bash
+      sudo systemctl restart docker
+      ```
 
-2. **Add a New Data Source**
-- Click **"Add data source"**.
-- Search for **"Loki"** and select it.
+      The Docker plugin enables seamless integration between Docker containers and Loki for centralized log management.
 
-3. **Configure Loki Data Source**
-- In the **URL** field, enter:
-``` bash
-http://your-loki-server:3100
-```
-(Replace `your-loki-server` with your actual Loki server address.)
-e.g could be `https://loki.myapp.com`
+      ##### Checking Loki Access for Labels, Metrics and queries
+      1. ***Query Logs:***
+      ```bash
+      https://{loki_subdomain}.{domain}/loki/api/v1/query_range?query={job=%22docker%22}&start=1609459200000000000&end=1609462800000000000
+      ```
+      2. ***Metrics for Health Check:***
+      ```bash
+      https://{loki_subdomain}.{domain}/metrics
+      ```
+      3. ***Query Labels:***
+      ```bash
+      https://{loki_subdomain}.{domain}/loki/api/v1/labels
+      ```
 
-- Enable **Basic Auth**
-- Enter your **Grafana Cloud username & API key**
+      ##### ***Ping, Curl and Wget Commands**
+      If using promtail, access promtail docker container and run one of the following commandas:
+      ```bash
+      ping loki
+      curl -s http://loki:3100/loki/api/v1/labels
+      wget -qO- http://loki:3100/loki/api/v1/labels
+      ```
+   2. **Open Grafana**
+   - Log in to your **Grafana** instance.
+   - Click on the **Gear Icon (⚙️) → Data Sources**.
 
-4. **Save & Test**
-- Click **"Save & Test"**.
-- If successful, you’ll see a message:  
-✅ **Data source is working**
+   3. **Add a New Data Source**
+   - Click **"Add data source"**.
+   - Search for **"Loki"** and select it.
 
-5. **Query Logs**
-- Go to **"Explore" (Compass Icon 🧭)**.
-- Select **Loki** as the data source.
-- Run queries like:
-```logql
-{job="your-app"}
-```
+   4. **Configure Loki Data Source**
+   - In the **URL** field, enter:
+   ``` bash
+   http://your-loki-server:3100
+   ```
+   (Replace `your-loki-server` with your actual Loki server address.)
+   e.g could be `https://loki.myapp.com`
+
+   - Enable **Basic Auth**
+   - Enter your **Grafana Cloud username & API key**
+
+   5. **Save & Test**
+   - Click **"Save & Test"**.
+   - If successful, you’ll see a message:  
+   ✅ **Data source is working**
+
+   6. **Query Logs**
+   - Go to **"Explore" (Compass Icon 🧭)**.
+   - Select **Loki** as the data source.
+   - Run queries like:
+   ```logql
+   {job="your-app"}
+   ```
 
 #### Add a New Prometheus Data Source in Grafana
 
@@ -400,7 +450,13 @@ To monitor Traefik logs and identify invalid certificate errors, follow these st
 
 3. **Check the Traefik dashboard or logs for details on the invalid certificate issue.**
 
-
-
-
+### Additional Network and Container Checks
+To inspect network settings and container health, use the following Docker commands:
+```bash
+docker network inspect docker-compose-nas # inspect network ips
+```
+Inspect an specific container
+```bash
+docker inspect radarr
+```
 
