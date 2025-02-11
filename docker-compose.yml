@@ -422,6 +422,27 @@ services:
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096/jellyfin
       - homepage.widget.key=${JELLYFIN_API_KEY}
+  cabernet:
+    <<: *default-container
+    container_name: cabernet
+    image: ghcr.io/cabernetwork/cabernet:latest
+    volumes:
+      - ${CONFIG_ROOT:-.}/cabernet/data:/app/data
+      - ${CONFIG_ROOT:-.}/cabernet/plugins_ext:/app/plugins_ext
+      - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
+      - traefik.http.routers.cabernet.tls=true
+      - traefik.http.routers.cabernet.tls.certresolver=myresolver
+      - traefik.http.services.cabernet.loadbalancer.server.port=6077
+    profiles:
+      - cabernet
+  iptv-app:
+    container_name: iptv-app
+    image: arbupo/free-iptv-channels
+    profiles:
+      - iptv
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
     container_name: calibre-web
@@ -563,27 +584,6 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  cabernet:
-    <<: *default-container
-    container_name: cabernet
-    image: ghcr.io/cabernetwork/cabernet:latest
-    volumes:
-      - ${CONFIG_ROOT:-.}/cabernet/data:/app/data
-      - ${CONFIG_ROOT:-.}/cabernet/plugins_ext:/app/plugins_ext
-      - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
-      - traefik.http.routers.cabernet.tls=true
-      - traefik.http.routers.cabernet.tls.certresolver=myresolver
-      - traefik.http.services.cabernet.loadbalancer.server.port=6077
-    profiles:
-      - cabernet
-  iptv-app:
-    container_name: iptv-app
-    image: arbupo/free-iptv-channels
-    profiles:
-      - iptv
   portainer: # Portainer helps debugging and monitors the containers
     <<: *default-container
     image: portainer/portainer-ce
