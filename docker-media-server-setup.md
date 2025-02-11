@@ -43,18 +43,37 @@ If additional kernel modules are needed, for example, to enable UTF-8 support, r
 sudo apt install linux-modules-extra-$(uname -r)
 ```
 
+## Create mount directores
+mkdir -p /mnt/data /mnt/data_nobrl
+
+## Update ubuntu and install cifs utils
+```bash
+sudo apt update
+sudo apt install cifs-utils
+sudo apt install docker-compose
+```
+
 ## Create Hetzner Storage box
 1. Go to Hetzner Storage Box Page 
 Visit: `https://www.hetzner.com/storage/storage-box/`
 2. Mount the Storage box:
-``` bash
-mount -t cifs <username>.your-storagebox.de/backup /mnt/backup-server cifs iocharset=utf8,rw,credentials=/etc/backup-credentials.txt,uid=<system account>,gid=<system group>,file_mode=0660,dir_mode=0770 0 0
-```
-
-To make this mount persistent across reboots, add the following line to /etc/fstab:
-```bash
-//<username>.your-storagebox.de/backup /mnt/backup-server cifs iocharset=utf8,rw,credentials=/etc/backup-credentials.txt,uid=<system account>,gid=<system group>,file_mode=0660,dir_mode=0770 0 0
-```
+ - Test trying to access using username and password
+   ```bash
+   sudo mount.cifs -o user=<<username>>,pass=<<password>> //u439025.your-storagebox.de/backup /mnt/data
+   ```
+ - Test trying to access using credentials
+   ``` bash
+   mount -t cifs <username>.your-storagebox.de/backup /mnt/backup-server cifs iocharset=utf8,rw,credentials=/etc/backup-credentials.txt,uid=<system account>,gid=<system group>,file_mode=0660,dir_mode=0770 0 0
+   ```
+   for example
+   ```bash
+   sudo mount -t cifs //u439025.your-storagebox.de/backup /mnt/data -o rw,credentials=/etc/backup-credentials.txt,file_mode=0770,dir_mode=0770,uid=1000,gid=1000
+   ```
+- Make persistent
+   To make this mount persistent across reboots, add the following line to /etc/fstab:
+   ```bash
+   //<username>.your-storagebox.de/backup /mnt/backup-server cifs rw,credentials=/etc/backup-credentials.txt,uid=<system account>,gid=<system group>,file_mode=0660,dir_mode=0770 0 0
+   ```
 
 3. Additional Mount Configurations
 Add these two lines to /etc/fstab to enable multiple mount points:
@@ -74,6 +93,10 @@ Then change the file's permissions to ensure security:
 ```bash
 chmod 0600 /etc/backup-credentials.txt
 ```
+5.  Run command:
+   ```bash
+   systemctl daemon-reload
+   ```
 
 5. Create Media Folders
 ```bash
@@ -85,51 +108,123 @@ sudo chown -R 1000:1000 .
 
 If the Storage Box is not mounted after a reboot, follow these troubleshooting steps:
 - Manually mount the disk: `mount -a`
-- Check kernel logs for errors: `dmesg | tail -n 50`
+- Check kernel logs for errors: `   
 
 
 ## Run applications
-1. Clone Repository
+1. Create a folder
+```bash
+mkdir -p ~/Documents/GitHub
+```
+2. Clone Repository
 Clone the docker-compose-nas repository:
 ```bash
-https://github.com/arbupo/docker-compose-nas.git
+mkdir GitHub
+cd GitHub
+git clone https://github.com/arbupo/docker-compose-nas.git
 ```
-2. Create Environment Variables File
+3. Create Environment Variables File
 Copy the sample environment file and update it with the appropriate values:
 ```bash
 cp .env.sample .env
 ```
-3. Run Docker Containers
+4. Update env values
+```bash
+HOSTNAME="app.nosoupforyou.xyz"
+DOMAIN="nosoupforyou.xyz"
+LETS_ENCRYPT_EMAIL="alon.wengierko@gmail.com"
+```
+5. Run Docker Containers
 Start the Docker containers in detached mode:
 ```bash
 docker compose up -d
 ```
+6. Update applicatios base URLs and set API Keys
+For the first time, run `./update-config.sh` to update the applications base URLs and set the API keys in `.env`.
 
 ## Configure Applications
 
 ### Configure Jellyfin
 1. **Login to Jellyfin**
    Access your Jellyfin instance through the web interface.
-2. **Add Media Libraries**
+2. ***Set admin username/password***
+3. **Add Media Libraries**
   - Go to the Dashboard → Libraries.
   - Click Add New Library and select `Movies`. Choose `/movies` as the library path.
   - Click Add New Library again, select `TV` and choose `/tv` as the path.
+4. ***Create users***
+  - Go to administration
+  - Go to users
+  - Click (+) button
+
+
+### Configure VPN
+Set env values for
+```bash
+VPN_SERVICE_PROVIDER=protonvpn
+VPN_TYPE=wireguard
+WIREGUARD_PRIVATE_KEY="xxxxx"
+SERVER_COUNTRIES="United States"
+```
+
+### Configure Qbittorrent
+1. Get password from docker-compose logs
+2. Login to Qbittorrent
+3. Go to tools -> Options -> WebUI -> Authentication -> Change current password
+4. Select *Bypass authentication for clients on localhost*
+5. Select *Bypass authentication for clients in whitelisted IP subnets* and select `prowlarr, radarr, sonarr`
+
+### Configure Prowlar
+#### Configure authentication
+1. **Login to Prowlarr**
+2. Complete authentication configuration form:
+   - Authentication Method: Forms (Login Page)
+   - Authentication Required: Disabled for Local Addresses
+
+#### Add indexers
+1. **Login to Prowlarr**
+2. Go to *Indexers*.
+3. Click *Add Indexer* and add the following:
+   - Badass Torrents
+   - LimeTorrents
+   - YourBittorrent
+   - YTS
+5. Set seed ratio to 0.001 for each indexer
+6. After click Test for each indexer and then Save
+
+#### Configure Indexers for other applications
+1. **Login to Prowlarr**
+2. Go to settings -> Apps -> Add Application 
+3. Click Add Sonarr
+4. Get API Key from .env file
+5. The indexers are configured through Prowlarr. They synchronize automatically to Radarr and Sonarr.
+Radarr and Sonarr may then be added via Settings > Apps. The Prowlarr server is `http://prowlarr:9696/prowlarr`, the Radarr server
+is `http://radarr:7878/radarr` Sonarr `http://sonarr:8989/sonarr`, and Lidarr `http://lidarr:8686/lidarr`.
+Their API keys can be found in Settings > Security > API Key.
+
 
 ### Configure Sonarr
+#### Configure authentication
+1. **Login to Sonarr**
+2. Complete authentication configuration form:
+   - Authentication Method: Forms (Login Page)
+   - Authentication Required: Disabled for Local Addresses
 #### Configure Root Folder:
 1. **Login to Sonarr**
 2. Go to *Settings* → *Media Management*.
 3. In the *Root Folder* section, click *Add Root Folder*.
 4. Select folder `/tv`.
-
 #### Configure Custom Format:
 1. **Login to Sonarr**
 2. Go to *Settings* → *Custom Formats* and click *Add Custom Format*.
   - Name: x265
   - Conditions
+    - Condition: Release Title
     - Name: x265
-    - Regular expression: x265
-
+    - Regular expression: 
+    - Set Required
+#### Cofigure Indexers
+1. It should not be neccesary, since it was configure before via prowlarr. 
 #### Configure Torrent Client:
 1. **Login to Sonarr**
 2. Go to *Settings* → *Download Clients*.
@@ -137,14 +232,17 @@ docker compose up -d
   - name: qbittorrent
   - host: vpn
   - port: 8080
+  - username: configure username for qbittorrent
+  - password: configure password for qbittorrent
 4. Click *Test*.
 5. If successful, click *Save*.
 6. After configuring the VPN and switching the network to qBittorrent, change the host from `qbittorrent` to `vpn`.
 
 #### Limit TV Episode Size:
+1. Go to Settings -> indexers
 1. Go to `{localhost}/sonarr/settings/indexers`.
 2. Set the *Maximum Size* to `3500 MB`.
-3. Click *Save*.
+3. Click *Save Changes*.
 
 #### Set Indexer Seed Ratio:
 1. **Login to Radarr**.
@@ -152,39 +250,55 @@ docker compose up -d
 3. Click on each indexer and set the *Seed Ratio* to `0.00001`.
 
 ### Configure  Radarr
-
+#### Configure authentication
+1. **Login to Sonarr**
+2. Complete authentication configuration form:
+   - Authentication Method: Forms (Login Page)
+   - Authentication Required: Disabled for Local Addresses
 #### Configure Root Folder:
 1. **Login to Radarr**.
 2. Go to *Settings* → *Media Management*.
 3. In the *Root Folder* section, click *Add Root Folder*.
 4. Select folder `/movies`.
-
 #### Configure Custom Format:
 1. **Login to Radarr**.
 2. Go to *Settings* → *Custom Formats*.
 3. Create a *Custom Format* with the condition `Release Title` and use the regular expression `x265`.
-
+#### Cofigure Indexers
+1. It should not be neccesary, since it was configure before via prowlarr. 
 #### Configure Torrent Client:
-Follow the same steps as for Sonarr.
-
+1. **Login to Sonarr**
+2. Go to *Settings* → *Download Clients*.
+3. Click *Add Download Client* and configure the client.
+  - name: qbittorrent
+  - host: vpn
+  - port: 8080
+  - username: configure username for qbittorrent
+  - password: configure password for qbittorrent
+4. Click *Test*.
+5. If successful, click *Save*.
+6. After configuring the VPN and switching the network to qBittorrent, change the host from `qbittorrent` to `vpn`.
 #### Limit TV Episode Size:
 1. Go to `{localhost}/radarr/settings/indexers`.
 2. Set the *Maximum Size* to `3500 MB`.
 3. Click *Save*.
 
-#### Set Indexer Seed Ratio:
-1. **Login to Radarr**.
-2. Go to *Settings* → *Indexers*.
-3. Click on each indexer and set the *Seed Ratio* to `0.00001`.
-
 
 ### Configure Jellyseer
 To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs as follows:
 
-1. **Configure Jellyfin:**
+1. **Configure Server Type:**
    - URL: `http://jellyfin:8096/jellyfin`.
-
-2. **Configure Radarr:**
+   - Jellyfin URL: jellyfin
+   - Jellyfin Port: 8096
+   - Jellyfin URL Base: jellyfin
+   - Jellyfin username:
+   - Jellyfin password: 
+2. **Sign In**
+   - Set Jellyfin libraries
+   - Click manual library sync
+3. **Configure Radarr:**
+   - Default Service: yes
    - Hostname: `radarr`
    - Port: `7878`
    - URL Base: `/radarr`
@@ -194,40 +308,34 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
    - Click *Test*.
    - Select *Root Folder*: `/movies`.
    - Click *Save*.
-
-3. **Configure Sonarr:**
+4. **Configure Sonarr:**
+   - Default Service: yes
    - Hostname: `sonarr`
    - Port: `8989`
-   - URL Base: `/sonarr`
+   - URL Base: `  `
    - Get the *API Key* from the `.env` file.
    - Click *Test*.
    - Select Quality: `720/1080 HD`.
    - Click *Test*.
    - Select *Root Folder*: `/tv`.
    - Click *Save*.
+5. **Create users**
+   - Import from Jellyfin
+   - Configure settings to auto approve
 
 
-### Configure Prowlar Indexers
-1. Open Prowlar.
-2. Go to *Indexers*.
-3. Click *Add Indexer* and add the following:
-   - Badass Torrents
-   - LimeTorrents
-   - YourBittorrent
-   - YTS
-
-
-### Configure Bazarr
+### Configure Bazarr 
 1. **Login to Bazarr**.
 2. Go to *Settings* → *Providers* and click the (+) button.
    - Add the following providers:
      - OpenSubtitles.com
-     - YIFS Subtitles
-     - TV Subtitles
+     - YIFY Subtitles
+     - TVSubtitles
      - Supersubtitles
      - Embedded Subtitles
      - Addic7ed
      - Subtitulados.tv
+   - Click Save
 
 3. Go to *Settings* → *Languages* and add the *Language Filter*: `English`.
 4. Go to *Settings* → *Languages* and add the *Language Profiler*: `English`.
@@ -296,8 +404,7 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
       - Port: `45876`
 
 
-### Configure Grafana Cloud
-#### Add a New Loki Data Source in Grafana
+### Configure Loki
 1. **Pre-requisities**
       ##### Installing Docker Plugins for Loki
       To efficiently send logs from your Docker containers to Loki for monitoring and analysis, you'll need to install the Docker plugin for Loki. This plugin acts as a log driver for Docker and ensures that container logs are directed to Loki.
@@ -320,6 +427,49 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
       }
       }
       ```
+   
+      ```json
+      {
+      "log-driver": "loki",
+      "log-opts": {
+         "mode":"non-blocking",
+         "loki-url": "http://localhost:3100/loki/api/v1/push", 
+         "loki-batch-size": "400",
+         "loki-retries": "2",
+         "loki-max-backoff":"800ms",
+         "loki-timeout":"1s"
+      }
+      }
+      ```
+      ```json
+      {
+      "log-driver": "loki",
+      "log-opts": {
+         "mode": "non-blocking",
+         "loki-url": "http://localhost:3100/loki/api/v1/push",
+         "loki-batch-size": "400",
+         "loki-retries": "2",
+         "loki-max-backoff": "800ms",
+         "loki-timeout": "1s",
+         "loki-batch-wait": "1s",
+         "max-line-size": "1k",
+         "labels": {
+            "app": "myapp",
+            "env": "production"
+         }
+      },
+      "http-timeout": "200s",
+      "log-level": "info",
+      "data-root": "/mnt/docker-data",
+      "default-address-pools": [
+         {"base": "192.168.0.0/16", "size": 24}
+      ],
+      "userns-remap": "default",
+      "dns": ["8.8.8.8", "8.8.4.4"]
+      }
+      ```
+
+
       3. ***Restart Docker***
       Once you have updated the configuration file, you need to restart Docker for the changes to take effect. You can restart Docker with the following command:
       ```bash
@@ -349,15 +499,21 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
       curl -s http://loki:3100/loki/api/v1/labels
       wget -qO- http://loki:3100/loki/api/v1/labels
       ```
-   2. **Open Grafana**
+
+### Configure Prometheus
+
+
+### Configure Grafana Cloud
+#### Add a New Loki Data Source in Grafana
+   1. **Open Grafana**
    - Log in to your **Grafana** instance.
    - Click on the **Gear Icon (⚙️) → Data Sources**.
 
-   3. **Add a New Data Source**
+   2. **Add a New Data Source**
    - Click **"Add data source"**.
    - Search for **"Loki"** and select it.
 
-   4. **Configure Loki Data Source**
+   3. **Configure Loki Data Source**
    - In the **URL** field, enter:
    ``` bash
    http://your-loki-server:3100
@@ -368,12 +524,12 @@ To set up Jellyseer, go to `https://hostname/jellyseerr/setup` and set the URLs 
    - Enable **Basic Auth**
    - Enter your **Grafana Cloud username & API key**
 
-   5. **Save & Test**
+   4. **Save & Test**
    - Click **"Save & Test"**.
    - If successful, you’ll see a message:  
    ✅ **Data source is working**
 
-   6. **Query Logs**
+   5. **Query Logs**
    - Go to **"Explore" (Compass Icon 🧭)**.
    - Select **Loki** as the data source.
    - Run queries like:

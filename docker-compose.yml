@@ -6,6 +6,9 @@ x-default-container: &default-container
   restart: always
 
 services:
+  ################################################################
+  #                        Services                              #
+  ################################################################
   traefik:
     image: traefik:v3.3
     container_name: traefik
@@ -44,6 +47,9 @@ services:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
       interval: 30s
       retries: 10
+  ################################################################
+  #                     Media Server                             #
+  ################################################################
   sonarr:
     <<: *default-container
     image: lscr.io/linuxserver/sonarr
@@ -315,7 +321,7 @@ services:
       - homepage.widget.url=http://vpn:8080
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
-  vpn:
+  vpn_protonwire:
     # Use semver tags or sha256 hashes of manifests.
     # using latest tag can lead to issues when used with
     # automatic image updaters like watchtower/podman.
@@ -347,6 +353,33 @@ services:
     restart: unless-stopped
     ports:
       - 8000:80
+    profiles:
+      - protonwire
+  vpn_gluetun:
+    image: qmcgaw/gluetun:v3
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ${CONFIG_ROOT:-.}/gluetun:/config
+      - ${CONFIG_ROOT:-.}/gluetun/port:/tmp/gluetun
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE}
+      - VPN_TYPE=${VPN_TYPE}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+    restart: unless-stopped
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - gluetun
   unpackerr:
     image: golift/unpackerr:latest
     container_name: unpackerr
@@ -422,6 +455,30 @@ services:
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096/jellyfin
       - homepage.widget.key=${JELLYFIN_API_KEY}
+  cabernet:
+    <<: *default-container
+    container_name: cabernet
+    image: ghcr.io/cabernetwork/cabernet:latest
+    volumes:
+      - ${CONFIG_ROOT:-.}/cabernet/data:/app/data
+      - ${CONFIG_ROOT:-.}/cabernet/plugins_ext:/app/plugins_ext
+      - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
+      - traefik.http.routers.cabernet.tls=true
+      - traefik.http.routers.cabernet.tls.certresolver=myresolver
+      - traefik.http.services.cabernet.loadbalancer.server.port=6077
+    profiles:
+      - cabernet
+  iptv-app:
+    container_name: iptv-app
+    image: arbupo/free-iptv-channels
+    profiles:
+      - iptv
+  ################################################################
+  #                       Books                                  #
+  ################################################################
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
     container_name: calibre-web
@@ -563,27 +620,9 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  cabernet:
-    <<: *default-container
-    container_name: cabernet
-    image: ghcr.io/cabernetwork/cabernet:latest
-    volumes:
-      - ${CONFIG_ROOT:-.}/cabernet/data:/app/data
-      - ${CONFIG_ROOT:-.}/cabernet/plugins_ext:/app/plugins_ext
-      - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
-      - traefik.http.routers.cabernet.tls=true
-      - traefik.http.routers.cabernet.tls.certresolver=myresolver
-      - traefik.http.services.cabernet.loadbalancer.server.port=6077
-    profiles:
-      - cabernet
-  iptv-app:
-    container_name: iptv-app
-    image: arbupo/free-iptv-channels
-    profiles:
-      - iptv
+  ################################################################
+  #                     Monitoring                               #
+  ################################################################
   portainer: # Portainer helps debugging and monitors the containers
     <<: *default-container
     image: portainer/portainer-ce
@@ -595,14 +634,14 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.portainer.rule=Host(`portainer-app.${DOMAIN}`)
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
       - traefik.http.routers.portainer.tls=true
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       - homepage.group=Utilities
       - homepage.name=Portainer
       - homepage.icon=portainer.png
-      - homepage.href=https://portainer-app.${DOMAIN}
+      - homepage.href=https://portainer.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=portainer
@@ -617,14 +656,14 @@ services:
       - ${CONFIG_ROOT:-.}/beszel/data:/beszel_data
     labels:
       - traefik.enable=true
-      - traefik.http.routers.beszel.rule=Host(`beszel-app.${DOMAIN}`)
+      - traefik.http.routers.beszel.rule=Host(`beszel.${DOMAIN}`)
       - traefik.http.routers.beszel.tls=true
       - traefik.http.routers.beszel.tls.certresolver=myresolver
       - traefik.http.services.beszel.loadbalancer.server.port=8090
       - homepage.group=Utilities
       - homepage.name=Beszel
       - homepage.icon=beszel.png
-      - homepage.href=https://beszel-app.${DOMAIN}
+      - homepage.href=https://beszel.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=beszel
@@ -658,14 +697,14 @@ services:
       - prom_data:/prometheus
     labels:
       - traefik.enable=true
-      - traefik.http.routers.prometheus.rule=Host(`prometheus-app.${DOMAIN}`)
+      - traefik.http.routers.prometheus.rule=Host(`prometheus.${DOMAIN}`)
       - traefik.http.routers.prometheus.tls=true
       - traefik.http.routers.prometheus.tls.certresolver=myresolver
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
       - homepage.group=Observability
       - homepage.name=Prometheus
       - homepage.icon=prometheus.png
-      - homepage.href=https://prometheus-app.${DOMAIN}
+      - homepage.href=https://prometheus.${DOMAIN}
       - homepage.description=Observability
       - homepage.weight=4
       - homepage.widget.type=prometheus
@@ -679,9 +718,11 @@ services:
       - ${CONFIG_ROOT:-.}/loki/loki-config.yml:/etc/loki/loki-config.yml
     restart: unless-stopped
     command: -config.file=/etc/loki/loki-config.yml
+    ports:
+      - "3100:3100"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.loki.rule=Host(`loki-app.${DOMAIN}`)
+      - traefik.http.routers.loki.rule=Host(`loki.${DOMAIN}`)
       - traefik.http.routers.loki.tls=true
       - traefik.http.routers.loki.tls.certresolver=myresolver
       - traefik.http.services.loki.loadbalancer.server.port=3100
