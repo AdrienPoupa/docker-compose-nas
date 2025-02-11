@@ -321,7 +321,7 @@ services:
       - homepage.widget.url=http://vpn:8080
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
-  vpn:
+  vpn_protonwire:
     # Use semver tags or sha256 hashes of manifests.
     # using latest tag can lead to issues when used with
     # automatic image updaters like watchtower/podman.
@@ -353,6 +353,33 @@ services:
     restart: unless-stopped
     ports:
       - 8000:80
+    profiles:
+      - protonwire
+  vpn_gluetun:
+    image: qmcgaw/gluetun:v3
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ${CONFIG_ROOT:-.}/gluetun:/config
+      - ${CONFIG_ROOT:-.}/gluetun/port:/tmp/gluetun
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE}
+      - VPN_TYPE=${VPN_TYPE}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+    restart: unless-stopped
+    healthcheck:
+      test: ping -c 1 www.google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles:
+      - gluetun
   unpackerr:
     image: golift/unpackerr:latest
     container_name: unpackerr
