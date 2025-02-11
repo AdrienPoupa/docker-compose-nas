@@ -6,6 +6,9 @@ x-default-container: &default-container
   restart: always
 
 services:
+  ################################################################
+  #                        Services                              #
+  ################################################################
   traefik:
     image: traefik:v3.3
     container_name: traefik
@@ -44,6 +47,9 @@ services:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
       interval: 30s
       retries: 10
+  ################################################################
+  #                     Media Server                             #
+  ################################################################
   sonarr:
     <<: *default-container
     image: lscr.io/linuxserver/sonarr
@@ -443,6 +449,9 @@ services:
     image: arbupo/free-iptv-channels
     profiles:
       - iptv
+  ################################################################
+  #                       Books                                  #
+  ################################################################
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
     container_name: calibre-web
@@ -584,6 +593,9 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  ################################################################
+  #                     Monitoring                               #
+  ################################################################
   portainer: # Portainer helps debugging and monitors the containers
     <<: *default-container
     image: portainer/portainer-ce
