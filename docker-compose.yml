@@ -3,7 +3,7 @@ x-default-container: &default-container
     - PUID=${USER_ID}
     - PGID=${GROUP_ID}
     - TZ=${TIMEZONE}
-  restart: always
+  restart: "no"
 
 services:
   ################################################################
@@ -12,7 +12,7 @@ services:
   traefik:
     image: traefik:v3.3
     container_name: traefik
-    restart: always
+    restart: "no"
     environment:
       - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
       - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
@@ -168,7 +168,7 @@ services:
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/jellyseerr:/app/config
-    restart: always
+    restart: "no"
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:5055/api/v1/status", "-qO", "/dev/null"]
       interval: 30s
@@ -261,7 +261,7 @@ services:
   flaresolverr:
     image: 21hsmw/flaresolverr:nodriver
     container_name: flaresolverr
-    restart: always
+    restart: "no"
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
@@ -286,7 +286,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/downloads
-    restart: always
+    restart: "no"
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
       # see: https://github.com/qdm12/gluetun/issues/641#issuecomment-933856220
@@ -321,6 +321,8 @@ services:
       - homepage.widget.url=http://vpn:8080
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
+    profiles:
+      -  qbittorrent
   vpn_protonwire:
     # Use semver tags or sha256 hashes of manifests.
     # using latest tag can lead to issues when used with
@@ -350,7 +352,7 @@ services:
       timeout: 10s
       retries: 3
     init: true
-    restart: unless-stopped
+    restart: "no"
     ports:
       - 8000:80
     profiles:
@@ -366,13 +368,13 @@ services:
       - ${CONFIG_ROOT:-.}/gluetun:/config
       - ${CONFIG_ROOT:-.}/gluetun/port:/tmp/gluetun
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE}
       - VPN_TYPE=${VPN_TYPE}
       - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
       - SERVER_COUNTRIES=${SERVER_COUNTRIES}
-    restart: unless-stopped
+    restart: "no"
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -385,7 +387,7 @@ services:
     container_name: unpackerr
     volumes:
       - ${DOWNLOAD_ROOT}:/data/torrents
-    restart: always
+    restart: "no"
     user: ${USER_ID}:${GROUP_ID}
     environment:
       - TZ=${TIMEZONE}
@@ -435,7 +437,7 @@ services:
     ports:
       - "7359:7359/udp"
       - "1900:1900/udp"
-    restart: always
+    restart: "no"
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health" ]
       interval: 30s
@@ -491,7 +493,7 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/calibre-web:/config
       - ${MEDIA_ROOT}/books:/books
-    restart: unless-stopped
+    restart: "no"
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.calibre-headers.headers.customRequestHeaders.X-Scheme=https
@@ -527,7 +529,7 @@ services:
       - ${CONFIG_ROOT:-.}/calibre-web-automated/config:/config
       - ${DOWNLOAD_ROOT_NOBRL}/book-ingest:/cwa-book-ingest
       - ${MEDIA_ROOT_NOBRL}/books/calibre-library:/calibre-library
-    restart: unless-stopped
+    restart: "no"
     labels:
       - traefik.enable=true
       - traefik.http.routers.cwa.rule=Host(`cwab.${DOMAIN}`)
@@ -566,7 +568,7 @@ services:
       timeout: 30s
       retries: 3
       start_period: 5s
-    restart: unless-stopped
+    restart: "no"
     labels:
       - traefik.enable=true
       - traefik.http.routers.cwabd.rule=(Host(`cwabd.${DOMAIN}`))
@@ -577,7 +579,7 @@ services:
       - cwad
   cloudflarebypassforscraping:
     image: ghcr.io/sarperavci/cloudflarebypassforscraping:latest
-    restart: unless-stopped
+    restart: "no"
     profiles:
       - cloudflarebypassforscraping
   homepage:
@@ -596,7 +598,7 @@ services:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_ROOT}:/data
-    restart: always
+    restart: "no"
     command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
@@ -607,7 +609,7 @@ services:
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
-    restart: always
+    restart: "no"
     environment:
       - WATCHTOWER_CLEANUP=true
     volumes:
@@ -615,7 +617,7 @@ services:
   autoheal:
     image: willfarrell/autoheal:latest
     container_name: autoheal
-    restart: always
+    restart: "no"
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
@@ -631,7 +633,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${CONFIG_ROOT:-.}/portainer:/data
-    restart: unless-stopped
+    restart: "no"
     labels:
       - traefik.enable=true
       - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
@@ -651,7 +653,7 @@ services:
   beszel:
     image: 'henrygd/beszel'
     container_name: 'beszel'
-    restart: unless-stopped
+    restart: "no"
     volumes:
       - ${CONFIG_ROOT:-.}/beszel/data:/beszel_data
     labels:
@@ -675,7 +677,7 @@ services:
   beszel-agent:
     image: 'henrygd/beszel-agent'
     container_name: 'beszel-agent'
-    restart: unless-stopped
+    restart: "no"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # monitor other disks / partitions by mounting a folder in /extra-filesystems
@@ -691,7 +693,7 @@ services:
     container_name: prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-    restart: unless-stopped
+    restart: "no"
     volumes:
       - ${CONFIG_ROOT:-.}/prometheus:/etc/prometheus
       - prom_data:/prometheus
@@ -716,7 +718,7 @@ services:
     container_name: loki
     volumes:
       - ${CONFIG_ROOT:-.}/loki/loki-config.yml:/etc/loki/loki-config.yml
-    restart: unless-stopped
+    restart: "no"
     command: -config.file=/etc/loki/loki-config.yml
     ports:
       - "3100:3100"
@@ -731,7 +733,7 @@ services:
   promtail:
     image: grafana/promtail:latest
     container_name: promtail
-    restart: unless-stopped
+    restart: "no"
     volumes:
       - /var/log:/var/log
       - ${CONFIG_ROOT:-.}/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
