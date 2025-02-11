@@ -741,7 +741,7 @@ services:
     depends_on:
       - loki
     profiles:
-      - promtail
+      - loki
 
 volumes:
   prom_data:
