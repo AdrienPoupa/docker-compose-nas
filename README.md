@@ -81,6 +81,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Home Assistant](https://www.home-assistant.io)                    | Optional - Open source home automation that puts local control and privacy first<br/>Enable with `COMPOSE_PROFILES=homeassistant`                    | [home-assistant/home-assistant:stable](https://ghcr.io/home-assistant/home-assistant)    |              |
 | [Immich](https://immich.app)                                       | Optional - Self-hosted photo and video management solution<br/>Enable with `COMPOSE_PROFILES=immich`                                                 | [immich-app/immich-server:release](https://ghcr.io/immich-app/immich-server)             |              |
 | [Calibre-Web](https://github.com/janeczku/calibre-web)             | Optional - Web app for browsing, reading and downloading eBooks stored in a Calibre database<br/>Enable with `COMPOSE_PROFILES=calibre-web`          | [linuxserver/calibre-web](https://hub.docker.com/r/linuxserver/calibre-web)              | /calibre     |
+| [Decluttarr](https://github.com/ManiMatter/decluttarr)             | Optional - Keeps the download queues free of stalled and redudant downloads. <br/>Enable with `COMPOSE_PROFILES=decluttarr`                          | [manimatter/decluttarr:latest](https://ghcr.io/manimatter/decluttarr:latest)             |              |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
@@ -393,6 +394,12 @@ On the initial setup screen, enter `/books` as your calibre library location.
 
 Unrar is included by default and needs to be set in the Calibre-Web admin page (Basic Configuration:External Binaries)
 with a path of `/usr/bin/unrar`.
+
+### Decluttarr
+Decluttarr keeps the queue free of stalled and redundant downloads. For configuration options and examples, 
+please see https://github.com/ManiMatter/decluttarr/blob/dev/README.md.
+
+All environment variables are prefixed with `DECLUTTARR_`. 
 
 ### Tandoor
 
