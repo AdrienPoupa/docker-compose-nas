@@ -190,7 +190,8 @@ services:
       - traefik.http.middlewares.jellyseerr-rewriteHeaders.plugin.rewriteHeaders.rewrites[1].replacement=/jellyseerr
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[0]=text/html
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[1]=application/javascript
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[2]=application/json
+      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[2]=*/*
+      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[3]=application/json
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[1].regex=/_next
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[1].replacement=/jellyseerr/_next
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].regex=\/_next\\/data\\//
