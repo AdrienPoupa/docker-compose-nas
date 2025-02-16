@@ -162,7 +162,7 @@ services:
       - homepage.widget.url=http://bazarr:6767/bazarr
       - homepage.widget.key=${BAZARR_API_KEY}
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:1.9.2
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
@@ -176,7 +176,7 @@ services:
       retries: 10
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && (PathPrefix(`/jellyseerr`)  || PathPrefix(`/api/v1`)))
+      - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyseerr`))
       - traefik.http.routers.jellyseerr.tls=true
       - traefik.http.routers.jellyseerr.tls.certresolver=myresolver
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
