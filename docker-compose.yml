@@ -176,7 +176,7 @@ services:
       retries: 10
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyseerr`))
+      - traefik.http.routers.jellyseerr.rule=(Host(`${HOSTNAME}`) && (PathPrefix(`/jellyseerr`)  || PathPrefix(`/api/v1`)))
       - traefik.http.routers.jellyseerr.tls=true
       - traefik.http.routers.jellyseerr.tls.certresolver=myresolver
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
