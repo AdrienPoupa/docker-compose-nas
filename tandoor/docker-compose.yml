@@ -40,7 +40,7 @@ services:
       - traefik.http.services.tandoor.loadbalancer.server.port=80
       - homepage.group=Apps
       - homepage.name=Tandoor
-      - homepage.icon=tandoor.png
+      - homepage.icon=tandoor-recipes.png
       - homepage.href=/recipes
       - homepage.description=Smart recipe management
       - homepage.weight=1
