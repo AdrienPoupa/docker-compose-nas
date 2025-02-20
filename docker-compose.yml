@@ -745,6 +745,50 @@ services:
     profiles:
       - loki
 
+  jellystat-db:
+    image: postgres:15.2
+    shm_size: '1gb'
+    container_name: jellystat-db
+    restart: "no"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    profiles:
+      - jellystat
+  jellystat:
+    image: cyfershepard/jellystat:latest
+    container_name: jellystat
+    restart: "no"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      JWT_SECRET: "my-secret-jwt-key"
+      TZ: mytimezone # timezone (ex: Europe/Paris)
+    volumes:
+      - jellystat-backup-data:/app/backend/backup-data
+    depends_on:
+      - jellystat-db
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellystat.rule=Host(`jellystat.${DOMAIN}`)
+      - traefik.http.routers.jellystat.tls=true
+      - traefik.http.routers.jellystat.tls.certresolver=myresolver
+      - traefik.http.services.jellystat.loadbalancer.server.port=3000
+      - homepage.group=Media
+      - homepage.name=Jellystat
+      - homepage.icon=jellystat.png
+      - homepage.href=/jellystat
+      - homepage.description=Media server
+      - homepage.weight=4
+      - homepage.widget.type=jellyfin
+      - homepage.widget.url=http://jellystat:3000/jellystat
+      - homepage.widget.key=${JELLYFIN_API_KEY}
+    profiles:
+      - jellystat
   waf:
     image: owasp/modsecurity-crs:apache
     container_name: waf
@@ -841,6 +885,8 @@ services:
       - fail2ban
 volumes:
   prom_data:
+  postgres-data:
+  jellystat-backup-data:
 
 networks:
   default:
