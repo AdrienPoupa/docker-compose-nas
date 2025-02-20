@@ -19,6 +19,12 @@ scrape_configs:
     static_configs:
       - targets:
         - localhost:9090
-  - job_name: elzim # Change to whatever you like
+  - job_name: "prowlarr-exporter"
     static_configs:
-      - targets: ['192.168.68.109:9100'] #Change this to your server's IP
+      - targets: ["prowlarr-exporter:9710"]
+  - job_name: "radarr-exporter"
+    static_configs:
+      - targets: ["radarr-exporter:9708"]
+  - job_name: "sonarr-exporter"
+    static_configs:
+      - targets: ["sonarr-exporter:9707"]

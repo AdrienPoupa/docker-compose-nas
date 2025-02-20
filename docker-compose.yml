@@ -744,7 +744,35 @@ services:
       - loki
     profiles:
       - loki
-
+  prowlarr-exporter:
+    image: ghcr.io/onedr0p/exportarr:v2.0
+    container_name: prowlarr-exporter
+    command: ["prowlarr"]
+    environment:
+      PORT: 9710
+      URL: "http://prowlarr:9696/prowlarr"
+      APIKEY: ${PROWLARR_API_KEY}
+      # PROWLARR__BACKFILL: true # optional
+      # PROWLARR__BACKFILL_SINCE_DATE: "2023-03-01" # optional
+    restart: "no"
+  radarr-exporter:
+    image: ghcr.io/onedr0p/exportarr:v2.0
+    container_name: radarr-exporter
+    command: ["radarr"]
+    environment:
+      PORT: 9708
+      URL: "http://radarr:7878/radarr"
+      APIKEY: ${RADARR_API_KEY}
+    restart: "no"
+  sonarr-exporter:
+    image: ghcr.io/onedr0p/exportarr:v2.0
+    container_name: sonarr-exporter
+    command: ["sonarr"]
+    environment:
+      PORT: 9707
+      URL: "http://sonarr:8989/sonarr"
+      APIKEY: ${SONARR_API_KEY}
+    restart: "no"
   jellystat-db:
     image: postgres:15.2
     shm_size: '1gb'
