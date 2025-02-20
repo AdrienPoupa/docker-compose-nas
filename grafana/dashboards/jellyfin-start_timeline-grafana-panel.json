@@ -1,0 +1,208 @@
+{
+    "datasource": {
+      "type": "prometheus",
+      "uid": "D5GQA944k"
+    },
+    "description": "",
+    "fieldConfig": {
+      "defaults": {
+        "custom": {
+          "lineWidth": 0,
+          "fillOpacity": 70,
+          "spanNulls": false,
+          "insertNulls": false,
+          "hideFrom": {
+            "tooltip": false,
+            "viz": false,
+            "legend": false
+          }
+        },
+        "color": {
+          "mode": "continuous-GrYlRd"
+        },
+        "mappings": [],
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {
+              "color": "green",
+              "value": null
+            },
+            {
+              "color": "red",
+              "value": 80
+            }
+          ]
+        }
+      },
+      "overrides": []
+    },
+    "gridPos": {
+      "h": 6,
+      "w": 13,
+      "x": 0,
+      "y": 9
+    },
+    "id": 348,
+    "options": {
+      "mergeValues": true,
+      "showValue": "auto",
+      "alignValue": "left",
+      "rowHeight": 0.9,
+      "legend": {
+        "showLegend": true,
+        "displayMode": "list",
+        "placement": "bottom"
+      },
+      "tooltip": {
+        "mode": "single",
+        "sort": "none"
+      }
+    },
+    "pluginVersion": "10.1.1",
+    "targets": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "D5GQA944k"
+        },
+        "editorMode": "code",
+        "expr": "sum by (user_name, item_index_clean, item_type) (label_replace(label_join(label_join(jellyfin_is_paused{job=\"json\"}, \"item_index\", \"\", \"season_index\", \"episode_index\"), \"full_name\", \" - \", \"series_name\", \"item_index\", \"item_name\"), \"item_index_clean\", \"$1\", \"full_name\", \"^[- ]*(.*?)[- ]*$\"))",
+        "instant": false,
+        "legendFormat": "__auto",
+        "range": true,
+        "refId": "A"
+      }
+    ],
+    "title": "Jellyfin",
+    "transformations": [
+      {
+        "id": "seriesToRows",
+        "options": {}
+      },
+      {
+        "id": "extractFields",
+        "options": {
+          "keepTime": false,
+          "replace": false,
+          "source": "Metric"
+        }
+      },
+      {
+        "id": "filterByValue",
+        "options": {
+          "filters": [
+            {
+              "config": {
+                "id": "isNotNull",
+                "options": {}
+              },
+              "fieldName": "user_name"
+            }
+          ],
+          "match": "any",
+          "type": "include"
+        }
+      },
+      {
+        "id": "calculateField",
+        "options": {
+          "alias": "Item",
+          "mode": "reduceRow",
+          "reduce": {
+            "include": [
+              "item_index_clean"
+            ],
+            "reducer": "firstNotNull"
+          }
+        }
+      },
+      {
+        "id": "calculateField",
+        "options": {
+          "alias": "Name",
+          "mode": "reduceRow",
+          "reduce": {
+            "include": [
+              "user_name"
+            ],
+            "reducer": "firstNotNull"
+          }
+        }
+      },
+      {
+        "id": "calculateField",
+        "options": {
+          "alias": "Temp",
+          "mode": "reduceRow",
+          "reduce": {
+            "include": [
+              "Item"
+            ],
+            "reducer": "firstNotNull"
+          },
+          "replaceFields": false
+        }
+      },
+      {
+        "id": "filterByValue",
+        "options": {
+          "filters": [
+            {
+              "config": {
+                "id": "regex",
+                "options": {
+                  "value": "(Movie|Episode)"
+                }
+              },
+              "fieldName": "item_type"
+            }
+          ],
+          "match": "any",
+          "type": "include"
+        }
+      },
+      {
+        "id": "filterByValue",
+        "options": {
+          "filters": [
+            {
+              "config": {
+                "id": "notEqual",
+                "options": {
+                  "value": 1
+                }
+              },
+              "fieldName": "Value"
+            }
+          ],
+          "match": "any",
+          "type": "include"
+        }
+      },
+      {
+        "id": "partitionByValues",
+        "options": {
+          "fields": [
+            "Name"
+          ]
+        }
+      },
+      {
+        "id": "filterFieldsByName",
+        "options": {
+          "include": {
+            "pattern": "Temp|Time (.*)"
+          }
+        }
+      },
+      {
+        "id": "renameByRegex",
+        "options": {
+          "regex": "Temp (.*)",
+          "renamePattern": "$1"
+        }
+      }
+    ],
+    "type": "state-timeline"
+  }
