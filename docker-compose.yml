@@ -773,6 +773,12 @@ services:
       URL: "http://sonarr:8989/sonarr"
       APIKEY: ${SONARR_API_KEY}
     restart: "no"
+  json-exporter:
+    image: quay.io/prometheuscommunity/json-exporter
+    container_name: json-exporter
+    volumes:
+      - ${CONFIG_ROOT:-.}/json_exporter/json-exporter-config.yml:/config.yml:ro
+    restart: "no"
   jellystat-db:
     image: postgres:15.2
     shm_size: '1gb'
