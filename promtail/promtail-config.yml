@@ -10,6 +10,7 @@ clients:
     batchwait: 1s
     batchsize: 1048576  # 1 MB per batch
 
+scrape_configs:
   - job_name: system
     static_configs:
       - targets:
@@ -23,11 +24,11 @@ clients:
       - source_labels: [__path__]
         target_label: filename
 
-      # Filter logs to only include lines with "ERROR" or "WARN"
-      - source_labels: [__log__]
-        target_label: severity
-        regex: '.*(ERROR|WARN).*'
-        action: keep  # Only keep logs that match the severity (ERROR or WARN)
+      # # Filter logs to only include lines with "ERROR" or "WARN"
+      # - source_labels: [__log__]
+      #   target_label: severity
+      #   regex: '.*(ERROR|WARN).*'
+      #   action: keep  # Only keep logs that match the severity (ERROR or WARN)
 
   - job_name: docker
     docker_sd_configs:
@@ -36,6 +37,12 @@ clients:
     relabel_configs:
       - source_labels: [__meta_docker_container_name]
         target_label: container_name
+        regex: '^/(.*)$'  # Matches a container name that starts with '/'
+        replacement: '$1'  # Replace with the part after the '/' (e.g., 'loki' instead of '/loki')
+      - source_labels: [__meta_docker_container_name]
+        target_label: service_name
+        regex: '^/(.*)$'  # Matches and captures everything after '/'
+        replacement: '$1'  # Strip the leading '/' and use the captured part
       - source_labels: [__meta_docker_container_image]
         target_label: container_image
       - source_labels: [__meta_docker_container_id]
@@ -45,8 +52,8 @@ clients:
       - source_labels: [__meta_docker_container_logpath]
         target_label: __path__  # Dynamically set the log path
 
-      # Filter logs to only include lines with "ERROR" or "WARN" in the logs
-      - source_labels: [__log__]
-        target_label: severity
-        regex: '.*(ERROR|WARN).*'
-        action: keep  # Only keep logs that match the severity (ERROR or WARN)
+      # # Filter logs to only include lines with "ERROR" or "WARN" in the logs
+      # - source_labels: [__log__]
+      #   target_label: severity
+      #   regex: '.*(ERROR|WARN).*'
+      #   action: keep  # Only keep logs that match the severity (ERROR or WARN)
