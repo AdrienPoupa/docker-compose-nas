@@ -745,6 +745,78 @@ services:
     profiles:
       - loki
 
+  waf:
+    image: owasp/modsecurity-crs:apache
+    container_name: waf
+    restart: "no"
+    environment:
+      PARANOIA: 1
+      ANOMALY_INBOUND: 10
+      ANOMALY_OUTBOUND: 5
+      PROXY: 1
+      REMOTEIP_INT_PROXY: "172.20.0.1/16"
+      BACKEND: "http://vaultwarden:80"
+      BACKEND_WS: "ws://vaultwarden:80/notifications/hub"
+      ERRORLOG: "/var/log/waf/waf.log"
+    volumes:
+     - ${CONFIG_ROOT:-.}/waf:/var/log/waf
+     - ${CONFIG_ROOT:-.}/waf/waf-rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+     - ${CONFIG_ROOT:-.}/waf/waf-rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.redirect-https.redirectScheme.scheme=https
+      - traefik.http.middlewares.redirect-https.redirectScheme.permanent=true
+      - traefik.http.routers.vw-ui-https.rule=Host(`${VAULTWARDEN_DOMAIN}`)
+      - traefik.http.routers.vw-ui-https.entrypoints=web-secure
+      - traefik.http.routers.vw-ui-https.tls=true
+      - traefik.http.routers.vw-ui-https.service=vw-ui
+      - traefik.http.routers.vw-ui-http.rule=Host(`${VAULTWARDEN_DOMAIN}`)
+      - traefik.http.routers.vw-ui-http.entrypoints=web
+      - traefik.http.routers.vw-ui-http.middlewares=redirect-https
+      - traefik.http.routers.vw-ui-http.service=vw-ui
+      - traefik.http.routers.vw-ui-https.tls.certresolver=myresolver
+      - traefik.http.services.vw-ui.loadbalancer.server.port=8080
+      - traefik.http.routers.vw-websocket-https.rule=Host(`${VAULTWARDEN_DOMAIN}`) && Path(`/notifications/hub`)
+      - traefik.http.routers.vw-websocket-https.entrypoints=web-secure
+      - traefik.http.routers.vw-websocket-https.tls=true
+      - traefik.http.routers.vw-websocket-https.service=vw-websocket
+      - traefik.http.routers.vw-websocket-http.rule=Host(`${VAULTWARDEN_DOMAIN}`) && Path(`/notifications/hub`)
+      - traefik.http.routers.vw-websocket-http.entrypoints=web
+      - traefik.http.routers.vw-websocket-http.middlewares=redirect-https
+      - traefik.http.routers.vw-websocket-http.service=vw-websocket
+      - traefik.http.routers.vw-websocket-https.tls.certresolver=myresolver
+      - traefik.http.services.vw-websocket.loadbalancer.server.port=3012
+    profiles:
+      - vaultwarden
+  vaultwarden:
+    <<: *default-container
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: "no"
+    environment:
+      WEBSOCKET_ENABLED: "true"
+      SENDS_ALLOWED: "true"
+      PASSWORD_ITERATIONS: 500000
+      SIGNUPS_ALLOWED: "true"
+      SIGNUPS_VERIFY: "true"
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+#      DOMAIN: "SMTP domain host name"
+#      SMTP_HOST: "smtp server"
+#      SMTP_FROM: "sender email e.g: holu@example.com"
+#      SMTP_FROM_NAME: "sender name"
+#      SMTP_SECURITY: "starttls"
+#      SMTP_PORT: 587
+#      SMTP_USERNAME: "smtp username"
+#      SMTP_PASSWORD: "smtp password"
+#      SMTP_TIMEOUT: 15
+      LOG_FILE: "/data/vaultwarden.log"
+      LOG_LEVEL: "warn"
+      EXTENDED_LOGGING: "true"
+      TZ: "${TZ}"
+    volumes:
+      - ${CONFIG_ROOT:-.}/vaultwarden/data:/data
+    profiles:
+      - vaultwarden
   fail2ban:
     container_name: fail2ban
     restart: "no"
