@@ -1,0 +1,9 @@
+[sshd]
+enabled  = true
+port     = 22
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 3
+bantime  = 31536000
+findtime = 600
+action   = iptables-multiport[name=SSH, port="ssh"]
