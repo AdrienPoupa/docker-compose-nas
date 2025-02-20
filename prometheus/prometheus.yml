@@ -28,3 +28,19 @@ scrape_configs:
   - job_name: "sonarr-exporter"
     static_configs:
       - targets: ["sonarr-exporter:9707"]
+  - job_name: json
+    metrics_path: /probe
+    params:
+      # The name of the module defined by json-exporter-config.yaml
+      module: [jellyfin] 
+    static_configs:
+      - targets:
+        # Use the Sessions endpoint to see actively playing items
+        - http://jellyfin:8096/jellyfin/Sessions
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: json-exporter:7979 # The exporter's hostname:port
