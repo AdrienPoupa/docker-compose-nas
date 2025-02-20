@@ -745,6 +745,28 @@ services:
     profiles:
       - loki
 
+  fail2ban:
+    container_name: fail2ban
+    restart: "no"
+    image: crazymax/fail2ban:latest
+    environment:
+      - F2B_LOG_PATH=/var/log/auth.log  # Path to SSH log file (adjust for your containerized SSH server)
+      - F2B_SSH_ACTION=iptables-multiport
+      - F2B_SSH_PORT=22
+      - F2B_IGNORE_IP=127.0.0.1
+      - TZ=Europe/Paris
+      - F2B_DB_PURGE_AGE=30d
+      - F2B_LOG_LEVEL=INFO
+    volumes:
+      - /var/log:/var/log:ro
+      - ${CONFIG_ROOT:-.}/fail2ban:/data
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    profiles:
+      - fail2ban
 volumes:
   prom_data:
 
