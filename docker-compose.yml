@@ -19,30 +19,63 @@ services:
       - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
       - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
+      # Basic Traefik setup
       - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
       - --entrypoints.web-secure.address=:443
+      # Redirect HTTP to HTTPS
       - --entrypoints.web.http.redirections.entryPoint.to=web-secure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      # Enable Dashboard
+      - --api.dashboard=true
+      - --api.insecure=true
+      # Experimental Plugins
       - --experimental.plugins.rewrite-body.modulename=github.com/packruler/rewrite-body
       - --experimental.plugins.rewrite-body.version=v1.2.0
       - --experimental.plugins.rewriteHeaders.modulename=github.com/XciD/traefik-plugin-rewrite-headers
       - --experimental.plugins.rewriteHeaders.version=v0.0.3
+      # ACME configuration for Let's Encrypt
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      # TLS configuration for secure entry points
       - --entrypoints.web-secure.http.tls.certresolver=myresolver
+      # Enable Metrics for Prometheus
+      - --metrics.prometheus=true
+      - --metrics.prometheus.buckets=0.100000,0.300000,1.200000,5.000000
+      - --metrics.prometheus.addEntryPointsLabels=true
+      - --metrics.prometheus.addServicesLabels=true
+      # Enable Tracing
+      - --tracing.otlp=true
+      # Logging configuration
+      #- --log.level=INFO  # Set the log level to INFO
+      #- --accesslog=true  # Enable access logs (logs all incoming HTTP requests)
+      # Optional: Set a log file path (uncomment to enable)
+      #- "--log.filepath=/var/log/traefik.log"  # Uncomment to log to a file
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik-dashboard.rule=(Host(`traefik.${DOMAIN}`))
+      - traefik.http.routers.traefik-dashboard.service=api@internal
+      - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
+      - traefik.http.routers.traefik-dashboard.middlewares=myauth
+      - traefik.http.middlewares.myauth.basicauth.users=${TRAEFIK_FRONTEND_AUTH}
+      - homepage.group=Admin
+      - homepage.name=Traefik
+      - homepage.icon=traefik.png
+      - homepage.href=https://traefik.${DOMAIN}
+      - homepage.description=Utilities
+      - homepage.weight=4
+      - homepage.widget.type=traefik
+      - homepage.widget.url=http://traefik:8080
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ${CONFIG_ROOT:-.}/letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    extra_hosts:
-      - host.docker.internal:172.17.0.1
     healthcheck:
       test: [ "CMD", "traefik", "healthcheck", "--ping" ]
       interval: 30s
