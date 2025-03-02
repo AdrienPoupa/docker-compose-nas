@@ -102,7 +102,7 @@ services:
       - traefik.http.routers.sonarr.tls=true
       - traefik.http.routers.sonarr.tls.certresolver=myresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
-      - homepage.group=Media
+      - homepage.group=Media Management
       - homepage.name=Sonarr
       - homepage.icon=sonarr.png
       - homepage.href=/sonarr
@@ -111,6 +111,8 @@ services:
       - homepage.widget.type=sonarr
       - homepage.widget.url=http://sonarr:8989/sonarr
       - homepage.widget.key=${SONARR_API_KEY}
+    profiles:
+      - media_download
   radarr:
     <<: *default-container
     image: lscr.io/linuxserver/radarr
@@ -130,7 +132,7 @@ services:
       - traefik.http.routers.radarr.tls=true
       - traefik.http.routers.radarr.tls.certresolver=myresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
-      - homepage.group=Media
+      - homepage.group=Media Management
       - homepage.name=Radarr
       - homepage.icon=radarr.png
       - homepage.href=/radarr
@@ -139,6 +141,8 @@ services:
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878/radarr
       - homepage.widget.key=${RADARR_API_KEY}
+    profiles:
+      - media_download
   lidarr:
     <<: *default-container
     image: lscr.io/linuxserver/lidarr
@@ -156,7 +160,7 @@ services:
       - traefik.http.routers.lidarr.tls=true
       - traefik.http.routers.lidarr.tls.certresolver=myresolver
       - traefik.http.services.lidarr.loadbalancer.server.port=8686
-      - homepage.group=Media
+      - homepage.group=Media Management
       - homepage.name=Lidarr
       - homepage.icon=lidarr.png
       - homepage.href=/lidarr
@@ -184,7 +188,7 @@ services:
       - traefik.http.routers.bazarr.tls=true
       - traefik.http.routers.bazarr.tls.certresolver=myresolver
       - traefik.http.services.bazarr.loadbalancer.server.port=6767
-      - homepage.group=Download
+      - homepage.group=Media Management
       - homepage.name=Bazarr
       - homepage.icon=bazarr.png
       - homepage.href=/bazarr
@@ -193,6 +197,8 @@ services:
       - homepage.widget.type=bazarr
       - homepage.widget.url=http://bazarr:6767/bazarr
       - homepage.widget.key=${BAZARR_API_KEY}
+    profiles:
+      - media_download
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -257,7 +263,7 @@ services:
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[16].replacement=/jellyseerr/imageproxy/
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[17].regex=/avatarproxy/
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[17].replacement=/jellyseerr/avatarproxy/
-      - homepage.group=Media
+      - homepage.group=Media Management
       - homepage.name=JellySeerr
       - homepage.icon=jellyseerr.png
       - homepage.href=/jellyseerr
@@ -266,6 +272,8 @@ services:
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_API_KEY}
+    profiles:
+      - media_download
   prowlarr:
     <<: *default-container
     image: lscr.io/linuxserver/prowlarr:latest
@@ -282,7 +290,7 @@ services:
       - traefik.http.routers.prowlarr.tls=true
       - traefik.http.routers.prowlarr.tls.certresolver=myresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
-      - homepage.group=Download
+      - homepage.group=Media Management
       - homepage.name=Prowlarr
       - homepage.icon=prowlarr.png
       - homepage.href=/prowlarr
@@ -291,6 +299,8 @@ services:
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696/prowlarr
       - homepage.widget.key=${PROWLARR_API_KEY}
+    profiles:
+      - media_download
   flaresolverr:
     image: 21hsmw/flaresolverr:nodriver
     container_name: flaresolverr
@@ -344,7 +354,7 @@ services:
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.replacement=$$1/
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.permanent=false
       #- com.centurylinklabs.watchtower.depends-on=/vpn
-      - homepage.group=Download
+      - homepage.group=Media Management
       - homepage.name=qBittorrent
       - homepage.icon=qbittorrent.png
       - homepage.href=/qbittorrent
@@ -428,6 +438,8 @@ services:
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
     security_opt:
       - no-new-privileges:true
+    profiles:
+      - media_download
   sabnzbd:
     <<: *default-container
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -441,7 +453,7 @@ services:
       - traefik.http.routers.sabnzbd.tls=true
       - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
       - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
-      - homepage.group=Download
+      - homepage.group=Media Management
       - homepage.name=Sabnzbd
       - homepage.icon=sabnzbd.png
       - homepage.href=/sabnzbd
@@ -465,6 +477,7 @@ services:
       - ${DATA_ROOT}:/data
       - ${MEDIA_ROOT}/movies:/movies:rw
       - ${MEDIA_ROOT}/tv:/tv:rw
+      - ${MEDIA_ROOT}/music:/music:rw
     ports:
       - "7359:7359/udp"
       - "1900:1900/udp"
@@ -488,27 +501,11 @@ services:
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096/jellyfin
       - homepage.widget.key=${JELLYFIN_API_KEY}
-  cabernet:
-    <<: *default-container
-    container_name: cabernet
-    image: ghcr.io/cabernetwork/cabernet:latest
-    volumes:
-      - ${CONFIG_ROOT:-.}/cabernet/data:/app/data
-      - ${CONFIG_ROOT:-.}/cabernet/plugins_ext:/app/plugins_ext
-      - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
-      - traefik.http.routers.cabernet.tls=true
-      - traefik.http.routers.cabernet.tls.certresolver=myresolver
-      - traefik.http.services.cabernet.loadbalancer.server.port=6077
-    profiles:
-      - cabernet
-  iptv-app:
-    container_name: iptv-app
-    image: arbupo/free-iptv-channels
-    profiles:
-      - iptv
+      - homepage.widget.enableBlocks=true
+      - homepage.widget.enableNowPlaying=true
+      - homepage.widget.enableUser=true
+      - homepage.widget.showEpisodeNumber=true
+      - homepage.widget.expandOneStreamToTwoRows=false
   ################################################################
   #                       Books                                  #
   ################################################################
@@ -559,29 +556,30 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/calibre-web-automated/config:/config
       - ${DOWNLOAD_ROOT_NOBRL}/book-ingest:/cwa-book-ingest
+#      - /tmp/data/calibre-web/ingest:/cwa-book-ingest
       - ${MEDIA_ROOT_NOBRL}/books/calibre-library:/calibre-library
     restart: "no"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cwa.rule=Host(`cwab.${DOMAIN}`)
+      - traefik.http.routers.cwa.rule=Host(`cwa.${DOMAIN}`)
       - traefik.http.routers.cwa.tls=true
       - traefik.http.routers.cwa.tls.certresolver=myresolver
       - traefik.http.services.cwa.loadbalancer.server.port=8083
       - homepage.group=Media
       - homepage.name=Calibre-Web-Automated
       - homepage.icon=calibre-web.png
-      - homepage.href=/cwa
+      - homepage.href=https://cwa.${DOMAIN}
       - homepage.description=Books management
       - homepage.weight=5
-      - homepage.widget.type=calibrewebautomated
+      - homepage.widget.type=calibreweb
       - homepage.widget.url=http://cwa:8083
       - homepage.widget.username=${CALIBRE_USERNAME}
       - homepage.widget.password=${CALIBRE_PASSWORD}
     profiles:
       - cwa
-  cwabd:
+  cwad:
     image: ghcr.io/calibrain/calibre-web-automated-book-downloader:latest
-    container_name: cwabd
+    container_name: cwad
     environment:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
@@ -592,7 +590,8 @@ services:
       - INGEST_DIR=${INGEST_DIR}
       - BOOK_LANGUAGE=${BOOK_LANGUAGE}
     volumes:
-      - ${DOWNLOAD_ROOT}/book-ingest:${INGEST_DIR:-/cwa-book-ingest}
+      - ${DOWNLOAD_ROOT_NOBRL}/book-ingest-cwa:${INGEST_DIR:-/cwa-book-ingest}
+      #- /tmp/data/calibre-web/ingest:${INGEST_DIR:-/cwa-book-ingest}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8084/request/api/status"]
       interval: 30s
@@ -602,14 +601,21 @@ services:
     restart: "no"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.cwabd.rule=(Host(`cwabd.${DOMAIN}`))
-      - traefik.http.routers.cwabd.tls=true
-      - traefik.http.routers.cwabd.tls.certresolver=myresolver
-      - traefik.http.services.cwabd.loadbalancer.server.port=8084
+      - traefik.http.routers.cwad.rule=(Host(`cwad.${DOMAIN}`))
+      - traefik.http.routers.cwad.tls=true
+      - traefik.http.routers.cwad.tls.certresolver=myresolver
+      - traefik.http.services.cwad.loadbalancer.server.port=8084
+      - homepage.group=Media Management
+      - homepage.name=Calibre-Web-Automated-Downloader
+      - homepage.icon=calibre-web.png
+      - homepage.href=https://cwad.${DOMAIN}
+      - homepage.description=Books management
+      - homepage.weight=5
     profiles:
       - cwad
   cloudflarebypassforscraping:
     image: ghcr.io/sarperavci/cloudflarebypassforscraping:latest
+    container_name: cloudflarebypassforscraping
     restart: "no"
     profiles:
       - cloudflarebypassforscraping
@@ -653,9 +659,27 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  ################################################################
-  #                     Monitoring                               #
-  ################################################################
+  cabernet:
+    <<: *default-container
+    container_name: cabernet
+    image: ghcr.io/cabernetwork/cabernet:latest
+    volumes:
+      - ${CONFIG_ROOT:-.}/cabernet/data:/app/data
+      - ${CONFIG_ROOT:-.}/cabernet/plugins_ext:/app/plugins_ext
+      - ${CONFIG_ROOT:-.}/cabernet/secrets:/app/.cabernet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cabernet.rule=(Host(`cabernet.${DOMAIN}`))
+      - traefik.http.routers.cabernet.tls=true
+      - traefik.http.routers.cabernet.tls.certresolver=myresolver
+      - traefik.http.services.cabernet.loadbalancer.server.port=6077
+    profiles:
+      - cabernet
+  iptv-app:
+    container_name: iptv-app
+    image: arbupo/free-iptv-channels
+    profiles:
+      - iptv
   portainer: # Portainer helps debugging and monitors the containers
     <<: *default-container
     image: portainer/portainer-ce
@@ -671,14 +695,16 @@ services:
       - traefik.http.routers.portainer.tls=true
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
-      - homepage.group=Utilities
+      - homepage.group=Admin
       - homepage.name=Portainer
       - homepage.icon=portainer.png
       - homepage.href=https://portainer.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=portainer
-      - homepage.widget.url=http://portainer:9000/
+      - homepage.widget.url=http://portainer:9000
+      - homepage.widget.env=2
+      - homepage.widget.key=${HOMEPAGE_VAR_PORTAINER_API_KEY}
     profiles:
       - portainer
   beszel:
@@ -693,14 +719,17 @@ services:
       - traefik.http.routers.beszel.tls=true
       - traefik.http.routers.beszel.tls.certresolver=myresolver
       - traefik.http.services.beszel.loadbalancer.server.port=8090
-      - homepage.group=Utilities
+      - homepage.group=Admin
       - homepage.name=Beszel
       - homepage.icon=beszel.png
       - homepage.href=https://beszel.${DOMAIN}
       - homepage.description=Utilities
       - homepage.weight=4
       - homepage.widget.type=beszel
-      - homepage.widget.url=http://beszel:8090/
+      - homepage.widget.url=http://beszel:8090
+      - homepage.widget.username=${BESZEL_USERNAME}
+      - homepage.widget.password=${BESZEL_PASSWORD}
+      - homepage.widget.version=2
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     profiles:
@@ -724,6 +753,7 @@ services:
     container_name: prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.config.file=/etc/prometheus/web.yml'
     restart: "no"
     volumes:
       - ${CONFIG_ROOT:-.}/prometheus:/etc/prometheus
@@ -734,7 +764,7 @@ services:
       - traefik.http.routers.prometheus.tls=true
       - traefik.http.routers.prometheus.tls.certresolver=myresolver
       - traefik.http.services.prometheus.loadbalancer.server.port=9090
-      - homepage.group=Observability
+      - homepage.group=Admin
       - homepage.name=Prometheus
       - homepage.icon=prometheus.png
       - homepage.href=https://prometheus.${DOMAIN}
@@ -742,6 +772,8 @@ services:
       - homepage.weight=4
       - homepage.widget.type=prometheus
       - homepage.widget.url=http://prometheus:9090/
+      - homepage.widget.username=${PROMETHEUS_USERNAME}
+      - homepage.widget.password=${PROMETHEUS_PASSWORD}
     profiles:
       - prometheus
   loki:
@@ -781,7 +813,7 @@ services:
     command: ["prowlarr"]
     environment:
       PORT: 9710
-      URL: "http://prowlarr:9696/prowlarr"
+      URL: "http://prowlarr:9696/prowlarr" # or; http://prowlarr:8080
       APIKEY: ${PROWLARR_API_KEY}
       # PROWLARR__BACKFILL: true # optional
       # PROWLARR__BACKFILL_SINCE_DATE: "2023-03-01" # optional
@@ -792,7 +824,7 @@ services:
     command: ["radarr"]
     environment:
       PORT: 9708
-      URL: "http://radarr:7878/radarr"
+      URL: "http://radarr:7878/radarr" # or; http://radarr:7878
       APIKEY: ${RADARR_API_KEY}
     restart: "no"
   sonarr-exporter:
@@ -801,7 +833,7 @@ services:
     command: ["sonarr"]
     environment:
       PORT: 9707
-      URL: "http://sonarr:8989/sonarr"
+      URL: "http://sonarr:8989/sonarr" # or; http://sonarr:8989
       APIKEY: ${SONARR_API_KEY}
     restart: "no"
   json-exporter:
@@ -895,6 +927,12 @@ services:
       - traefik.http.routers.vw-websocket-http.service=vw-websocket
       - traefik.http.routers.vw-websocket-https.tls.certresolver=myresolver
       - traefik.http.services.vw-websocket.loadbalancer.server.port=3012
+      - homepage.group=Main
+      - homepage.name=Vaultwarden
+      - homepage.icon=vaultwarden-light.png
+      - homepage.href=https://vaultwarden.${DOMAIN}
+      - homepage.description=Passwords
+      - homepage.weight=4
     profiles:
       - vaultwarden
   vaultwarden:
@@ -948,11 +986,310 @@ services:
     network_mode: host
     profiles:
       - fail2ban
+  authelia:
+    image: 'authelia/authelia'
+    container_name: authelia
+    volumes:
+      - ${CONFIG_ROOT:-.}/authelia/secrets:/secrets:ro
+      - ${CONFIG_ROOT:-.}/authelia/config:/config
+      - ${CONFIG_ROOT:-.}/authelia/logs:/var/log/authelia/
+    labels:
+      ## Expose Authelia through Traefik
+      traefik.enable: 'true'
+      traefik.http.routers.authelia.rule: 'Host(`authelia.nosoupforyou.xyz`)'
+      traefik.http.routers.authelia.entrypoints: 'https'
+      traefik.http.routers.authelia.tls: 'true'
+      traefik.http.routers.authelia.tls.options: 'default'
+      ## Setup Authelia ForwardAuth Middlewares
+      traefik.http.middlewares.authelia.forwardauth.address: 'http://authelia:9091/api/authz/forward-auth'  # yamllint disable-line rule:line-length
+      traefik.http.middlewares.authelia.forwardauth.trustForwardHeader: 'true'
+      traefik.http.middlewares.authelia.forwardauth.authResponseHeaders: 'Remote-User,Remote-Groups,Remote-Name,Remote-Email'  # yamllint disable-line rule:line-length
+    restart: 'no'
+    healthcheck:
+      ## In production the healthcheck section should be commented.
+      disable: true
+    environment:
+      TZ: 'America/Los_Angeles'
+    profiles:
+      - authelia
+  whoami:
+    image: "traefik/whoami"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.aloni.site`)"
+      - "traefik.http.routers.whoami.entrypoints=web-secure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+    profiles:
+      - whoami
+  jaeger:
+    image: jaegertracing/all-in-one:1.35
+    container_name: jaeger
+#    ports:
+#      - "5775:5775"   # Zipkin Thrift over UDP
+#      - "6831:6831/udp" # Jaeger Thrift over UDP
+#      - "6832:6832/udp" # Jaeger Thrift over UDP
+#      - "5778:5778"     # HTTP Port
+#      - "16686:16686"   # Jaeger UI (Web Interface)
+#      - "14268:14268"   # Jaeger HTTP Endpoint
+#      - "14250:14250"   # Jaeger gRPC
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_HTTP_PORT=9411
+    restart: "no"
+    labels:
+      - "traefik.enable=true"  # Enable Traefik for this service
+      - "traefik.http.routers.jaeger.rule=Host(`jaeger-http.${DOMAIN}`)"  # Define a routing rule for Jaeger
+      - "traefik.http.services.jaeger.loadbalancer.server.port=5778"  # Expose the HTTP port (default Jaeger UI port)
+      - "traefik.http.routers.jaeger.entrypoints=web,web-secure"  # Enable HTTP and HTTPS entrypoints for Traefik
+      - "traefik.http.routers.jaeger.tls=true"  # Enable TLS for secure access
+    profiles:
+      - jaeger
+  monitoring:
+    image: nicolargo/glances:dev
+    container_name: glances
+    restart: "no"
+    pid: host
+    privileged: true
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ${CONFIG_ROOT:-.}/glances/glances.conf:/glances/conf/glances.conf
+    environment:
+      - TZ=${TIMEZONE}
+      - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jaeger.rule=Host(`glances.${DOMAIN}`)"
+      - "traefik.http.services.glances.loadbalancer.server.port=61208"
+      - "traefik.http.routers.glances.entrypoints=web,web-secure"
+      - "traefik.http.routers.glances.tls=true"
+    profiles:
+      - glances
+  uptime-kuma:
+    container_name: uptime-kuma
+    image: louislam/uptime-kuma:1
+    volumes:
+      - ${CONFIG_ROOT:-.}/uptime-kuma/data:/app/data
+#      - ${CONFIG_ROOT:-.}/uptime-kuma/server:/app/server
+#      - ${CONFIG_ROOT:-.}/uptime-kuma/db:/app/db
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.uptime-kuma.rule=Host(`uptime-kuma.${DOMAIN}`)
+      - traefik.http.routers.uptime-kuma.tls=true
+      - traefik.http.routers.uptime-kuma.tls.certresolver=myresolver
+      - traefik.http.services.uptime-kuma.loadbalancer.server.port=3001
+      - homepage.group=Admin
+      - homepage.name=Uptimekuma
+      - homepage.icon=uptime-kuma.png
+      - homepage.href=https://uptime-kuma.${DOMAIN}
+      - homepage.description=Monitoring
+      - homepage.weight=0
+      - homepage.widget.type=uptimekuma
+      - homepage.widget.url=http://uptime-kuma:3001
+      - homepage.widget.slug=app
+  vikunja:
+    <<: *default-container
+    image: vikunja/vikunja
+    container_name: vikunja
+    environment:
+      VIKUNJA_SERVICE_PUBLICURL: https://vikunja.nosoupforyou.xyz
+      VIKUNJA_DATABASE_HOST: vikunja-db
+      VIKUNJA_DATABASE_PASSWORD: changeme
+      VIKUNJA_DATABASE_TYPE: mysql
+      VIKUNJA_DATABASE_USER: vikunja
+      VIKUNJA_DATABASE_DATABASE: vikunja
+      VIKUNJA_SERVICE_JWTSECRET: test134
+    volumes:
+      - ${CONFIG_ROOT:-.}/vikunja/files:/app/vikunja/files
+    depends_on:
+      vikunja-db:
+        condition: service_healthy
+    restart: "no"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vikunja.rule=Host(`vikunja.${DOMAIN}`)
+      - traefik.http.routers.vikunja.tls=true
+      - traefik.http.routers.vikunja.tls.certresolver=myresolver
+      - traefik.http.services.vikunja.loadbalancer.server.port=3456
+      - homepage.group=Main
+      - homepage.name=Vikunja
+      - homepage.icon=vikunja.png
+      - homepage.href=https://vikunja.${DOMAIN}
+      - homepage.description=Task management
+      - homepage.weight=0
+      - homepage.widget.type=vikunja
+      - homepage.widget.url=http://vikunja:3456
+      - homepage.widget.key=${VIKUNJA_API_KEY}
+    profiles:
+      - vikunja
+  vikunja-db:
+    image: mariadb:10
+    container_name: vikunja-db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: supersupersecret
+      MYSQL_USER: vikunja
+      MYSQL_PASSWORD: changeme
+      MYSQL_DATABASE: vikunja
+    volumes:
+      - ${CONFIG_ROOT:-.}/vikunja/db:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD"]
+      interval: 2s
+      start_period: 30s
+    profiles:
+      - vikunja
+  silverbullet:
+    image: ghcr.io/silverbulletmd/silverbullet
+    container_name: silverbullet
+    restart: "no"
+    environment:
+      - SB_USER=admin:Clavelinas123
+    volumes:
+      - ${CONFIG_ROOT:-.}/silverbullet/space:/space
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sb.rule=(Host(`silverbullet.${DOMAIN}`))
+      - traefik.http.routers.sb.tls=true
+      - traefik.http.routers.sb.tls.certresolver=myresolver
+      - traefik.http.services.sb.loadbalancer.server.port=3000
+      - homepage.group=Main
+      - homepage.name=Silverbullet
+      - homepage.icon=silverbullet.png
+      - homepage.href=https://silverbullet.${DOMAIN}
+      - homepage.description=Note taking
+    profiles:
+      - silverbullet
+  audiobookshelf:
+    <<: *default-container
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: abs
+    volumes:
+      - ${MEDIA_ROOT}/audiobooks:/audiobooks
+      - ${MEDIA_ROOT}/podcasts:/podcasts
+      - ${CONFIG_ROOT:-.}/abs/metadata:/metadata
+      - ${CONFIG_ROOT:-.}/abs/config:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.abs.rule=(Host(`abs.${DOMAIN}`))
+      - traefik.http.routers.abs.tls=true
+      - traefik.http.routers.abs.tls.certresolver=myresolver
+      - traefik.http.services.abs.loadbalancer.server.port=80
+      - homepage.group=Media
+      - homepage.name=AudioBookShelf
+      - homepage.icon=audiobookshelf.png
+      - homepage.href=https://abs.${DOMAIN}
+      - homepage.description=AudioBooks/Podcast management
+      - homepage.weight=5
+      - homepage.widget.type=audiobookshelf
+      - homepage.widget.url=http://abs:80
+      - homepage.widget.key=${ABS_API_KEY}
+    restart: "no"
+    profiles:
+      - abs
+  web:
+    image: ghcr.io/hoarder-app/hoarder:${HOARDER_VERSION:-release}
+    container_name: hoarder
+    restart: "no"
+    volumes:
+      - ${CONFIG_ROOT:-.}/hoarder/data:/data
+    env_file:
+      - .hoarder.env
+    environment:
+      MEILI_ADDR: http://meilisearch:7700
+      BROWSER_WEB_URL: http://chrome:9222
+      # OPENAI_API_KEY: ...
+      DATA_DIR: /data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hoarder.rule=(Host(`hoarder.${DOMAIN}`))
+      - traefik.http.routers.hoarder.tls=true
+      - traefik.http.routers.hoarder.tls.certresolver=myresolver
+      - traefik.http.services.hoarder.loadbalancer.server.port=3000
+      - homepage.group=Main
+      - homepage.name=Hoarder
+      - homepage.icon=hoarder.png
+      - homepage.href=https://hoarder.${DOMAIN}
+      - homepage.description=Bookmarks management
+      - homepage.weight=5
+    profiles:
+      - hoarder
+  chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: "no"
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+    profiles:
+      - hoarder
+  meilisearch:
+    image: getmeili/meilisearch:v1.11.1
+    restart: "no"
+    env_file:
+      - .env
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch:/meili_data
+    profiles:
+      - hoarder
+  tailscale-authkey1:
+    image: tailscale/tailscale:latest
+    container_name: ts-authkey-test
+    hostname: banana
+    environment:
+      - TS_AUTHKEY=tskey-auth-kRu2tCCjA521CNTRL-df9dcjKe8RMUXu1MFUgrQMazunDMfNcZ
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ts-authkey-test:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: "no"
+    labels:
+      - homepage.group=Admin
+      - homepage.name=Tailscale
+      - homepage.icon=tailscale.png
+      - homepage.weight=5
+      - homepage.widget.type=tailscale
+      - homepage.widget.deviceid=njajigLhcA21CNTRL
+      - homepage.widget.key=tskey-api-k78NypEqms11CNTRL-94XfdqzcRxS2siwz3ocKxSMZLnZuSCV8A
+  nginx-authkey-test:
+    image: nginx
+    network_mode: service:tailscale-authkey1
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+#    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.node-exporter.rule=(Host(`node-exporter.${DOMAIN}`))
+      - traefik.http.routers.node-exporter.tls=true
+      - traefik.http.routers.noder-exporter.tls.certresolver=myresolver
+      - traefik.http.services.node-exporter.loadbalancer.server.port=9100
+    profiles:
+      - node-exporter
+
 volumes:
   prom_data:
   postgres-data:
   jellystat-backup-data:
-
+  meilisearch:
+  ts-authkey-test:
+    driver: local
 networks:
   default:
     name: docker-compose-nas
