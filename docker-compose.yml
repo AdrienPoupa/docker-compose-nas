@@ -41,6 +41,7 @@ services:
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      # TLS configuration for secure entry points
       - --entrypoints.web-secure.http.tls.certresolver=myresolver
     ports:
       - "80:80"
