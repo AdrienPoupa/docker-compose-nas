@@ -62,6 +62,14 @@ services:
       - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
       - traefik.http.routers.traefik-dashboard.middlewares=myauth
       - traefik.http.middlewares.myauth.basicauth.users=${TRAEFIK_FRONTEND_AUTH}
+      - homepage.group=Admin
+      - homepage.name=Traefik
+      - homepage.icon=traefik.png
+      - homepage.href=https://traefik.${DOMAIN}
+      - homepage.description=Utilities
+      - homepage.weight=4
+      - homepage.widget.type=traefik
+      - homepage.widget.url=http://traefik:8080
     ports:
       - "80:80"
       - "443:443"
