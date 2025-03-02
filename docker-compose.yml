@@ -43,6 +43,11 @@ services:
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
       # TLS configuration for secure entry points
       - --entrypoints.web-secure.http.tls.certresolver=myresolver
+      # Enable Metrics for Prometheus
+      - --metrics.prometheus=true
+      - --metrics.prometheus.buckets=0.100000,0.300000,1.200000,5.000000
+      - --metrics.prometheus.addEntryPointsLabels=true
+      - --metrics.prometheus.addServicesLabels=true
     ports:
       - "80:80"
       - "443:443"
