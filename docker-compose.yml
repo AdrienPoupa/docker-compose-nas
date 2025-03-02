@@ -30,6 +30,8 @@ services:
       # ACME configuration for Let's Encrypt
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      # Enable Tracing
+      - --tracing.otlp=true
     ports:
       - "80:80"
       - "443:443"
