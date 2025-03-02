@@ -30,6 +30,9 @@ services:
       # ACME configuration for Let's Encrypt
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      # TLS configuration for secure entry points
+      - --entrypoints.web-secure.http.tls.certresolver=myresolver
       # Enable Metrics for Prometheus
       - --metrics.prometheus=true
       - --metrics.prometheus.buckets=0.100000,0.300000,1.200000,5.000000
