@@ -50,6 +50,11 @@ services:
       - --metrics.prometheus.addServicesLabels=true
       # Enable Tracing
       - --tracing.otlp=true
+      # Logging configuration
+      #- --log.level=INFO  # Set the log level to INFO
+      #- --accesslog=true  # Enable access logs (logs all incoming HTTP requests)
+      # Optional: Set a log file path (uncomment to enable)
+      #- "--log.filepath=/var/log/traefik.log"  # Uncomment to log to a file
     ports:
       - "80:80"
       - "443:443"
