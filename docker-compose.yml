@@ -37,12 +37,14 @@ services:
       - --experimental.plugins.rewrite-body.version=v1.2.0
       - --experimental.plugins.rewriteHeaders.modulename=github.com/XciD/traefik-plugin-rewrite-headers
       - --experimental.plugins.rewriteHeaders.version=v0.0.3
+      # ACME DNS-01 challenge setup (for obtaining SSL certificates)
+      - --certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE:-true}
+      - --certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
+      - --certificatesresolvers.myresolver.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
+      - --certificatesresolvers.myresolver.acme.caserver=${LETS_ENCRYPT_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
       # ACME configuration for Let's Encrypt
       - --certificatesresolvers.myresolver.acme.email=${LETS_ENCRYPT_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      # TLS configuration for secure entry points
-      - --entrypoints.web-secure.http.tls.certresolver=myresolver
       # Enable Metrics for Prometheus
       - --metrics.prometheus=true
       - --metrics.prometheus.buckets=0.100000,0.300000,1.200000,5.000000
