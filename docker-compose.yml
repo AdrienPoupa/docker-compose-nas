@@ -1265,7 +1265,7 @@ services:
     container_name: ts-authkey-test
     hostname: banana
     environment:
-      - TS_AUTHKEY=tskey-auth-kRu2tCCjA521CNTRL-df9dcjKe8RMUXu1MFUgrQMazunDMfNcZ
+      - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
     volumes:
@@ -1281,8 +1281,8 @@ services:
       - homepage.icon=tailscale.png
       - homepage.weight=5
       - homepage.widget.type=tailscale
-      - homepage.widget.deviceid=njajigLhcA21CNTRL
-      - homepage.widget.key=tskey-api-k78NypEqms11CNTRL-94XfdqzcRxS2siwz3ocKxSMZLnZuSCV8A
+      - homepage.widget.deviceid=${TS_DEVICE_ID}
+      - homepage.widget.key=${TS_DEVICE_KEY_ID}
   nginx-authkey-test:
     image: nginx
     network_mode: service:tailscale-authkey1
