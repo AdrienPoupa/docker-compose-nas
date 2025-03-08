@@ -1002,7 +1002,7 @@ services:
       - F2B_DB_PURGE_AGE=30d
       - F2B_LOG_LEVEL=INFO
     volumes:
-      - /var/log:/var/log:ro 
+      - /var/log:/var/log:ro
       - ${CONFIG_ROOT:-.}/fail2ban:/data
     privileged: true
     cap_add:
