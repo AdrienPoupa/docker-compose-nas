@@ -60,6 +60,8 @@ services:
       - traefik.enable=true
       - traefik.http.routers.traefik-dashboard.rule=(Host(`traefik.${DOMAIN}`))
       - traefik.http.routers.traefik-dashboard.service=api@internal
+      - traefik.http.routers.traefik-dashboard.tls=true
+      - traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver
       - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
       - traefik.http.routers.traefik-dashboard.middlewares=myauth
       - traefik.http.middlewares.myauth.basicauth.users=${TRAEFIK_FRONTEND_AUTH}
