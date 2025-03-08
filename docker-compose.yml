@@ -50,7 +50,7 @@ services:
       - --metrics.prometheus.addEntryPointsLabels=true
       - --metrics.prometheus.addServicesLabels=true
       # Enable Tracing
-      - --tracing.otlp=true
+      - --tracing.otlp=false
       # Logging configuration
       #- --log.level=INFO  # Set the log level to INFO
       #- --accesslog=true  # Enable access logs (logs all incoming HTTP requests)
