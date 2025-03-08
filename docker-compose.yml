@@ -52,7 +52,7 @@ services:
       # Enable Tracing
       - --tracing.otlp=false
       # Logging configuration
-      #- --log.level=INFO  # Set the log level to INFO
+      - --log.level=INFO  # Set the log level to INFO
       #- --accesslog=true  # Enable access logs (logs all incoming HTTP requests)
       # Optional: Set a log file path (uncomment to enable)
       #- "--log.filepath=/var/log/traefik.log"  # Uncomment to log to a file
