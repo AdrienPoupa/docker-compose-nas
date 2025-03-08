@@ -1039,9 +1039,10 @@ services:
     container_name: "simple-service"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.aloni.site`)"
+      - "traefik.http.routers.whoami.rule=Host(`test.aloni.site`)"
       - "traefik.http.routers.whoami.entrypoints=web-secure"
       - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+      - "traefik.constraint=proxy-public"
     profiles:
       - whoami
   jaeger:
