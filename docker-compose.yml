@@ -14,9 +14,8 @@ services:
     container_name: traefik
     restart: "no"
     environment:
-      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
-      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
-      - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
+      - CF_API_EMAIL:${CLOUDFLARE_EMAIL}
+      - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
       - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
       # Basic Traefik setup
