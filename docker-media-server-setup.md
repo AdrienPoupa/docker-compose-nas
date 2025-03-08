@@ -616,3 +616,12 @@ Inspect an specific container
 docker inspect radarr
 ```
 
+If get error, when trying to run immich, try creating missing folders and missing .immich files.
+
+Add authentication to bazarr
+
+Add Default Language Profiles For Newly Added Shows
+If you have previous movies, series, do a mass edit of the language profile
+
+Check where is pointing
+nslookup traefik.nosoupforyou.xyz
