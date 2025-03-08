@@ -181,6 +181,8 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/bazarr/config:/config
       - ${DATA_ROOT}:/data
+      - ${MEDIA_ROOT}/movies:/movies:rw
+      - ${MEDIA_ROOT}/tv:/tv:rw
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
       interval: 5s
@@ -1000,7 +1002,7 @@ services:
       - F2B_DB_PURGE_AGE=30d
       - F2B_LOG_LEVEL=INFO
     volumes:
-      - /var/log:/var/log:ro
+      - /var/log:/var/log:ro 
       - ${CONFIG_ROOT:-.}/fail2ban:/data
     privileged: true
     cap_add:
