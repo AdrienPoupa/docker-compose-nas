@@ -1304,6 +1304,33 @@ services:
       - traefik.http.services.node-exporter.loadbalancer.server.port=9100
     profiles:
       - node-exporter
+  cloudflare-companion:
+    image: tiredofit/traefik-cloudflare-companion
+    container_name: cloudflare-companion
+    volumes:
+      - ${CONFIG_ROOT:-.}/cloudfare-companion/logs:/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TIMEZONE=America/Vancouver
+      - LOG_TYPE=BOTH
+      - LOG_LEVEL=INFO
+      - TRAEFIK_VERSION=2
+      - CF_EMAIL=${CLOUDFLARE_EMAIL}
+      - CF_TOKEN=50c83214b5d9e79851d2933f618de2c8fc74e
+      - RC_TYPE=A
+      - TARGET_DOMAIN=${ROOT_DOMAIN}
+      - REFRESH_ENTRIES=TRUE
+      - TRAEFIK_FILTER_LABEL=traefik.constraint
+      - TRAEFIK_FILTER=proxy-public
+      - DOMAIN1=aloni.site
+      - DOMAIN1_ZONE_ID=${ZONE_ID}
+      #- DOCKER_HOST=tcp://198.51.100.32:2376
+      #- DOCKER_CERT_PATH=/docker-certs
+      #- DOCKER_TLS_VERIFY=1
+
+    restart: "no"
+    profiles:
+      - cloudfare-companion
 
 volumes:
   prom_data:
