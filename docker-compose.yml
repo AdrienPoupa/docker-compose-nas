@@ -14,9 +14,8 @@ services:
     container_name: traefik
     restart: "no"
     environment:
-      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
-      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
-      - CLOUDFLARE_ZONE_API_TOKEN=${CLOUDFLARE_ZONE_API_TOKEN}
+      - CF_API_EMAIL:${CLOUDFLARE_EMAIL}
+      - CF_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
       - LETS_ENCRYPT_EMAIL=${LETS_ENCRYPT_EMAIL}
     command:
       # Basic Traefik setup
@@ -51,9 +50,9 @@ services:
       - --metrics.prometheus.addEntryPointsLabels=true
       - --metrics.prometheus.addServicesLabels=true
       # Enable Tracing
-      - --tracing.otlp=true
+      - --tracing.otlp=false
       # Logging configuration
-      #- --log.level=INFO  # Set the log level to INFO
+      - --log.level=INFO  # Set the log level to INFO
       #- --accesslog=true  # Enable access logs (logs all incoming HTTP requests)
       # Optional: Set a log file path (uncomment to enable)
       #- "--log.filepath=/var/log/traefik.log"  # Uncomment to log to a file
@@ -61,6 +60,8 @@ services:
       - traefik.enable=true
       - traefik.http.routers.traefik-dashboard.rule=(Host(`traefik.${DOMAIN}`))
       - traefik.http.routers.traefik-dashboard.service=api@internal
+      - traefik.http.routers.traefik-dashboard.tls=true
+      - traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver
       - traefik.http.services.traefik-dashboard.loadbalancer.server.port=8080
       - traefik.http.routers.traefik-dashboard.middlewares=myauth
       - traefik.http.middlewares.myauth.basicauth.users=${TRAEFIK_FRONTEND_AUTH}
