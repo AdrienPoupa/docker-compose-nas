@@ -651,8 +651,28 @@ services:
     restart: "no"
     environment:
       - WATCHTOWER_CLEANUP=true
+      - TZ=Europe/London
+      - NO_COLOR=true
+      - WATCHTOWER_SCHEDULE=0 0 19 * * *
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_MONITOR_ONLY=true
+      - WATCHTOWER_HTTP_API_UPDATE=true
+      - WATCHTOWER_HTTP_API_METRICS=true
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_API_KEY}
+      - WATCHTOWER_HTTP_API_PERIODIC_POLLS=true
+      - DOCKER_TLS_VERIFY=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - homepage.group=Admin
+      - homepage.name=Watchtower
+      - homepage.icon=watchtower.png
+      - homepage.description=Observability
+      - homepage.weight=4
+      - homepage.widget.type=watchtower
+      - homepage.widget.url=http://watchtower:8080/
+      - homepage.widget.key=${WATCHTOWER_API_KEY}
   autoheal:
     image: willfarrell/autoheal:latest
     container_name: autoheal
