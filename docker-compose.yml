@@ -1304,7 +1304,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.node-exporter.rule=(Host(`node-exporter.${DOMAIN}`))
       - traefik.http.routers.node-exporter.tls=true
-      - traefik.http.routers.noder-exporter.tls.certresolver=myresolver
+      - traefik.http.routers.node-exporter.tls.certresolver=myresolver
       - traefik.http.services.node-exporter.loadbalancer.server.port=9100
     profiles:
       - node-exporter
