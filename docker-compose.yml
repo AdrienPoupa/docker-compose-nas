@@ -1281,8 +1281,8 @@ services:
       - homepage.icon=tailscale.png
       - homepage.weight=5
       - homepage.widget.type=tailscale
-      - homepage.widget.deviceid=njajigLhcA21CNTRL
-      - homepage.widget.key=tskey-api-k78NypEqms11CNTRL-94XfdqzcRxS2siwz3ocKxSMZLnZuSCV8A
+      - homepage.widget.deviceid=${TS_DEVICE_ID}
+      - homepage.widget.key=${TS_DEVICE_KEY_ID}
   nginx-authkey-test:
     image: nginx
     network_mode: service:tailscale-authkey1
