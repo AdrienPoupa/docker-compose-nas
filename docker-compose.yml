@@ -664,6 +664,15 @@ services:
       - DOCKER_TLS_VERIFY=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - homepage.group=Admin
+      - homepage.name=Watchtower
+      - homepage.icon=watchtower.png
+      - homepage.description=Observability
+      - homepage.weight=4
+      - homepage.widget.type=watchtower
+      - homepage.widget.url=http://watchtower:8080/
+      - homepage.widget.key=${WATCHTOWER_API_KEY}
   autoheal:
     image: willfarrell/autoheal:latest
     container_name: autoheal
