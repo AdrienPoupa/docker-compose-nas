@@ -1,7 +1,7 @@
 services:
   immich-server:
     container_name: immich_server
-    image: ghcr.io/immich-app/immich-server:v1.125.2
+    image: ghcr.io/immich-app/immich-server:v1.129.0
     environment:
       DB_HOSTNAME: immich_postgres
       DB_PASSWORD: ${IMMICH_DB_PASSWORD}
@@ -37,7 +37,7 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.125.2
+    image: ghcr.io/immich-app/immich-machine-learning:v1.129.0
     volumes:
       - immich-model-cache:/cache
     restart: always
@@ -46,7 +46,7 @@ services:
 
   immich-redis:
     container_name: immich_redis
-    image: registry.hub.docker.com/library/redis:6.2-alpine@sha256:905c4ee67b8e0aa955331960d2aa745781e6bd89afc44a8584bfd13bc890f0ae
+    image: public.ecr.aws/docker/library/redis:6.2
     restart: always
     healthcheck:
       test: redis-cli ping || exit 1
@@ -55,12 +55,12 @@ services:
 
   immich-database:
     container_name: immich_postgres
-    image: registry.hub.docker.com/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+    image: ghcr.io/tensorchord/pgvecto-rs:pg14-v0.2.0
     environment:
       POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
       POSTGRES_USER: postgres
       POSTGRES_DB: immich
-      POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_INITDB_ARGS: "--data-checksums"
     volumes:
       - ${CONFIG_ROOT:-.}/immich/postgresql:/var/lib/postgresql/data
     restart: always

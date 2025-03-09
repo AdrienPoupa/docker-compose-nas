@@ -1,6 +1,6 @@
 services:
   tandoor:
-    image: vabene1111/recipes:latest
+    image: ghcr.io/tandoorrecipes/recipes:latest
     container_name: tandoor
     restart: always
     env_file:
@@ -17,7 +17,7 @@ services:
       - tandoor
 
   tandoor-nginx:
-    image: nginx:mainline-alpine
+    image: public.ecr.aws/nginx/nginx:mainline-alpine
     container_name: tandoor-nginx
     restart: always
     env_file:
@@ -48,7 +48,7 @@ services:
       - tandoor
 
   tandoor-backup:
-    image: adrienpoupa/rclone-backup:latest
+    image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: tandoor-backup
     restart: always
     env_file:

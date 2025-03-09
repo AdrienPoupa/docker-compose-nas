@@ -13,7 +13,7 @@ services:
       - /run/dbus:/run/dbus:ro
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8123" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8123"]
       interval: 30s
       retries: 10
     privileged: true
@@ -36,7 +36,7 @@ services:
       - homeassistant
   mosquitto:
     container_name: mosquitto
-    image: eclipse-mosquitto
+    image: public.ecr.aws/docker/library/eclipse-mosquitto:latest
     restart: always
     user: ${USER_ID}:${GROUP_ID}
     environment:
@@ -49,14 +49,28 @@ services:
     ports:
       - "1883:1883"
     healthcheck:
-      test: [ "CMD", "mosquitto_sub", "-p", "1880", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3" ]
+      test:
+        [
+          "CMD",
+          "mosquitto_sub",
+          "-p",
+          "1880",
+          "-t",
+          "$$SYS/#",
+          "-C",
+          "1",
+          "-i",
+          "healthcheck",
+          "-W",
+          "3",
+        ]
       interval: 1m
       timeout: 10s
       retries: 3
     profiles:
       - mqtt
   homeassistant-backup:
-    image: adrienpoupa/rclone-backup:latest
+    image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: homeassistant-backup
     restart: always
     env_file:

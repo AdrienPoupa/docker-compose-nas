@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v3.3
+    image: ghcr.io/traefik/traefik:3.3
     container_name: traefik
     restart: always
     environment:
@@ -36,7 +36,7 @@ services:
     extra_hosts:
       - host.docker.internal:172.17.0.1
     healthcheck:
-      test: [ "CMD", "traefik", "healthcheck", "--ping" ]
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 30s
       retries: 10
   sonarr:
@@ -51,7 +51,7 @@ services:
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping"]
       interval: 30s
       retries: 10
     labels:
@@ -81,7 +81,7 @@ services:
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping"]
       interval: 30s
       retries: 10
     labels:
@@ -111,7 +111,7 @@ services:
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping"]
       interval: 30s
       retries: 10
     labels:
@@ -143,7 +143,7 @@ services:
       - ${DATA_ROOT}:/data
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping"]
       interval: 5s
       retries: 10
     labels:
@@ -162,7 +162,7 @@ services:
       - homepage.widget.url=http://bazarr:6767/bazarr
       - homepage.widget.key=${BAZARR_API_KEY}
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: ghcr.io/fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
@@ -171,7 +171,14 @@ services:
       - ${CONFIG_ROOT:-.}/jellyseerr:/app/config
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "http://127.0.0.1:5055/api/v1/status", "-qO", "/dev/null"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "http://127.0.0.1:5055/api/v1/status",
+          "-qO",
+          "/dev/null",
+        ]
       interval: 30s
       retries: 10
     labels:
@@ -246,7 +253,7 @@ services:
       - ${CONFIG_ROOT:-.}/prowlarr:/config
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping"]
       interval: 30s
       retries: 10
     labels:
@@ -296,7 +303,8 @@ services:
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
       # see: https://github.com/qdm12/gluetun/issues/641#issuecomment-933856220
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8080", "https://google.com" ]
+      test:
+        ["CMD", "curl", "--fail", "http://127.0.0.1:8080", "https://google.com"]
       interval: 30s
       retries: 10
     network_mode: "service:vpn"
@@ -328,7 +336,7 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
   vpn:
-    image: thrnz/docker-wireguard-pia
+    image: ghcr.io/thrnz/docker-wireguard-pia:latest
     container_name: vpn
     volumes:
       - ${CONFIG_ROOT:-.}/pia:/pia
@@ -358,7 +366,7 @@ services:
       retries: 3
     restart: always
   unpackerr:
-    image: golift/unpackerr:latest
+    image: ghcr.io/unpackerr/unpackerr:latest
     container_name: unpackerr
     volumes:
       - ${DOWNLOAD_ROOT}:/data/torrents
@@ -416,7 +424,7 @@ services:
       - "1900:1900/udp"
     restart: always
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health" ]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health"]
       interval: 30s
       retries: 10
     labels:
@@ -522,7 +530,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_ROOT}:/data
     restart: always
-    command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
+    command:
+      [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
       - traefik.http.routers.homepage.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
@@ -530,7 +539,7 @@ services:
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
   watchtower:
-    image: containrrr/watchtower
+    image: ghcr.io/containrrr/watchtower:latest
     container_name: watchtower
     restart: always
     environment:

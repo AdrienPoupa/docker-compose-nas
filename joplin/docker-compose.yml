@@ -41,7 +41,7 @@ services:
       - joplin
 
   joplin-backup:
-    image: adrienpoupa/rclone-backup:latest
+    image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: joplin-backup
     restart: always
     env_file:
