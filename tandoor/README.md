@@ -1,6 +1,6 @@
 # Tandoor
 
-[Tandoor](https://tandoor.dev/) is a recipe manager that allows you to manage your ever growing collection of digital recipes.
+[Tandoor](https://tandoor.dev/) is a recipe manager that allows you to manage your ever-growing collection of digital recipes.
 
 ## Installation
 

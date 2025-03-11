@@ -37,6 +37,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
       * [DHCP](#dhcp)
       * [Expose DNS Server with Tailscale](#expose-dns-server-with-tailscale)
     * [Calibre-Web](#calibre-web)
+    * [Decluttarr](#decluttarr)
     * [Tandoor](#tandoor)
     * [Joplin](#joplin)
     * [Home Assistant](#home-assistant)
@@ -81,7 +82,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Home Assistant](https://www.home-assistant.io)                    | Optional - Open source home automation that puts local control and privacy first<br/>Enable with `COMPOSE_PROFILES=homeassistant`                    | [home-assistant/home-assistant:stable](https://ghcr.io/home-assistant/home-assistant)    |              |
 | [Immich](https://immich.app)                                       | Optional - Self-hosted photo and video management solution<br/>Enable with `COMPOSE_PROFILES=immich`                                                 | [immich-app/immich-server:release](https://ghcr.io/immich-app/immich-server)             |              |
 | [Calibre-Web](https://github.com/janeczku/calibre-web)             | Optional - Web app for browsing, reading and downloading eBooks stored in a Calibre database<br/>Enable with `COMPOSE_PROFILES=calibre-web`          | [linuxserver/calibre-web](https://hub.docker.com/r/linuxserver/calibre-web)              | /calibre     |
-| [Decluttarr](https://github.com/ManiMatter/decluttarr)             | Optional - Keeps the download queues free of stalled and redudant downloads. <br/>Enable with `COMPOSE_PROFILES=decluttarr`                          | [manimatter/decluttarr:latest](https://ghcr.io/manimatter/decluttarr:latest)             |              |
+| [Decluttarr](https://github.com/ManiMatter/decluttarr)             | Optional - Keeps the download queues free of stalled and redundant downloads. <br/>Enable with `COMPOSE_PROFILES=decluttarr`                         | [manimatter/decluttarr:latest](https://ghcr.io/manimatter/decluttarr:latest)             |              |
 
 Optional containers are not enabled by default, they need to be enabled, 
 see [Optional Services](#optional-services) for more information.
@@ -251,7 +252,7 @@ The files in `/homepage/tpl/*.yaml` only serve as a base to set up the homepage 
 
 Jellyseer gives you content recommendations, allows others to make requests to you, and allows logging in with Jellyfin credentials.
 
-To setup, go to https://hostname/jellyseerr/setup, and set the URLs as follows:
+To set up, go to https://hostname/jellyseerr/setup, and set the URLs as follows:
 - Jellyfin: http://jellyfin:8096/jellyfin
 - Radarr:
   - Hostname: radarr
