@@ -354,6 +354,7 @@ services:
       - PORT_FORWARDING=1
       - PORT_PERSIST=1
       - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+      - FIREWALL=0
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv6.conf.default.disable_ipv6=1
