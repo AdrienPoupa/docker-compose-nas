@@ -526,6 +526,7 @@ services:
       - HOMEPAGE_VAR_WEATHER_LONG=${HOMEPAGE_VAR_WEATHER_LONG}
       - HOMEPAGE_VAR_WEATHER_TIME=${TIMEZONE}
       - HOMEPAGE_VAR_WEATHER_UNIT=${HOMEPAGE_VAR_WEATHER_UNIT}
+      - HOMEPAGE_ALLOWED_HOSTS=${HOSTNAME}
     volumes:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
