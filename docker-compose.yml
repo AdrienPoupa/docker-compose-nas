@@ -201,8 +201,8 @@ services:
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.monitoring.types[3]=application/json
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[1].regex=/_next
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[1].replacement=/jellyseerr/_next
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].regex=\/_next\\/data\\//
-      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].replacement=\/jellyseerr\/_next\/data\//
+      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].regex=/_next/data/
+      - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[2].replacement=/jellyseerr/_next/data/
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[3].regex=/api/v1
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[3].replacement=/jellyseerr/api/v1
       - traefik.http.middlewares.jellyseerr-rewrite.plugin.rewrite-body.rewrites[4].regex=/login/plex/loading
