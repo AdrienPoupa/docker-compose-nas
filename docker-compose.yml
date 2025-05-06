@@ -345,10 +345,10 @@ services:
     environment:
       - TZ=${TIMEZONE}
       - QUEUECLEANER__ENABLED=true
-      - TRIGGERS__QUEUECLEANER="0 0 0/1 * * ?" # Hourly
+      - TRIGGERS__QUEUECLEANER=0 0 0/1 * * ?
       - CONTENTBLOCKER__ENABLED=true
       - CONTENTBLOCKER__IGNORED_DOWNLOADS_PATH=/ignored.txt
-      - TRIGGERS__CONTENTBLOCKER="0 0 0/1 * * ?" # Hourly
+      - TRIGGERS__CONTENTBLOCKER=0 0 0/1 * * ?
       - DOWNLOAD_CLIENT=qBittorrent
       - QBITTORRENT__URL=http://vpn:8080
       - QBITTORRENT__PASSWORD=${QBITTORRENT_PASSWORD}
