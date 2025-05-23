@@ -14,7 +14,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8123"]
-      interval: 30s
+      interval: 1m
       retries: 10
     privileged: true
     labels:

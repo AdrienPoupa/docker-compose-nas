@@ -19,7 +19,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:3000", "-qO", "/dev/null"]
-      interval: 30s
+      interval: 1m
       retries: 10
     networks:
       adguardhome:
