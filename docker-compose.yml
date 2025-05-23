@@ -144,7 +144,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping"]
-      interval: 5s
+      interval: 30s
       retries: 10
     labels:
       - traefik.enable=true
