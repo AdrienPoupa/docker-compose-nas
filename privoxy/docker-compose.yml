@@ -1,0 +1,17 @@
+services:
+  privoxy:
+    image: vimagick/privoxy
+    container_name: privoxy
+    network_mode: "service:vpn"
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8118"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+    depends_on:
+      vpn:
+        condition: service_healthy
+    profiles:
+      - privoxy
