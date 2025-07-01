@@ -332,14 +332,14 @@ services:
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
     security_opt:
       - no-new-privileges:true
-  cleanuperr:
-    image: ghcr.io/flmorg/cleanuperr:latest
-    container_name: cleanuperr
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
     restart: always
     volumes:
-      - ${CONFIG_ROOT:-.}/cleanuperr/logs:/var/logs
-      - ${CONFIG_ROOT:-.}/cleanuperr/ignored.txt:/usr/ignored.txt
-      - ${CONFIG_ROOT:-.}/cleanuperr/blacklist.json:/usr/blacklist.json
+      - ${CONFIG_ROOT:-.}/cleanuparr/logs:/var/logs
+      - ${CONFIG_ROOT:-.}/cleanuparr/ignored.txt:/usr/ignored.txt
+      - ${CONFIG_ROOT:-.}/cleanuparr/blacklist.json:/usr/blacklist.json
     environment:
       - TZ=${TIMEZONE}
       - QUEUECLEANER__ENABLED=true
