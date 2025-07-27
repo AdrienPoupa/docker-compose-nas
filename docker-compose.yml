@@ -413,6 +413,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/jellyfin`))
       - traefik.http.routers.jellyfin.tls=true
+      - traefik.http.routers.jellyfin.entrypoints=web-secure
       - traefik.http.routers.jellyfin.tls.certresolver=myresolver
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
       - homepage.group=Media
@@ -512,9 +513,7 @@ services:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_ROOT}:/data
-    restart: always
-    command:
-      [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
+    command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
       - traefik.enable=true
       - traefik.http.routers.homepage.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/`))
