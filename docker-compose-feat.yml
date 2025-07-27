@@ -1,0 +1,287 @@
+services:
+  nextcloud-db:
+    image: mariadb:10.11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=${NEXTCLOUD_DB_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+    volumes:
+      - nextcloud-db-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: nextcloud-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    depends_on:
+      - nextcloud-db
+      - redis
+    environment:
+      - NEXTCLOUD_MOUNT=/mnt/
+      - MYSQL_HOST=nextcloud-db
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=${NEXTCLOUD_DB_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+      - TZ=${TIMEZONE}
+      - NEXTCLOUD_TRUSTED_PROXIES=traefik
+      - NEXTCLOUD_TRUSTED_DOMAINS=nc.${HOSTNAME}
+      - REDIS_HOST=redis
+      - REDIS_HOST_PORT=6379
+    volumes:
+      - nextcloud-data:/var/www/html
+      - /mnt/data:/mnt/data:rw
+      - /home:/home_angelo:rw
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nextcloud.rule=Host(`nc.${HOSTNAME}`)
+      - traefik.http.routers.nextcloud.entrypoints=web-secure
+      - traefik.http.routers.nextcloud.tls=true
+      - traefik.http.routers.nextcloud.tls.certresolver=myresolver
+      - traefik.http.services.nextcloud.loadbalancer.server.port=80
+      - homepage.group=Cloud
+      - homepage.name=Nextcloud
+      - homepage.icon=nextcloud.png
+      - homepage.href=https://nc.${HOSTNAME}
+      - homepage.description=Self-hosted cloud storage & collaboration
+      - homepage.weight=3
+      - homepage.widget.type=nextcloud
+      - homepage.widget.url=https://nc.${HOSTNAME}
+      - homepage.widget.username=admin
+      - homepage.widget.password=4tz!7Oe09FA3
+
+  stalled-download-cleaner:
+    build: https://github.com/MattDGTL/sonarr-radarr-queue-cleaner.git
+    container_name: stalled-download-cleaner
+    restart: unless-stopped
+    environment:
+      - SONARR_URL=http://sonarr:8989/sonarr
+      - SONARR_API_KEY=${SONARR_API_KEY}
+      - RADARR_URL=http://radarr:7878/radarr
+      - RADARR_API_KEY=${RADARR_API_KEY}
+      - API_TIMEOUT=6000
+
+  netdata:
+    image: netdata/netdata:stable
+    container_name: netdata
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    pid: host
+    network_mode: bridge
+    security_opt:
+      - apparmor:unconfined
+    group_add:
+      - "983"
+    volumes:
+      - /DATA/AppData/Netdata/config:/etc/netdata
+      - /DATA/AppData/Netdata/lib:/var/lib/netdata
+      - /DATA/AppData/Netdata/cache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    expose:
+      - "19999"
+    ports:
+      - "19999:19999"
+    labels:
+      - homepage.group=Network
+      - homepage.name=Netdata
+      - homepage.icon=netdata.png
+      - homepage.href=http://192.168.50.16:19999
+      - homepage.description=Real-time performance monitoring
+      - homepage.weight=2
+      - homepage.widget.type=netdata
+      - homepage.widget.url=http://192.168.50.16:19999
+
+  portainerr:
+    image: portainer/portainer-ce:2.21.1
+    container_name: portainerr
+    restart: unless-stopped
+    volumes:
+      - /DATA/AppData/portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    expose:
+      - "9000"
+      - "9443"
+    ports:
+      - "9000:9000"
+    labels:
+      - homepage.group=Network
+      - homepage.name=Portainer
+      - homepage.icon=portainer.png
+      - homepage.href=http://192.168.50.16:9000
+      - homepage.description=Lightweight Docker management UI
+      - homepage.weight=1
+      - homepage.widget.type=portainer
+      - homepage.widget.url=http://192.168.50.16:9000
+      - homepage.widget.key=ptr_iWntAxIK1Js2VI9ETjRYGshkyMaAGgeninbwTTe3zMg=
+      - homepage.widget.env=2
+
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    restart: unless-stopped
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - APP_KEY=base64:L2LLPjOLwu874QJjHSl2gYHgVPpQueOzoa0cD4PRAis=
+      - SPEEDTEST_SCHEDULE=0 */1 * * *
+      - SPEEDTEST_SERVERS=40180
+    volumes:
+      - ${CONFIG_ROOT:-.}/speedtest-tracker:/config
+    ports:
+      - "9010:80"
+    labels:
+      - homepage.group=Network
+      - homepage.name=Speedtest
+      - homepage.icon=speedtest-tracker.png
+      - homepage.href=http://192.168.50.16:9010/
+      - homepage.description=ISP speed monitoring
+      - homepage.weight=5
+      - homepage.widget.type=speedtest
+      - homepage.widget.url=http://192.168.50.16:9010/
+      - homepage.widget.version=2
+      - homepage.widget.key=Oad6RCjSV4zrhovTiqnrK9RNZ5K9FrnRGaHOCLoH5126bb66
+      - homepage.widget.bitratePrecision=3
+
+  samba:
+    image: elswork/samba
+    container_name: samba
+    restart: unless-stopped
+    environment:
+      - TZ='Europe/Madrid'
+    ports:
+      - "139:139"
+      - "445:445"
+    volumes:
+      - /mnt:/share/folder
+    command: '-u "1000:1000:pirate:pirate:WkgBTiWcOIFEXZG" -s "SmbShare:/share/folder:rw:pirate"'
+    networks:
+      - default
+
+  zigbee2mqtt:
+    image: ghcr.io/koenkk/zigbee2mqtt
+    container_name: zigbee2mqtt
+    restart: always
+    volumes:
+      - ./data:/app/data
+      - /run/udev:/run/udev:ro
+    ports:
+      - 8088:8080
+      - 8089:8089
+    environment:
+      - TZ=Europe/Berlin
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    labels:
+      - homepage.group=Home Automation
+      - homepage.name=Zigbee2MQTT
+      - homepage.icon=zigbee2mqtt.png
+      - homepage.href=http://192.168.50.16:8089/
+      - homepage.description=Your Zigbee2MQTT web UI
+      - homepage.weight=6
+
+  mqtt:
+    image: eclipse-mosquitto
+    container_name: mqtt
+    restart: always
+    environment:
+      - PUID=1883
+      - PGID=1883
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ${CONFIG_ROOT:-.}/mqtt/config:/mosquitto/config:rw
+      - ${CONFIG_ROOT:-.}/mqtt/data:/mosquitto/data:rw
+      - ${CONFIG_ROOT:-.}/mqtt/log:/mosquitto/log:rw
+
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:8
+    container_name: matter-server
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${CONFIG_ROOT:-.}/matter-data:/data
+    environment:
+      - WS_PORT=5580
+
+  ollama:
+    image: ollama/ollama:rocm
+    container_name: ollama
+    restart: unless-stopped
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0
+      - HCC_AMDGPU_TARGET=gfx1030
+      - OLLAMA_ORIGINS=*
+    volumes:
+      - ollama-data:/root/.ollama
+    expose:
+      - "11434"
+    ports:
+      - "11434:11434"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ollama.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/ollama`))
+      - traefik.http.routers.ollama.entrypoints=web-secure
+      - traefik.http.routers.ollama.tls=true
+      - traefik.http.routers.ollama.tls.certresolver=myresolver
+      - traefik.http.services.ollama.loadbalancer.server.port=11434
+      - traefik.http.routers.ollama.middlewares=ollama-strip
+      - traefik.http.middlewares.ollama-strip.stripPrefix.prefixes=/ollama
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_AUTH=False
+    volumes:
+      - openwebui-data:/app/backend/data
+    ports:
+      - "8080:8080"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    command:
+      - --config
+      - /etc/cloudflared/config.yml
+      - tunnel
+      - run
+    volumes:
+      - /home/angelo/.cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - /home/angelo/.cloudflared/7ad8d47f-cfe0-4fa1<|diff_marker|>---
+volumes:
+  nextcloud-db-data:
+  nextcloud-data:
+  redis-data:
+  ollama-data:
+  openwebui-data:
+  mqtt-config:
+  mqtt-data:
+  mqtt-log:
