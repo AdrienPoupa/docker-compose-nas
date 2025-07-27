@@ -19,16 +19,17 @@ services:
     privileged: true
     labels:
       - traefik.enable=true
+      - traefik.http.routers.homeassistant.entrypoints=web-secure
       - traefik.http.routers.homeassistant.rule=(Host(`${HOMEASSISTANT_HOSTNAME}`))
       - traefik.http.routers.homeassistant.tls=true
       - traefik.http.routers.homeassistant.tls.certresolver=myresolver
       - traefik.http.services.homeassistant.loadbalancer.server.port=8123
-      - homepage.group=Apps
+      - homepage.group=Home Automation
       - homepage.name=Home Assistant
       - homepage.icon=home-assistant.png
       - homepage.href=https://${HOMEASSISTANT_HOSTNAME}
       - homepage.description=Open source home automation that puts local control and privacy first
-      - homepage.weight=3
+      - homepage.weight=1
       - homepage.widget.type=homeassistant
       - homepage.widget.url=https://${HOMEASSISTANT_HOSTNAME}
       - homepage.widget.key=${HOMEASSISTANT_ACCESS_TOKEN}
