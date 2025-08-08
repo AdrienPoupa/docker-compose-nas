@@ -93,7 +93,7 @@ see [Optional Services](#optional-services) for more information.
 
 ## Quick Start
 
-`cp .env.example .env`, edit to your needs then `docker compose up -d`.
+`cp .env.example .env`, edit to your needs then `docker-compose up -d`.
 
 For the first time, run `./update-config.sh` to update the applications base URLs and set the API keys in `.env`.
 
