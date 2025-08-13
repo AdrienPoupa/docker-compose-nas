@@ -8,30 +8,12 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/tandoor/database:/opt/recipes/database
       - ${CONFIG_ROOT:-.}/tandoor/mediafiles:/opt/recipes/mediafiles
+      - ${CONFIG_ROOT:-.}/tandoor/nginx:/opt/recipes/http.d
       - tandoor-staticfiles:/opt/recipes/staticfiles
     healthcheck:
       test: ["CMD", "wget", "http://127.0.0.1:8080/recipes", "-qO", "/dev/null"]
       interval: 1m
       retries: 10
-    profiles:
-      - tandoor
-
-  tandoor-nginx:
-    image: public.ecr.aws/nginx/nginx:mainline-alpine
-    container_name: tandoor-nginx
-    restart: always
-    env_file:
-      - ${CONFIG_ROOT:-.}/tandoor/.env
-    volumes:
-      - ${CONFIG_ROOT:-.}/tandoor/nginx:/etc/nginx/conf.d:ro
-      - ${CONFIG_ROOT:-.}/tandoor/mediafiles:/media:ro
-      - tandoor-staticfiles:/static:ro
-    healthcheck:
-      test: ["CMD", "wget", "http://127.0.0.1/recipes", "-qO", "/dev/null"]
-      interval: 1m
-      retries: 10
-    depends_on:
-      - tandoor
     labels:
       - traefik.enable=true
       - traefik.http.routers.tandoor.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/recipes`))
