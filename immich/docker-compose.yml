@@ -1,7 +1,7 @@
 services:
   immich-server:
     container_name: immich_server
-    image: ghcr.io/immich-app/immich-server:v1.132.3
+    image: ghcr.io/immich-app/immich-server:v1.138.0
     environment:
       DB_HOSTNAME: immich_postgres
       DB_PASSWORD: ${IMMICH_DB_PASSWORD}
@@ -9,7 +9,7 @@ services:
       DB_DATABASE_NAME: immich
       REDIS_HOSTNAME: immich_redis
     volumes:
-      - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
+      - ${IMMICH_UPLOAD_LOCATION}:/data
       - /etc/localtime:/etc/localtime:ro
       - ${CONFIG_ROOT:-.}/immich/healthcheck:/healthcheck
     depends_on:
@@ -37,7 +37,7 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:v1.132.3
+    image: ghcr.io/immich-app/immich-machine-learning:v1.138.0
     volumes:
       - immich-model-cache:/cache
     restart: always
