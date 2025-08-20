@@ -1,0 +1,6 @@
+.env
+backup.env
+/backup
+!/backup/.gitkeep
+/vw-data
+!/vw-data/.gitkeep

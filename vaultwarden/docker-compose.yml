@@ -1,0 +1,55 @@
+services:
+  vaultwarden:
+    image: ghcr.io/dani-garcia/vaultwarden:latest
+    container_name: vaultwarden
+    restart: always
+    volumes:
+      - ${CONFIG_ROOT:-.}/vaultwarden/vw-data:/data
+    env_file:
+      - ${CONFIG_ROOT:-.}/vaultwarden/.env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vaultwarden-ui.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/vaultwarden`))
+      - traefik.http.routers.vaultwarden-ui.tls=true
+      - traefik.http.routers.vaultwarden-ui.tls.certresolver=myresolver
+      - traefik.http.services.vaultwarden-ui.loadbalancer.server.port=80
+      - traefik.http.services.vaultwarden-ui.loadbalancer.passhostheader=true
+      - traefik.http.routers.vaultwarden-ui.service=vaultwarden-ui
+      - traefik.http.routers.vaultwarden-ui.middlewares=vaultwarden-strip-slash
+      - traefik.http.middlewares.vaultwarden-strip-slash.redirectregex.regex=(^.*\/vaultwarden$$)
+      - traefik.http.middlewares.vaultwarden-strip-slash.redirectregex.replacement=$$1/
+      - traefik.http.middlewares.vaultwarden-strip-slash.redirectregex.permanent=false
+      - traefik.http.routers.vaultwarden-ws.rule=(Host(`${HOSTNAME}`) && Path(`/vaultwarden/notifications/hub`))
+      - traefik.http.services.vaultwarden-ws.loadbalancer.server.port=3012
+      - traefik.http.routers.vaultwarden-ws.tls=true
+      - traefik.http.routers.vaultwarden-ws.tls.certresolver=myresolver
+      - traefik.http.routers.vaultwarden-ws.service=vaultwarden-ws
+      - homepage.group=Utilities
+      - homepage.name=Vaultwarden
+      - homepage.icon=vaultwarden.png
+      - homepage.href=/vaultwarden
+      - homepage.description=Password Manager
+      - homepage.weight=1
+    profiles:
+      - vaultwarden
+
+  vaultwarden-backup:
+    image: ghcr.io/adrienpoupa/rclone-backup:latest
+    container_name: vaultwarden-backup
+    restart: always
+    env_file:
+      - ${CONFIG_ROOT:-.}/vaultwarden/backup.env
+    environment:
+      - BACKUP_FOLDER_NAME_1=attachments
+      - BACKUP_FOLDER_PATH_1=/vw-data/attachments
+      - BACKUP_FOLDER_NAME_2=sends
+      - BACKUP_FOLDER_PATH_2=/vw-data/sends
+      - BACKUP_FOLDER_NAME_3=rsa-key
+      - BACKUP_FOLDER_PATH_3=/vw-data/rsa_key
+      - DB_TYPE=sqlite
+      - SQLITE_DATABASE=/vw-data/db.sqlite3
+    volumes:
+      - ${CONFIG_ROOT:-.}/vaultwarden/vw-data:/vw-data
+      - ${CONFIG_ROOT:-.}/vaultwarden/backup:/config
+    profiles:
+      - vaultwarden
