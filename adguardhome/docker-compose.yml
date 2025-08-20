@@ -18,8 +18,8 @@ services:
     container_name: adguardhome
     restart: always
     healthcheck:
-      test: [ "CMD", "wget", "http://127.0.0.1:3000", "-qO", "/dev/null" ]
-      interval: 30s
+      test: ["CMD", "wget", "http://127.0.0.1:3000", "-qO", "/dev/null"]
+      interval: 1m
       retries: 10
     networks:
       adguardhome:
@@ -56,7 +56,7 @@ services:
       - adguardhome
 
   traefik-certs-dumper:
-    image: ldez/traefik-certs-dumper
+    image: ghcr.io/ldez/traefik-certs-dumper:latest
     container_name: traefik-certs-dumper
     restart: always
     entrypoint: sh -c '
