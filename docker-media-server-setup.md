@@ -44,7 +44,9 @@ sudo apt install linux-modules-extra-$(uname -r)
 ```
 
 ## Create mount directores
+```
 mkdir -p /mnt/data /mnt/data_nobrl
+```
 
 ## Update ubuntu and install cifs utils
 ```bash
@@ -52,6 +54,26 @@ sudo apt update
 sudo apt install cifs-utils
 sudo apt install docker-compose
 ```
+
+# install docker 
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+
+ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
 
 ## Create Hetzner Storage box
 1. Go to Hetzner Storage Box Page 
@@ -625,3 +647,44 @@ If you have previous movies, series, do a mass edit of the language profile
 
 Check where is pointing
 nslookup traefik.nosoupforyou.xyz
+
+
+#### Fix values in homepage
+Create jellyfin api key
+1. Login to jellyfin -> advanced -> api keys. -> +  -> Copy and update .env vlaues
+Create audiobookshelf api key
+1. Login to abs -> settings -> API Keys -> Add API key for homepage -> Copy and update .env vlaue
+Create beszel username
+1. Login to beszel users, use admin user, create user using command line
+docker exec beszel /beszel superuser create username password
+add username password to .env file BESZEL_USERNAME, BESZEL_PASSWORD
+Create portainer api key
+1. Login to portainer -> Users -> Scroll down until finding api keys -> Create api key introuce passowrd. 
+The default environment is 1, so to get the used environment is to call 
+
+`curl -L -k -H 'X-Api-Key:ptr_a_key' 'https://portainer.aloni.site/api/endpoints/3/docker/containers/json'`
+where 3 is the environment. So you should try until you get a response
+
+traefik
+Create username password
+htpasswd -nb <username> <password>
+add to TRAEFIK_FRONTEND_AUTH
+when creating hasshed password: Make sure to have a hashed password and in docker-compose.yml every single $ is escaped to $$.
+
+Create vikunja api key
+1. Create user, Go to settings, api keys, set permission, and update VIKUNJA_API_KEY
+
+Create jellyseer
+Get api key and update .env file
+
+Set admin_token vaultwarden
+echo -n "MySecretPassword" | argon2 "$(openssl rand -base64 32)" -e -id -k 65540 -t 3 -p 4
+
+
+# Issue with network
+docker network rm docker-compose-nas
+docker compose down
+docker compose up -d
+
+# Set user, group and permissions
+This is important, because if this is wrong, it will not work.
