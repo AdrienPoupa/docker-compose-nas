@@ -622,6 +622,9 @@ services:
     container_name: decluttarr
     restart: always
     environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
       - RADARR_URL=http://radarr:7878/radarr
       - RADARR_KEY=${RADARR_API_KEY}
       - SONARR_URL=http://sonarr:8989/sonarr
