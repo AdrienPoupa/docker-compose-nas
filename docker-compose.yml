@@ -366,6 +366,37 @@ services:
 #    restart: "no"
 #    ports:
 #      - 8000:80
+  pia:
+    image: ghcr.io/thrnz/docker-wireguard-pia:latest
+    container_name: pia
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ${CONFIG_ROOT:-.}/gluetun:/config
+      - ${CONFIG_ROOT:-.}/gluetun/port:/tmp/gluetun
+    environment:
+      - LOC=${PIA_LOCATION}
+      - USER=${PIA_USER}
+      - PASS=${PIA_PASS}
+      - QBT_USER=${QBITTORRENT_USERNAME}
+      - QBT_PASS=${QBITTORRENT_PASSWORD}
+      - LOCAL_NETWORK=${PIA_LOCAL_NETWORK}
+      - PORT_FORWARDING=1
+      - PORT_PERSIST=1
+      - PORT_SCRIPT=/pia-shared/portupdate-qbittorrent.sh
+      - FIREWALL=0
+      - ACTIVE_HEALTHCHECKS=1
+      - RECONNECT=1
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.default.disable_ipv6=1
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.lo.disable_ipv6=1
+    restart: always
+    profiles:
+      - pia
   vpn:
     image: qmcgaw/gluetun:v3
     container_name: vpn
@@ -670,7 +701,7 @@ services:
       - ${CONFIG_ROOT:-.}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_ROOT}:/data
-    restart: no
+    restart: always
     command:
       [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
