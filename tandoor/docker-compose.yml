@@ -11,7 +11,7 @@ services:
       - ${CONFIG_ROOT:-.}/tandoor/nginx:/opt/recipes/http.d
       - tandoor-staticfiles:/opt/recipes/staticfiles
     healthcheck:
-      test: ["CMD", "wget", "http://127.0.0.1:8080/recipes", "-qO", "/dev/null"]
+      test: ["CMD", "wget", "http://127.0.0.1:80/recipes", "-qO", "/dev/null"]
       interval: 1m
       retries: 10
     labels:
