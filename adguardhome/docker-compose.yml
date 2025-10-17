@@ -4,7 +4,8 @@ services:
     container_name: dhcp-relay
     restart: always
     depends_on:
-      - adguardhome
+      adguardhome:
+        condition: service_healthy
     command: ["-id", "enp2s0", "-iu", "br_adguard", "10.0.0.10"]
     cap_add:
       - NET_ADMIN
@@ -18,9 +19,16 @@ services:
     container_name: adguardhome
     restart: always
     healthcheck:
-      test: ["CMD", "wget", "http://127.0.0.1:3000", "-qO", "/dev/null"]
+      test:
+        [
+          "CMD",
+          "sh",
+          "-c",
+          "ip addr show | grep -F '10.0.0.10' >/dev/null && wget -qO /dev/null http://127.0.0.1:3000",
+        ]
       interval: 1m
       retries: 10
+      start_period: 30s
     networks:
       adguardhome:
         ipv4_address: 10.0.0.10
