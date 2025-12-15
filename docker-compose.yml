@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: ghcr.io/traefik/traefik:3.4
+    image: ghcr.io/traefik/traefik:3.6
     container_name: traefik
     restart: always
     environment:
