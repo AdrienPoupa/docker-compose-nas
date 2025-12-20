@@ -21,7 +21,7 @@ services:
       - ${CONFIG_ROOT:-.}/joplin/healthcheck:/healthcheck
     healthcheck:
       test: ["CMD", "node", "/healthcheck/healthcheck.js"]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true

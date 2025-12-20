@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: ghcr.io/traefik/traefik:3.4
+    image: ghcr.io/traefik/traefik:3.6
     container_name: traefik
     restart: always
     environment:
@@ -17,10 +17,6 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.to=web-secure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
-      - --experimental.plugins.rewrite-body.modulename=github.com/packruler/rewrite-body
-      - --experimental.plugins.rewrite-body.version=v1.2.0
-      - --experimental.plugins.rewriteHeaders.modulename=github.com/XciD/traefik-plugin-rewrite-headers
-      - --experimental.plugins.rewriteHeaders.version=v0.0.3
       - --certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE:-true}
       - --certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-cloudflare}
       - --certificatesresolvers.myresolver.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53
@@ -37,7 +33,7 @@ services:
       - host.docker.internal:172.17.0.1
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 30s
+      interval: 1m
       retries: 10
   sonarr:
     image: lscr.io/linuxserver/sonarr
@@ -52,7 +48,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping"]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -82,7 +78,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping"]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -112,7 +108,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping"]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -144,7 +140,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping"]
-      interval: 5s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -179,7 +175,7 @@ services:
           "-qO",
           "/dev/null",
         ]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -208,7 +204,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping"]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -329,36 +325,19 @@ services:
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
     security_opt:
       - no-new-privileges:true
-  cleanuperr:
-    image: ghcr.io/flmorg/cleanuperr:latest
-    container_name: cleanuperr
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
     restart: always
     volumes:
-      - ${CONFIG_ROOT:-.}/cleanuperr/logs:/var/logs
-      - ${CONFIG_ROOT:-.}/cleanuperr/ignored.txt:/usr/ignored.txt
-      - ${CONFIG_ROOT:-.}/cleanuperr/blacklist.json:/usr/blacklist.json
+      - ${CONFIG_ROOT:-.}/cleanuparr/logs:/var/logs
+      - ${CONFIG_ROOT:-.}/cleanuparr/ignored.txt:/usr/ignored.txt
+      - ${CONFIG_ROOT:-.}/cleanuparr/blacklist.json:/usr/blacklist.json
+      - ${CONFIG_ROOT:-.}/cleanuparr:/config
     environment:
       - TZ=${TIMEZONE}
-      - QUEUECLEANER__ENABLED=true
-      - QUEUECLEANER__IMPORT_FAILED_MAX_STRIKES=3
-      - QUEUECLEANER__STALLED_MAX_STRIKES=3
-      - QUEUECLEANER__DOWNLOADING_METADATA_MAX_STRIKES=3
-      - QUEUECLEANER__STALLED_RESET_STRIKES_ON_PROGRESS=true
-      - TRIGGERS__QUEUECLEANER=0 0 0/1 * * ?
-      - CONTENTBLOCKER__ENABLED=true
-      - CONTENTBLOCKER__IGNORED_DOWNLOADS_PATH=/usr/ignored.txt
-      - TRIGGERS__CONTENTBLOCKER=0 0 0/1 * * ?
-      - DOWNLOAD_CLIENT=qBittorrent
-      - QBITTORRENT__URL=http://vpn:8080
-      - QBITTORRENT__PASSWORD=${QBITTORRENT_PASSWORD}
-      - SONARR__ENABLED=true
-      - SONARR__BLOCK__PATH=/usr/blacklist.json
-      - SONARR__INSTANCES__0__URL=http://sonarr:8989/sonarr
-      - SONARR__INSTANCES__0__APIKEY=${SONARR_API_KEY}
-      - RADARR__ENABLED=true
-      - RADARR__BLOCK__PATH=/usr/blacklist.json
-      - RADARR__INSTANCES__0__URL=http://radarr:7878/radarr
-      - RADARR__INSTANCES__0__APIKEY=${RADARR_API_KEY}
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
@@ -404,7 +383,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health"]
-      interval: 30s
+      interval: 1m
       retries: 10
     labels:
       - traefik.enable=true
@@ -519,7 +498,7 @@ services:
       - traefik.http.routers.homepage.tls.certresolver=myresolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
   watchtower:
-    image: ghcr.io/containrrr/watchtower:latest
+    image: ghcr.io/nicholas-fedor/watchtower:latest
     container_name: watchtower
     restart: always
     environment:
