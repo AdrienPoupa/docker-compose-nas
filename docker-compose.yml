@@ -332,12 +332,13 @@ services:
     image: ghcr.io/cleanuparr/cleanuparr:latest
     container_name: cleanuparr
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11011/health"]
-      interval: 1m
-      timeout: 10s
-      start_period: 30s
-      retries: 10
+    # healthcheck:
+    # Removing healthcheck for now, see https://github.com/Cleanuparr/Cleanuparr/issues/393
+    #   test: ["CMD", "curl", "-f", "http://localhost:11011/health"]
+    #   interval: 1m
+    #   timeout: 10s
+    #   start_period: 30s
+    #   retries: 10
     volumes:
       - ${CONFIG_ROOT:-.}/cleanuparr/logs:/var/logs
       - ${CONFIG_ROOT:-.}/cleanuparr/ignored.txt:/usr/ignored.txt
