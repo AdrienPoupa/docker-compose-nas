@@ -360,6 +360,33 @@ services:
       - homepage.href=/cleanuparr
       - homepage.description=Cleanuparr
       - homepage.weight=5
+    profiles:
+      - cleanuparr
+  huntarr:
+    image: ghcr.io/plexguide/huntarr:latest
+    container_name: huntarr
+    restart: always
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIMEZONE}
+      - BASE_URL=/huntarr
+    volumes:
+      - ${CONFIG_ROOT:-.}/huntarr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.huntarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/huntarr`))
+      - traefik.http.routers.huntarr.tls=true
+      - traefik.http.routers.huntarr.tls.certresolver=myresolver
+      - traefik.http.services.huntarr.loadbalancer.server.port=9705
+      - homepage.group=Download
+      - homepage.name=Huntarr
+      - homepage.icon=cleanuperr.png
+      - homepage.href=/huntarr
+      - homepage.description=Huntarr
+      - homepage.weight=6
+    profiles:
+      - huntarr
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
