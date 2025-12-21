@@ -350,7 +350,7 @@ services:
       - traefik.http.services.cleanuparr.loadbalancer.server.port=11011
       - homepage.group=Download
       - homepage.name=Cleanuparr
-      - homepage.icon=cleanuparr.png
+      - homepage.icon=cleanuperr.png
       - homepage.href=/cleanuparr
       - homepage.description=Cleanuparr
       - homepage.weight=5
