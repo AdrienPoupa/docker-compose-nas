@@ -381,7 +381,7 @@ services:
       - traefik.http.services.huntarr.loadbalancer.server.port=9705
       - homepage.group=Download
       - homepage.name=Huntarr
-      - homepage.icon=cleanuperr.png
+      - homepage.icon=huntarr.png
       - homepage.href=/huntarr
       - homepage.description=Huntarr
       - homepage.weight=6
