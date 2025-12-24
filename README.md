@@ -24,6 +24,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     - [File Structure](#file-structure)
     - [Download Client](#download-client)
   - [Prowlarr](#prowlarr)
+  - [Cross-Seed](#cross-seed)
   - [qBittorrent](#qbittorrent)
   - [Jellyfin](#jellyfin)
   - [Homepage](#homepage)
@@ -87,6 +88,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Vaultwarden](https://github.com/dani-garcia/vaultwarden)          | Optional - Password manager<br/>Enable with `COMPOSE_PROFILES=vaultwarden`                                                                                    | [dani-garcia/vaultwarden](https://ghcr.io/dani-garcia/vaultwarden)                       | /vaultwarden           |
 | [Cleanuparr](https://github.com/Cleanuparr/Cleanuparr)             | Optional - Cleanuparr is a tool for automating the cleanup of unwanted or blocked files in Sonarr and Radarr<br/>Enable with `COMPOSE_PROFILES=cleanuparr`    | [cleanuparr/cleanuparr](https://ghcr.io/cleanuparr/cleanuparr)                           | /cleanuparr            |
 | [Huntarr](https://github.com/PlexGuide/Huntarr)                    | Optional - Huntarr is a specialized utility that automates discovering missing and upgrading your media collection<br/>Enable with `COMPOSE_PROFILES=huntarr` | [plexguide/huntarr](https://ghcr.io/plexguide/huntarr)                                   | /huntarr               |
+| [Cross-Seed](https://github.com/cross-seed/cross-seed)             | Optional - Cross-Seed is a tool for automating the cross-seeding of torrents<br/>Enable with `COMPOSE_PROFILES=cross-seed`                                    | [cross-seed/cross-seed](https://ghcr.io/cross-seed/cross-seed)                           |                        |
 
 Optional containers are not enabled by default, they need to be enabled,
 see [Optional Services](#optional-services) for more information.
@@ -348,6 +350,29 @@ Multiple optional services can be enabled separated by commas: `COMPOSE_PROFILES
 ### FlareSolverr
 
 In Prowlarr, add the FlareSolverr indexer with the URL http://flaresolverr:8191/
+
+### Cross-Seed
+
+Enable Cross-Seed by setting `COMPOSE_PROFILES=cross-seed`.
+
+Generate the configuration file with `docker compose run -v ./cross-seed:/config cross-seed gen-config`.
+
+Modify the configuration file as follows:
+
+```js
+module.exports = {
+  ...
+  torznab: [
+    "http://prowlarr:9696/prowlarr/1/api?apikey=<api_key>",
+    ...
+  ],
+  sonarr: ["http://sonarr:8989/sonarr?apikey=<api_key>"],
+  radarr: ["http://radarr:7878/radarr?apikey=<api_key>"],
+  torrentClients: ["qbittorrent:http://admin:adminadmin@vpn:8080"],
+  linkDirs: ["/data/torrents"],
+  ...
+}
+```
 
 ### SABnzbd
 
