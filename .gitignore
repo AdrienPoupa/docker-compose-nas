@@ -23,5 +23,6 @@ docker-compose.override.yml
 /calibre-web
 /cleanuparr
 /cross-seed
+/autobrr
 !/cleanuparr/blacklist.json
 !/cleanuparr/logs/.gitkeep
