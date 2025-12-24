@@ -237,6 +237,36 @@ services:
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
     profiles:
       - flaresolverr
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr:latest
+    restart: always
+    environment:
+      - TZ=${TIMEZONE}
+      - AUTOBRR__BASE_URL=/autobrr/
+    user: ${USER_ID}:${GROUP_ID}
+    volumes:
+      - ${CONFIG_ROOT:-.}/autobrr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.autobrr-strip.stripprefix.prefixes=/autobrr
+      - traefik.http.middlewares.autobrr-strip.stripprefix.forceSlash=true
+      - traefik.http.routers.autobrr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/autobrr`))
+      - traefik.http.routers.autobrr.tls=true
+      - traefik.http.routers.autobrr.tls.certresolver=myresolver
+      - traefik.http.services.autobrr.loadbalancer.server.port=7474
+      - traefik.http.routers.autobrr.middlewares=autobrr-strip
+      - homepage.group=Download
+      - homepage.name=Autobrr
+      - homepage.icon=autobrr.png
+      - homepage.href=/autobrr
+      - homepage.description=Torrent download automation
+      - homepage.weight=7
+      - homepage.widget.type=autobrr
+      - homepage.widget.url=http://autobrr:7474
+      - homepage.widget.key=${AUTOBRR_API_KEY}
+    profiles:
+      - autobrr
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:libtorrentv1
     container_name: qbittorrent
