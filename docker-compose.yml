@@ -370,7 +370,8 @@ services:
       - PUID=${USER_ID}
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
-      - BASE_URL=/huntarr
+      # Not using Huntarr's base URL feature until this is merged: https://github.com/plexguide/Huntarr.io/pull/760
+      # - BASE_URL=/huntarr
     volumes:
       - ${CONFIG_ROOT:-.}/huntarr:/config
     labels:
@@ -379,6 +380,12 @@ services:
       - traefik.http.routers.huntarr.tls=true
       - traefik.http.routers.huntarr.tls.certresolver=myresolver
       - traefik.http.services.huntarr.loadbalancer.server.port=9705
+      - traefik.http.middlewares.huntarr-slash.redirectregex.regex=^https?://([^/]+)/huntarr$
+      - traefik.http.middlewares.huntarr-slash.redirectregex.replacement=https://$${1}/huntarr/
+      - traefik.http.middlewares.huntarr-slash.redirectregex.permanent=true
+      - traefik.http.middlewares.huntarr-strip.stripprefix.prefixes=/huntarr
+      - traefik.http.middlewares.huntarr-xfp.headers.customrequestheaders.X-Forwarded-Prefix=/huntarr
+      - traefik.http.routers.huntarr.middlewares=huntarr-slash,huntarr-strip,huntarr-xfp
       - homepage.group=Download
       - homepage.name=Huntarr
       - homepage.icon=huntarr.png
