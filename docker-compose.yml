@@ -157,14 +157,14 @@ services:
       - homepage.widget.type=bazarr
       - homepage.widget.url=http://bazarr:6767/bazarr
       - homepage.widget.key=${BAZARR_API_KEY}
-  jellyseerr:
-    image: ghcr.io/fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/fallenbagel/seerr:latest
+    container_name: seerr
     environment:
       - LOG_LEVEL=debug
       - TZ=${TIMEZONE}
     volumes:
-      - ${CONFIG_ROOT:-.}/jellyseerr:/app/config
+      - ${CONFIG_ROOT:-.}/seerr:/app/config
     restart: always
     healthcheck:
       test:
@@ -179,19 +179,19 @@ services:
       retries: 10
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=(Host(`${JELLYSEERR_HOSTNAME}`))
-      - traefik.http.routers.jellyseerr.tls=true
-      - traefik.http.routers.jellyseerr.tls.certresolver=myresolver
-      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
+      - traefik.http.routers.seerr.rule=(Host(`${SEERR_HOSTNAME}`))
+      - traefik.http.routers.seerr.tls=true
+      - traefik.http.routers.seerr.tls.certresolver=myresolver
+      - traefik.http.services.seerr.loadbalancer.server.port=5055
       - homepage.group=Media
-      - homepage.name=JellySeerr
-      - homepage.icon=jellyseerr.png
-      - homepage.href=https://${JELLYSEERR_HOSTNAME}
+      - homepage.name=seerr
+      - homepage.icon=seerr.png
+      - homepage.href=https://${SEERR_HOSTNAME}
       - homepage.description=Content Recommendations and Request Management
       - homepage.weight=3
-      - homepage.widget.type=jellyseerr
-      - homepage.widget.url=http://jellyseerr:5055
-      - homepage.widget.key=${JELLYSEERR_API_KEY}
+      - homepage.widget.type=seerr
+      - homepage.widget.url=http://seerr:5055
+      - homepage.widget.key=${SEERR_API_KEY}
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
