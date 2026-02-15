@@ -158,7 +158,8 @@ services:
       - homepage.widget.url=http://bazarr:6767/bazarr
       - homepage.widget.key=${BAZARR_API_KEY}
   seerr:
-    image: ghcr.io/fallenbagel/seerr:latest
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
     container_name: seerr
     environment:
       - LOG_LEVEL=debug
@@ -167,14 +168,9 @@ services:
       - ${CONFIG_ROOT:-.}/seerr:/app/config
     restart: always
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "http://127.0.0.1:5055/api/v1/status",
-          "-qO",
-          "/dev/null",
-        ]
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
       interval: 1m
       retries: 10
     labels:
@@ -185,11 +181,11 @@ services:
       - traefik.http.services.seerr.loadbalancer.server.port=5055
       - homepage.group=Media
       - homepage.name=seerr
-      - homepage.icon=seerr.png
+      - homepage.icon=jellyseerr.png
       - homepage.href=https://${SEERR_HOSTNAME}
       - homepage.description=Content Recommendations and Request Management
       - homepage.weight=3
-      - homepage.widget.type=seerr
+      - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://seerr:5055
       - homepage.widget.key=${SEERR_API_KEY}
   prowlarr:
