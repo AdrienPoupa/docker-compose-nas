@@ -404,38 +404,6 @@ services:
       - homepage.weight=5
     profiles:
       - cleanuparr
-  huntarr:
-    image: ghcr.io/plexguide/huntarr:latest
-    container_name: huntarr
-    restart: always
-    environment:
-      - PUID=${USER_ID}
-      - PGID=${GROUP_ID}
-      - TZ=${TIMEZONE}
-      # Not using Huntarr's base URL feature until this is merged: https://github.com/plexguide/Huntarr.io/pull/760
-      # - BASE_URL=/huntarr
-    volumes:
-      - ${CONFIG_ROOT:-.}/huntarr:/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.huntarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/huntarr`))
-      - traefik.http.routers.huntarr.tls=true
-      - traefik.http.routers.huntarr.tls.certresolver=myresolver
-      - traefik.http.services.huntarr.loadbalancer.server.port=9705
-      - traefik.http.middlewares.huntarr-slash.redirectregex.regex=^https?://([^/]+)/huntarr$
-      - traefik.http.middlewares.huntarr-slash.redirectregex.replacement=https://$${1}/huntarr/
-      - traefik.http.middlewares.huntarr-slash.redirectregex.permanent=true
-      - traefik.http.middlewares.huntarr-strip.stripprefix.prefixes=/huntarr
-      - traefik.http.middlewares.huntarr-xfp.headers.customrequestheaders.X-Forwarded-Prefix=/huntarr
-      - traefik.http.routers.huntarr.middlewares=huntarr-slash,huntarr-strip,huntarr-xfp
-      - homepage.group=Download
-      - homepage.name=Huntarr
-      - homepage.icon=huntarr.png
-      - homepage.href=/huntarr
-      - homepage.description=Huntarr
-      - homepage.weight=6
-    profiles:
-      - huntarr
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
