@@ -217,6 +217,30 @@ services:
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696/prowlarr
       - homepage.widget.key=${PROWLARR_API_KEY}
+  suggestarr:
+    image: ciuse99/suggestarr:latest
+    container_name: suggestarr
+    environment:
+      - SUBPATH=/suggestarr
+      - JELLYFIN_API_URL=http://jellyfin:8096/jellyfin
+      - SEER_API_URL=http://seerr:5055
+    volumes:
+      - ${CONFIG_ROOT:-.}/suggestarr:/app/config/config_files
+    restart: always
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.suggestarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/suggestarr`))
+    - traefik.http.routers.suggestarr.tls=true
+    - traefik.http.routers.suggestarr.tls.certresolver=myresolver
+    - traefik.http.services.suggestarr.loadbalancer.server.port=5000
+    - homepage.group=Media
+    - homepage.name=Suggestarr
+    - homepage.icon=suggest-arr.png
+    - homepage.href=/suggestarr
+    - homepage.description=Media recommendations
+    - homepage.weight=6
+    profiles:
+      - suggestarr
   flaresolverr:
     image: 21hsmw/flaresolverr:nodriver
     container_name: flaresolverr
