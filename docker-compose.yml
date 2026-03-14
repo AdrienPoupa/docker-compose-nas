@@ -222,8 +222,6 @@ services:
     container_name: suggestarr
     environment:
       - SUBPATH=/suggestarr
-      - JELLYFIN_API_URL=http://jellyfin:8096/jellyfin
-      - SEER_API_URL=http://seerr:5055
     volumes:
       - ${CONFIG_ROOT:-.}/suggestarr:/app/config/config_files
     restart: always
@@ -233,6 +231,10 @@ services:
     - traefik.http.routers.suggestarr.tls=true
     - traefik.http.routers.suggestarr.tls.certresolver=myresolver
     - traefik.http.services.suggestarr.loadbalancer.server.port=5000
+    - traefik.http.routers.suggestarr.middlewares=suggestarr-strip-slash
+    - traefik.http.middlewares.suggestarr-strip-slash.redirectregex.regex=(^.*\/suggestarr$$)
+    - traefik.http.middlewares.suggestarr-strip-slash.redirectregex.replacement=$$1/
+    - traefik.http.middlewares.suggestarr-strip-slash.redirectregex.permanent=false
     - homepage.group=Media
     - homepage.name=Suggestarr
     - homepage.icon=suggest-arr.png
