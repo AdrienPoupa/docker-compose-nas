@@ -217,6 +217,32 @@ services:
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696/prowlarr
       - homepage.widget.key=${PROWLARR_API_KEY}
+  suggestarr:
+    image: ciuse99/suggestarr:latest
+    container_name: suggestarr
+    environment:
+      - SUBPATH=/suggestarr
+    volumes:
+      - ${CONFIG_ROOT:-.}/suggestarr:/app/config/config_files
+    restart: always
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.suggestarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/suggestarr`))
+    - traefik.http.routers.suggestarr.tls=true
+    - traefik.http.routers.suggestarr.tls.certresolver=myresolver
+    - traefik.http.services.suggestarr.loadbalancer.server.port=5000
+    - traefik.http.routers.suggestarr.middlewares=suggestarr-strip-slash
+    - traefik.http.middlewares.suggestarr-strip-slash.redirectregex.regex=(^.*\/suggestarr$$)
+    - traefik.http.middlewares.suggestarr-strip-slash.redirectregex.replacement=$$1/
+    - traefik.http.middlewares.suggestarr-strip-slash.redirectregex.permanent=false
+    - homepage.group=Media
+    - homepage.name=Suggestarr
+    - homepage.icon=suggest-arr.png
+    - homepage.href=/suggestarr
+    - homepage.description=Media recommendations
+    - homepage.weight=6
+    profiles:
+      - suggestarr
   flaresolverr:
     image: 21hsmw/flaresolverr:nodriver
     container_name: flaresolverr
