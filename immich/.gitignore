@@ -2,3 +2,4 @@
 !README.md
 !docker-compose.yml
 !healthcheck
+!backup.env.example

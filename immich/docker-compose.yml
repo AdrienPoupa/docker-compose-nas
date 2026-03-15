@@ -68,5 +68,31 @@ services:
     profiles:
       - immich
 
+  immich-backup:
+    container_name: immich_backup
+    image: djmaze/resticker:latest
+    env_file:
+      - ${CONFIG_ROOT:-.}/immich/backup.env
+    environment:
+      RESTIC_BACKUP_SOURCES: /data
+      RESTIC_BACKUP_ARGS: --tag immich --exclude /data/thumbs --exclude /data/encoded-video --exclude /data/backups
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION}:/data
+      - ${CONFIG_ROOT:-.}/immich/postgresql:/postgresql:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_ROOT:-.}/immich/.rclone:/root/.config/rclone:ro
+    depends_on:
+      - immich-server
+      - immich-database
+    restart: always
+    profiles:
+      - immich-backup
+    command: >
+      sh -c '
+      export PRE_COMMANDS="docker exec immich_postgres pg_dumpall -U postgres | gzip > /data/db-dump.sql.gz";
+      export POST_COMMANDS_SUCCESS="rm -f /data/db-dump.sql.gz";
+      exec /entry.sh
+      '
+
 volumes:
   immich-model-cache:
