@@ -68,17 +68,36 @@ Edit `immich/backup.env` and set the following:
 
 Restic supports multiple backends. Pick one based on your infrastructure:
 
-**Rclone Remote** (reuse existing rclone configuration):
-```bash
-# First, configure rclone if not already done
-docker compose run --rm -it immich-backup rclone config
+**Rclone Remote** (Optional - reuse existing rclone configuration):
 
-# Then set in backup.env:
+Rclone is optional. Use this only if your `RESTIC_REPOSITORY` URI starts with `rclone:`. If you prefer to use Rclone, it allows you to back up to any service supported by Rclone (S3, B2, SFTP, Google Drive, OneDrive, Dropbox, etc.) without direct Restic support, or if you want to reuse existing Rclone configurations.
+
+First, configure your rclone remote destination:
+
+```bash
+docker compose run --rm -it immich-backup rclone config
+```
+
+This interactive command will guide you through:
+1. Creating a new remote (choose `n`)
+2. Naming your remote (e.g., `backup-s3`, `backup-b2`, `backup-sftp`, etc.)
+3. Selecting your storage type (S3, B2, SFTP, etc.)
+4. Entering credentials and configuration
+
+The configuration will be saved to `immich/.rclone/rclone.conf`. Do not manually edit this file; use the `rclone config` command above to modify it.
+
+Then set in `backup.env`:
+
+```bash
 RESTIC_REPOSITORY=rclone:myremote:/nas-backups/immich
 ```
-This allows you to use any rclone-supported backend (S3, B2, SFTP, Google Drive, etc.) seamlessly.
 
-**S3-Compatible** (AWS, Wasabi, MinIO, DigitalOcean Spaces, etc.):
+This allows you to use any rclone-supported backend seamlessly.
+
+**S3-Compatible (Direct)** (AWS, Wasabi, MinIO, DigitalOcean Spaces, etc. - no Rclone needed):
+
+You can also back up directly to S3-compatible services without using Rclone:
+
 ```bash
 # Set in backup.env:
 RESTIC_REPOSITORY=s3:s3.amazonaws.com/my-bucket/immich
@@ -91,7 +110,7 @@ AWS_ACCESS_KEY_ID=your_key
 AWS_SECRET_ACCESS_KEY=your_secret
 ```
 
-**Backblaze B2**:
+**Backblaze B2** (Direct - no Rclone needed):
 ```bash
 # Set in backup.env:
 RESTIC_REPOSITORY=b2:my-bucket:immich
@@ -101,7 +120,7 @@ B2_ACCOUNT_ID=your_account_id
 B2_ACCOUNT_KEY=your_account_key
 ```
 
-**SFTP**:
+**SFTP** (Direct - no Rclone needed):
 ```bash
 # Set in backup.env:
 RESTIC_REPOSITORY=sftp://user@backup.example.com/immich
@@ -110,7 +129,7 @@ RESTIC_REPOSITORY=sftp://user@backup.example.com/immich
 SFTP_PASSWORD=your_sftp_password
 ```
 
-**Local Path** (NAS mounted volume or local directory):
+**Local Path** (NAS mounted volume or local directory - no Rclone needed):
 ```bash
 # Set in backup.env:
 RESTIC_REPOSITORY=/mnt/backup-drive/immich
@@ -119,7 +138,7 @@ RESTIC_REPOSITORY=/mnt/backup-drive/immich
 mkdir -p /mnt/backup-drive/immich
 ```
 
-**Google Cloud Storage**:
+**Google Cloud Storage** (Direct - no Rclone needed):
 ```bash
 # Set in backup.env:
 RESTIC_REPOSITORY=gs://my-bucket/immich
@@ -128,7 +147,7 @@ RESTIC_REPOSITORY=gs://my-bucket/immich
 GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ```
 
-**Azure Blob Storage**:
+**Azure Blob Storage** (Direct - no Rclone needed):
 ```bash
 # Set in backup.env:
 RESTIC_REPOSITORY=azure://immich-container/immich
