@@ -173,21 +173,31 @@ openssl rand -base64 32
 #### List Existing Snapshots
 
 ```bash
-docker compose run --rm immich-backup restic snapshots
+docker compose run --rm immich-backup snapshots
 ```
 
 This will list all backup snapshots. If the repository doesn't exist yet, it will be initialized automatically on the first scheduled backup.
 
 #### Manually Trigger a Backup
 
+Perform a one-time backup:
+
 ```bash
-docker compose run --rm immich-backup /bin/bash -c 'restic backup /data && restic forget --prune ${RESTIC_FORGET_ARGS}'
+docker compose run --rm immich-backup backup /data
 ```
+
+Then apply the retention policy to clean up old snapshots:
+
+```bash
+docker compose run --rm immich-backup c forget --prune --keep-last 7 --keep-daily 7 --keep-weekly 4 --keep-monthly 3
+```
+
+(Note: Replace the `--keep-*` arguments with your configured `RESTIC_FORGET_ARGS` from `backup.env`)
 
 #### Check Repository Status
 
 ```bash
-docker compose run --rm immich-backup restic check
+docker compose run --rm immich-backup check
 ```
 
 #### Monitor Scheduled Backups
@@ -219,7 +229,7 @@ For detailed instructions on restoring Immich from backups, see the [Immich Rest
 To restore a specific snapshot:
 
 ```bash
-docker compose run --rm immich-backup restic restore <snapshot-id> --target /restored
+docker compose run --rm immich-backup restore <snapshot-id> --target /restored
 ```
 
 Then copy the files and database from `/restored` back to their original locations.
