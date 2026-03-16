@@ -70,7 +70,7 @@ services:
 
   immich-backup:
     container_name: immich_backup
-    image: djmaze/resticker:latest
+    image: mazzolino/restic:latest
     env_file:
       - ${CONFIG_ROOT:-.}/immich/backup.env
     environment:
