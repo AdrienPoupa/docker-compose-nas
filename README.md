@@ -580,7 +580,14 @@ services:
 
 Note you will lose the hard link ability, ie your files will be duplicated.
 
-In Sonarr and Radarr, go to `Settings` > `Importing` > Untick `Use Hardlinks instead of Copy`
+In Sonarr and Radarr, go to `Settings` > `Importing` > Untick `Use Hardlinks instead of Copy`.  
+To [setup permissions](https://trash-guides.info/File-and-Folder-Structure/How-to-set-up/Docker/#permissions) for the `DATA_ROOT` folder:
+
+```
+source .env
+sudo chown -R $USER:$USER $DATA_ROOT
+sudo chmod -R a=,a+rX,u+w,g+w $DATA_ROOT
+```
 
 ## NFS Share
 
