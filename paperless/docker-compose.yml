@@ -15,7 +15,7 @@ services:
     environment:
       PAPERLESS_REDIS: redis://paperless-broker:6379
       PAPERLESS_FORCE_SCRIPT_NAME: /paperless
-      PAPERLESS_URL: https://${HOSTNAME}/paperless
+      PAPERLESS_URL: https://${HOSTNAME}
       PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER}
       PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
       USERMAP_UID: ${USER_ID}
