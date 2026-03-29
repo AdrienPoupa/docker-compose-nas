@@ -1,0 +1,71 @@
+services:
+  paperless-webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless_webserver
+    restart: always
+    depends_on:
+      - paperless-broker
+    volumes:
+      - paperless-data:/usr/src/paperless/data
+      - paperless-media:/usr/src/paperless/media
+      - ${CONFIG_ROOT:-.}/paperless/consume:/usr/src/paperless/consume
+      - ${CONFIG_ROOT:-.}/paperless/export:/usr/src/paperless/export
+    env_file:
+      - ${CONFIG_ROOT:-.}/paperless/.env
+    environment:
+      PAPERLESS_REDIS: redis://paperless-broker:6379
+      PAPERLESS_FORCE_SCRIPT_NAME: /paperless
+      PAPERLESS_URL: https://${HOSTNAME}/paperless
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
+      USERMAP_UID: ${USER_ID}
+      USERMAP_GID: ${GROUP_ID}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.paperless.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/paperless`))
+      - traefik.http.routers.paperless.tls=true
+      - traefik.http.routers.paperless.tls.certresolver=myresolver
+      - traefik.http.services.paperless.loadbalancer.server.port=8000
+      - homepage.group=Apps
+      - homepage.name=Paperless
+      - homepage.icon=paperless.png
+      - homepage.href=/paperless
+      - homepage.description=Document management system
+      - homepage.weight=5
+    profiles:
+      - paperless
+
+  paperless-broker:
+    image: docker.io/library/redis:8
+    container_name: paperless_broker
+    restart: always
+    volumes:
+      - paperless-redis:/data
+    profiles:
+      - paperless
+
+  paperless-backup:
+    container_name: paperless_backup
+    image: mazzolino/restic:latest
+    env_file:
+      - ${CONFIG_ROOT:-.}/paperless/backup.env
+    environment:
+      RESTIC_BACKUP_SOURCES: /data
+      RESTIC_BACKUP_ARGS: --tag paperless --exclude /data/media/.thumbnails
+      PRE_COMMANDS: sqlite3 /data/paperless.db ".backup /tmp/paperless-backup.db" && gzip -c /tmp/paperless-backup.db > /data/paperless-db-backup.gz && rm /tmp/paperless-backup.db
+      POST_COMMANDS_SUCCESS: rm -f /data/paperless-db-backup.gz
+    volumes:
+      - paperless-data:/data
+      - paperless-media:/data/media:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_ROOT:-.}/paperless/.rclone:/root/.config/rclone:ro
+    depends_on:
+      - paperless-webserver
+    restart: always
+    profiles:
+      - paperless-backup
+
+volumes:
+  paperless-data:
+  paperless-media:
+  paperless-redis:

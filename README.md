@@ -45,6 +45,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
     - [Home Assistant](#home-assistant)
     - [Immich](#immich)
     - [Vaultwarden](#vaultwarden)
+    - [Paperless Ngx](#paperless-ngx)
   - [Customization](#customization)
     - [Optional: Using the VPN for \*arr apps](#optional-using-the-vpn-for-arr-apps)
   - [Synology Quirks](#synology-quirks)
@@ -90,6 +91,7 @@ I am running it in Ubuntu Server 22.04; I also tested this setup on a [Synology 
 | [Cross-Seed](https://github.com/cross-seed/cross-seed)             | Optional - Cross-Seed is a tool for automating the cross-seeding of torrents<br/>Enable with `COMPOSE_PROFILES=cross-seed`                                    | [cross-seed/cross-seed](https://ghcr.io/cross-seed/cross-seed)                           |                        |
 | [Autobrr](https://github.com/autobrr/autobrr)                      | Optional - Autobrr is a tool for automating the downloading of torrents<br/>Enable with `COMPOSE_PROFILES=autobrr`                                            | [autobrr/autobrr](https://ghcr.io/autobrr/autobrr)                                       | /autobrr               |
 | [Suggestarr](github.com/giuseppe99barchetta/SuggestArr)                      | Optional - SuggestArr is a project designed to automate media content recommendations and download requests<br/>Enable with `COMPOSE_PROFILES=suggestarr`                                            | [ciuse99/suggestarr](https://hub.docker.com/r/ciuse99/suggestarr)                                       | /suggestarr               |
+| [Paperless Ngx](https://paperless-ngx.com)                            | Optional - Document management system for organizing and searching your documents<br/>Enable with `COMPOSE_PROFILES=paperless`                                                     | [paperless-ngx/paperless-ngx](https://ghcr.io/paperless-ngx/paperless-ngx)                           | /paperless               |
 
 Optional containers are not enabled by default, they need to be enabled,
 see [Optional Services](#optional-services) for more information.
@@ -465,6 +467,10 @@ See [here](./immich/README.md).
 ### Vaultwarden
 
 See [here](./vaultwarden/README.md).
+
+### Paperless Ngx
+
+See [here](./paperless/README.md).
 
 ## Customization
 
