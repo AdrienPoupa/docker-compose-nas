@@ -319,13 +319,15 @@ services:
       - traefik.http.routers.qbittorrent.tls=true
       - traefik.http.routers.qbittorrent.tls.certresolver=myresolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
-      - traefik.http.routers.qbittorrent.middlewares=qbittorrent-strip-slash,qbittorrent-stripprefix
+      - traefik.http.routers.qbittorrent.middlewares=qbittorrent-strip-slash,qbittorrent-stripprefix,qbittorrent-drop-encoding
       # https://github.com/qbittorrent/qBittorrent/issues/5693#issuecomment-552146296
       - traefik.http.middlewares.qbittorrent-stripprefix.stripPrefix.prefixes=/qbittorrent
       # https://community.traefik.io/t/middleware-to-add-the-if-needed/1895/19
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.regex=(^.*\/qbittorrent$$)
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.replacement=$$1/
       - traefik.http.middlewares.qbittorrent-strip-slash.redirectregex.permanent=false
+      # https://github.com/VueTorrent/VueTorrent/issues/2718#issuecomment-4189837679
+      - traefik.http.middlewares.qbittorrent-drop-encoding.headers.customrequestheaders.Accept-Encoding=
       - com.centurylinklabs.watchtower.depends-on=vpn
       - homepage.group=Download
       - homepage.name=qBittorrent
