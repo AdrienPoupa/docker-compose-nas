@@ -495,6 +495,7 @@ services:
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096/jellyfin
       - homepage.widget.key=${JELLYFIN_API_KEY}
+      - homepage.widget.version=2
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
     container_name: calibre-web
