@@ -12,6 +12,13 @@ services:
       - ${CONFIG_ROOT:-.}/paperless/export:/usr/src/paperless/export
     env_file:
       - ${CONFIG_ROOT:-.}/paperless/.env
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "-L", "--max-time", "10", "http://localhost:8000"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      # bytecode compile + migrations can take ~6-8 min even when idle
+      start_period: 15m
     environment:
       PAPERLESS_REDIS: redis://paperless-broker:6379
       PAPERLESS_FORCE_SCRIPT_NAME: /paperless

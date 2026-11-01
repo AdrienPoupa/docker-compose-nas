@@ -6,24 +6,25 @@ uwsgi_temp_path /tmp/uwsgi_temp;
 scgi_temp_path /tmp/scgi_temp;
 
 server {
-  listen 80;
+  listen ${TANDOOR_PORT};
+  listen [::]:${TANDOOR_PORT} ipv6only=on;
   server_name localhost;
 
   client_max_body_size 512M;
 
   # serve media files
   location /recipes/media {
-    alias /opt/recipes/mediafiles;
+    alias ${MEDIA_ROOT};
     add_header Content-Disposition 'attachment; filename="$args"';
   }
 
   location /recipes/static {
-    alias /opt/recipes/staticfiles;
+    alias ${STATIC_ROOT};
   }
 
   # serve service worker under main path
   location = /recipes/service-worker.js {
-    alias /opt/recipes/staticfiles/vue3/service-worker.js;
+    alias ${STATIC_ROOT}/vue3/service-worker.js;
   }
 
   # pass requests for dynamic content to gunicorn
@@ -33,15 +34,19 @@ server {
 
     # param needed by django allauth sessions to log IP
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Script-Name /recipes;
     proxy_cookie_path / /recipes;
+
+    # Upstream bug: ScopeMiddleware redirects unauthenticated users to
+    # /account/login/ without the /recipes SCRIPT_NAME prefix. Gunicorn 26
+    # rejects unprefixed paths, so re-add the prefix to relative redirects.
+    proxy_redirect ~^/(?!recipes/)(.*)$ /recipes/$1;
 
     # disabled for now because it redirects to the error page and not back, also not showing html
     #error_page 502 /errors/http502.html;
   }
 
   location /recipes/errors/ {
-    alias /etc/nginx/conf.d/errorpages/;
+    alias /etc/nginx/http.d/errorpages/;
     internal;
   }
 }

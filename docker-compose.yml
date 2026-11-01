@@ -297,7 +297,7 @@ services:
       - PGID=${GROUP_ID}
       - TZ=${TIMEZONE}
       - WEBUI_PORT=8080
-      - DOCKER_MODS=ghcr.io/gabe565/linuxserver-mod-vuetorrent
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod
     volumes:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
@@ -573,6 +573,7 @@ services:
     restart: always
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
+      - AUTOHEAL_INTERVAL=30
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 

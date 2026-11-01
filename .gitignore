@@ -26,3 +26,4 @@ docker-compose.override.yml
 /autobrr
 !/cleanuparr/blacklist.json
 !/cleanuparr/logs/.gitkeep
+/tandoor/nginx/Recipes.conf

@@ -16,6 +16,9 @@ services:
       - immich-redis
       - immich-database
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "immich-healthcheck"]
+      start_period: 5m
     labels:
       - traefik.enable=true
       - traefik.http.routers.immich.rule=(Host(`${IMMICH_HOSTNAME}`))
@@ -41,6 +44,9 @@ services:
     volumes:
       - immich-model-cache:/cache
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "python3 healthcheck.py"]
+      start_period: 5m
     profiles:
       - immich
 
