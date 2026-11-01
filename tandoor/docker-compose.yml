@@ -3,6 +3,11 @@ services:
     image: ghcr.io/tandoorrecipes/recipes:latest
     container_name: tandoor
     restart: always
+    mem_limit: 1g
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
     env_file:
       - ${CONFIG_ROOT:-.}/tandoor/.env
     volumes:
@@ -34,6 +39,10 @@ services:
     image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: tandoor-backup
     restart: always
+    mem_limit: 256m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${CONFIG_ROOT:-.}/tandoor/backup.env
     environment:

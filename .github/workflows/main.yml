@@ -1,13 +1,16 @@
-on: push
+name: Validate docker-compose
+
+on:
+  push:
+  pull_request:
+
 jobs:
   validate-docker-compose:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Docker Compose
-        uses: ndeloof/install-compose-action@v0.0.1
+        uses: actions/checkout@v4
       - name: Setup Environment Variables
         run: cp .env.example .env
       - name: Validate Docker Compose
-        run: docker-compose config
+        run: docker compose config --quiet

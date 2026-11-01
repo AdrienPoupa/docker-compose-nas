@@ -12,6 +12,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     restart: always
+    mem_limit: 1g
+    pids_limit: 300
+    stop_grace_period: 1m
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8123"]
       interval: 1m
@@ -38,6 +41,10 @@ services:
     container_name: mosquitto
     image: public.ecr.aws/docker/library/eclipse-mosquitto:latest
     restart: always
+    mem_limit: 64m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     user: ${USER_ID}:${GROUP_ID}
     environment:
       - PUID=${USER_ID}
@@ -77,6 +84,10 @@ services:
     image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: homeassistant-backup
     restart: always
+    mem_limit: 256m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${CONFIG_ROOT:-.}/homeassistant/backup.env
     environment:

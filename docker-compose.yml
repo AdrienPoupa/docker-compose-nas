@@ -3,6 +3,10 @@ services:
     image: ghcr.io/traefik/traefik:3.7
     container_name: traefik
     restart: always
+    mem_limit: 256m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     environment:
       - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
       - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
@@ -30,11 +34,12 @@ services:
       - ${CONFIG_ROOT:-.}/letsencrypt:/letsencrypt
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     extra_hosts:
-      - host.docker.internal:172.17.0.1
+      - host.docker.internal:host-gateway
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 1m
       retries: 10
+      start_period: 30s
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
@@ -46,6 +51,10 @@ services:
       - ${CONFIG_ROOT:-.}/sonarr:/config
       - ${DATA_ROOT}:/data
     restart: always
+    mem_limit: 512m
+    pids_limit: 300
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping"]
       interval: 1m
@@ -76,6 +85,10 @@ services:
       - ${CONFIG_ROOT:-.}/radarr:/config
       - ${DATA_ROOT}:/data
     restart: always
+    mem_limit: 384m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping"]
       interval: 1m
@@ -106,6 +119,10 @@ services:
       - ${CONFIG_ROOT:-.}/lidarr:/config
       - ${DATA_ROOT}:/data
     restart: always
+    mem_limit: 384m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping"]
       interval: 1m
@@ -138,6 +155,10 @@ services:
       - ${CONFIG_ROOT:-.}/bazarr/config:/config
       - ${DATA_ROOT}:/data
     restart: always
+    mem_limit: 512m
+    pids_limit: 400
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:6767/bazarr/ping"]
       interval: 1m
@@ -159,14 +180,17 @@ services:
       - homepage.widget.key=${BAZARR_API_KEY}
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
-    init: true
     container_name: seerr
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=info
       - TZ=${TIMEZONE}
     volumes:
       - ${CONFIG_ROOT:-.}/seerr:/app/config
     restart: always
+    mem_limit: 512m
+    pids_limit: 300
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
@@ -198,6 +222,10 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/prowlarr:/config
     restart: always
+    mem_limit: 512m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping"]
       interval: 1m
@@ -225,6 +253,10 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/suggestarr:/app/config/config_files
     restart: always
+    mem_limit: 256m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     labels:
     - traefik.enable=true
     - traefik.http.routers.suggestarr.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/suggestarr`))
@@ -247,6 +279,10 @@ services:
     image: 21hsmw/flaresolverr:nodriver
     container_name: flaresolverr
     restart: always
+    mem_limit: 512m
+    pids_limit: 300
+    security_opt:
+      - no-new-privileges:true
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
@@ -263,6 +299,10 @@ services:
     container_name: autobrr
     image: ghcr.io/autobrr/autobrr:latest
     restart: always
+    mem_limit: 384m
+    pids_limit: 300
+    security_opt:
+      - no-new-privileges:true
     environment:
       - TZ=${TIMEZONE}
       - AUTOBRR__BASE_URL=/autobrr/
@@ -302,6 +342,10 @@ services:
       - ${CONFIG_ROOT:-.}/qbittorrent:/config
       - ${DOWNLOAD_ROOT}:/data/torrents
     restart: always
+    mem_limit: 6g
+    pids_limit: 400
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       # Container may fail if the PIA's token expired, so mark as unhealthy when there is no internet connection
       # see: https://github.com/qdm12/gluetun/issues/641#issuecomment-933856220
@@ -368,6 +412,10 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.lo.disable_ipv6=1
     restart: always
+    mem_limit: 128m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
   cross-seed:
     image: ghcr.io/cross-seed/cross-seed:latest
     container_name: cross-seed
@@ -377,6 +425,10 @@ services:
       - ${DOWNLOAD_ROOT}:/data/torrents
     command: daemon
     restart: always
+    mem_limit: 256m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     profiles:
       - cross-seed
   unpackerr:
@@ -385,6 +437,10 @@ services:
     volumes:
       - ${DOWNLOAD_ROOT}:/data/torrents
     restart: always
+    mem_limit: 128m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     user: ${USER_ID}:${GROUP_ID}
     environment:
       - TZ=${TIMEZONE}
@@ -392,8 +448,6 @@ services:
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
       - UN_RADARR_0_URL=http://radarr:7878/radarr
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-    security_opt:
-      - no-new-privileges:true
     logging:
       driver: "json-file"
       options:
@@ -403,6 +457,10 @@ services:
     image: ghcr.io/cleanuparr/cleanuparr:latest
     container_name: cleanuparr
     restart: always
+    mem_limit: 256m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11011/cleanuparr/health"]
       interval: 1m
@@ -444,9 +502,13 @@ services:
       - ${CONFIG_ROOT:-.}/sabnzbd:/config
       - ${DATA_ROOT}:/data
     restart: always
+    mem_limit: 512m
+    pids_limit: 300
+    security_opt:
+      - no-new-privileges:true
     labels:
       - traefik.enable=true
-      - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`) || PathPrefix(`/sabnzbd`))
+      - traefik.http.routers.sabnzbd.rule=(Host(`${HOSTNAME}`) && PathPrefix(`/sabnzbd`))
       - traefik.http.routers.sabnzbd.tls=true
       - traefik.http.routers.sabnzbd.tls.certresolver=myresolver
       - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
@@ -476,6 +538,10 @@ services:
       - "7359:7359/udp"
       - "1900:1900/udp"
     restart: always
+    mem_limit: 1g
+    pids_limit: 400
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8096/jellyfin/health"]
       interval: 1m
@@ -508,7 +574,11 @@ services:
     volumes:
       - ${CONFIG_ROOT:-.}/calibre-web:/config
       - ${DATA_ROOT}/books:/books
-    restart: unless-stopped
+    restart: always
+    mem_limit: 384m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.calibre-headers.headers.customRequestHeaders.X-Scheme=https
@@ -549,6 +619,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${DATA_ROOT}:/data
     restart: always
+    mem_limit: 256m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     command:
       [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     labels:
@@ -561,19 +635,29 @@ services:
     image: ghcr.io/nicholas-fedor/watchtower:latest
     container_name: watchtower
     restart: always
+    mem_limit: 128m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     environment:
       - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_DEBUG=true
       - WATCHTOWER_INCLUDE_STOPPED=true
+      - 'WATCHTOWER_SCHEDULE=0 0 4 * * *'
+      - WATCHTOWER_ROLLING_RESTART=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   autoheal:
     image: willfarrell/autoheal:latest
     container_name: autoheal
     restart: always
+    mem_limit: 64m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     environment:
       - AUTOHEAL_CONTAINER_LABEL=all
       - AUTOHEAL_INTERVAL=30
+      - AUTOHEAL_START_PERIOD=300
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 

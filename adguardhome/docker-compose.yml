@@ -3,6 +3,10 @@ services:
     image: modem7/dhcprelay:latest
     container_name: dhcp-relay
     restart: always
+    mem_limit: 64m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       adguardhome:
         condition: service_healthy
@@ -18,6 +22,10 @@ services:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: always
+    mem_limit: 256m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test:
         [
@@ -67,6 +75,10 @@ services:
     image: ghcr.io/ldez/traefik-certs-dumper:latest
     container_name: traefik-certs-dumper
     restart: always
+    mem_limit: 64m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     entrypoint: sh -c '
       apk add jq
       ; while ! [ -e /data/acme.json ]

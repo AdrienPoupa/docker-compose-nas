@@ -1,4 +1,5 @@
 /database
 /storage
+/backup
 .env
 backup.env

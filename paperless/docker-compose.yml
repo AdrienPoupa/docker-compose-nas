@@ -3,8 +3,14 @@ services:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     container_name: paperless_webserver
     restart: always
+    mem_limit: 512m
+    pids_limit: 300
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 1m
     depends_on:
-      - paperless-broker
+      paperless-broker:
+        condition: service_healthy
     volumes:
       - paperless-data:/usr/src/paperless/data
       - paperless-media:/usr/src/paperless/media
@@ -46,8 +52,18 @@ services:
     image: docker.io/library/redis:8
     container_name: paperless_broker
     restart: always
+    mem_limit: 128m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
     volumes:
       - paperless-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
     profiles:
       - paperless
 
@@ -69,6 +85,10 @@ services:
     depends_on:
       - paperless-webserver
     restart: always
+    mem_limit: 256m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     profiles:
       - paperless-backup
 

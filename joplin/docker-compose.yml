@@ -4,6 +4,11 @@ services:
     user: root # Not pretty, but non-root breaks volumes: https://github.com/laurent22/joplin/issues/9489
     container_name: joplin
     restart: always
+    mem_limit: 512m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 1m
     env_file:
       - ${CONFIG_ROOT:-.}/joplin/.env
     environment:
@@ -44,6 +49,10 @@ services:
     image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: joplin-backup
     restart: always
+    mem_limit: 256m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${CONFIG_ROOT:-.}/joplin/backup.env
     environment:

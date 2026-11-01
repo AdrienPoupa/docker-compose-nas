@@ -4,6 +4,10 @@ services:
     container_name: privoxy
     network_mode: "service:vpn"
     restart: always
+    mem_limit: 128m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     labels:
       - com.centurylinklabs.watchtower.depends-on=vpn
     healthcheck:

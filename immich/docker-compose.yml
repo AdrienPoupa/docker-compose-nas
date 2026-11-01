@@ -13,9 +13,16 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${CONFIG_ROOT:-.}/immich/healthcheck:/healthcheck
     depends_on:
-      - immich-redis
-      - immich-database
+      immich-redis:
+        condition: service_healthy
+      immich-database:
+        condition: service_healthy
     restart: always
+    mem_limit: 1g
+    pids_limit: 500
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 1m
     healthcheck:
       test: ["CMD-SHELL", "immich-healthcheck"]
       start_period: 5m
@@ -44,6 +51,10 @@ services:
     volumes:
       - immich-model-cache:/cache
     restart: always
+    mem_limit: 2g
+    pids_limit: 500
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD-SHELL", "python3 healthcheck.py"]
       start_period: 5m
@@ -54,6 +65,10 @@ services:
     container_name: immich_redis
     image: public.ecr.aws/docker/library/redis:6.2
     restart: always
+    mem_limit: 128m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: redis-cli ping || exit 1
     profiles:
@@ -71,6 +86,17 @@ services:
       - ${CONFIG_ROOT:-.}/immich/postgresql:/var/lib/postgresql/data
     shm_size: 128mb
     restart: always
+    mem_limit: 512m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 2m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d immich"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 2m
     profiles:
       - immich
 
@@ -93,6 +119,10 @@ services:
       - immich-server
       - immich-database
     restart: always
+    mem_limit: 256m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     profiles:
       - immich-backup
 

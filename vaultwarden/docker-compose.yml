@@ -3,6 +3,11 @@ services:
     image: ghcr.io/dani-garcia/vaultwarden:latest
     container_name: vaultwarden
     restart: always
+    mem_limit: 128m
+    pids_limit: 200
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
     volumes:
       - ${CONFIG_ROOT:-.}/vaultwarden/vw-data:/data
     env_file:
@@ -37,6 +42,10 @@ services:
     image: ghcr.io/adrienpoupa/rclone-backup:latest
     container_name: vaultwarden-backup
     restart: always
+    mem_limit: 256m
+    pids_limit: 100
+    security_opt:
+      - no-new-privileges:true
     env_file:
       - ${CONFIG_ROOT:-.}/vaultwarden/backup.env
     environment:

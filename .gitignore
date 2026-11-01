@@ -24,6 +24,7 @@ docker-compose.override.yml
 /cleanuparr
 /cross-seed
 /autobrr
+/suggestarr
 !/cleanuparr/blacklist.json
 !/cleanuparr/logs/.gitkeep
 /tandoor/nginx/Recipes.conf
